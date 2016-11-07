@@ -70,12 +70,6 @@ export const POST_COMPACT_THUMBNAIL_WIDTH = 70;
 
 export const POST_DEFAULT_WIDTH = 320;
 
-/* eslint-disable max-len */
-export const BANNER_URLS_TUNE = {
-  IMPRESSION: 'https://249639.measurementapi.com/serve?action=impression&publisher_id=249639&site_id=122129&site_id_ios=121809',
-  CLICK: 'https://249639.measurementapi.com/serve?action=click&publisher_id=249639&site_id=122129&site_id_ios=121809',
-};
-
 export const BANNER_URLS_DIRECT = {
   IOS: 'https://itunes.apple.com/us/app/reddit-the-official-app/id1064216828',
   ANDROID: 'https://play.google.com/store/apps/details?id=com.reddit.frontpage',

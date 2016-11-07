@@ -12,11 +12,10 @@ createTest({ reducers: { smartBanner } }, ({ getStore, expect }) => {
         const { store } = getStore({ smartBanner: DEFAULT });
         const expected = {
           showBanner: true,
-          impressionUrl: 'foo',
-          clickUrl: 'bar',
+          clickUrl: 'foo',
         };
 
-        store.dispatch(smartBannerActions.show('foo', 'bar'));
+        store.dispatch(smartBannerActions.show('foo'));
         const { smartBanner } = store.getState();
         expect(smartBanner).to.eql(expected);
       });

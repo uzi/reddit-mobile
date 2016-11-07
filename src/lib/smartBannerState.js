@@ -3,7 +3,6 @@ import * as constants from 'app/constants';
 
 const BASE_VAL = {
   showBanner: false,
-  impressionUrl: '',
   clickUrl: '',
 };
 
@@ -30,7 +29,7 @@ const PAGE_PERCENTAGES = {
   'comments': 5,
 };
 
-const USE_TUNE = 100;
+const USE_BRANCH = 100;
 
 const checkDeviceType = (allowedAgents, userAgentString) => {
   return allowedAgents.some(a => userAgentString.indexOf(a) > -1);
@@ -70,14 +69,12 @@ export function shouldShowBanner({ actionName, user, userAgent }={}) {
 
   // Ok, now we know we're actually going to show the banner. Next, we need to
   // determine what urls we're going to use
-  // A) Use Tune links
-  if (bucket < USE_TUNE) {
-    // just use the universal Tune links
+  // A) Use Branch link
+  if (bucket < USE_BRANCH) {
+    // just use the universal Branch link
     return {
       ...BASE_VAL,
       showBanner: true,
-      clickUrl: constants.BANNER_URLS_TUNE.CLICK,
-      impressionUrl: constants.BANNER_URLS_TUNE.IMPRESSION,
     };
   }
 
