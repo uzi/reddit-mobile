@@ -17,6 +17,8 @@ import { getExperimentData } from 'lib/experiments';
 import { getDevice, IPHONE, ANDROID } from 'lib/getDeviceFromState';
 import { isInterstitialDimissed } from 'lib/xpromoState';
 import { trackXPromoIneligibleEvent } from 'lib/eventUtils';
+import { isCommentsPage } from 'platform/pageUtils';
+import { POST_TYPE } from 'apiClient/models/thingTypes';
 
 const { DAYMODE } = COLOR_SCHEME;
 const { USUAL, MINIMAL, PERSIST } = XPROMO_DISPLAY_THEMES;
@@ -186,6 +188,17 @@ export function isEligibleListingPage(state) {
     || (actionName === 'listing' && !isNSFWPage(state));
 }
 
+function isVideoCommentsPage(state) {
+  const currentPage = state.platform.currentPage;
+  const currentPostId = POST_TYPE + '_' + currentPage.urlParams.postId;
+  const currentPost = state.posts[currentPostId];
+
+  if (isCommentsPage(currentPage) && currentPost && currentPost.media && currentPost.media.reddit_video) {
+    return true;
+  }
+  return false;
+}
+
 export function isEligibleCommentsPage(state) {
   const actionName = getRouteActionName(state);
   return actionName === 'comments' && isDayMode(state) && !isNSFWPage(state);
@@ -211,7 +224,8 @@ export function loginRequiredEnabled(state) {
 }
 
 export function commentsInterstitialEnabled(state) {
-  return shouldShowXPromo(state) && anyFlagEnabled(state, COMMENTS_PAGE_BANNER_FLAGS);
+  //Don't show the comments interstitial for native reddit video posts to prevent dialog for sharing on third party apps
+  return shouldShowXPromo(state) && anyFlagEnabled(state, COMMENTS_PAGE_BANNER_FLAGS) && !isVideoCommentsPage(state);
 }
 
 /**
