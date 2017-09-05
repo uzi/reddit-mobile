@@ -69,7 +69,7 @@ export default class SearchPage extends BaseHandler {
 
     const searchParams = SearchPage.pageParamsToSearchRequestParams(this);
     const { q: query } = searchParams;
-    if (query && query.length > SEARCH_MIN_LENGTH) {
+    if (query && query.length >= SEARCH_MIN_LENGTH) {
       dispatch(searchActions.search(searchParams));
     }
 
