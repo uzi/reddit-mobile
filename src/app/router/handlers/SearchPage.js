@@ -8,7 +8,7 @@ import { fetchUserBasedData } from './handlerCommon';
 import { SORTS } from 'app/sortValues';
 
 const DEFAULT_SEARCH_TYPE = ['sr', 'link'];
-const SEARCH_MIN_LENGTH = 3;
+const SEARCH_MIN_LENGTH = 1;
 const SEARCH_MAX_LENGTH = 512;
 
 const searchPath = (subredditOrNil) => {
