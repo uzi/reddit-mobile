@@ -29,7 +29,43 @@ export const defineSlot = (element, {
 }) => {
   const googletag = (window.googletag = window.googletag || {});
   googletag.cmd = googletag.cmd || [];
+
   return new Promise(resolve => {
+    const makeAdRequest = () => {
+      googletag.cmd.push(function() {
+        // slot was destroyed already
+        if (!adSlots[slot]) {
+          return;
+        }
+
+        googletag.display(id);
+        googletag.pubads().refresh([adSlots[slot]]);
+      });
+
+      resolve();
+    };
+
+    if (a9) {
+      window.apstag.fetchBids({
+        slots: [{
+          slotID: id,
+          sizes,
+        }],
+        timeout: 2e3,
+      }, () => {
+        googletag.cmd.push(function() {
+          // slot was destroyed already
+          if (!adSlots[slot]) {
+            return;
+          }
+
+          window.apstag.setDisplayBids();
+        });
+
+        makeAdRequest();
+      });
+    }
+
     googletag.cmd.push(function() {
       // make sure we don't try to create the same ad slot twice.
       destroySlot(slot);
@@ -51,43 +87,7 @@ export const defineSlot = (element, {
         adSlot.setTargeting(key, properties[key]);
       });
 
-      const makeAdRequest = () => {
-        googletag.cmd.push(function() {
-          // slot was destroyed already
-          if (!adSlots[slot]) {
-            return;
-          }
-
-          googletag.display(id);
-          googletag.pubads().refresh([adSlots[slot]]);
-        });
-        resolve();
-      };
-
-      if (a9) {
-        window.apstag.fetchBids({
-          slots: [{
-            slotID: id,
-            sizes,
-          }],
-          timeout: 2e3,
-        }, (bids) => {
-          googletag.cmd.push(function() {
-            // slot was destroyed already
-            if (!adSlots[slot]) {
-              return;
-            }
-
-            // we only request a single bid.
-            const bid = bids[0];
-            window.apstag.targetingKeys().forEach((key) => {
-              adSlots[slot].setTargeting(key, bid[key]);
-            });
-          });
-
-          makeAdRequest();
-        });
-      } else {
+      if (!a9) {
         makeAdRequest();
       }
     });
