@@ -21,8 +21,8 @@ export const ampLink = (currentPage, state) => {
     return null;
   }
 
-  if (!post.isSelf) {
-    // We only support AMP'd self posts.
+  if (post.media && post.media.reddit_video) {
+    // We don't support reddit video posts
     return null;
   }
 
