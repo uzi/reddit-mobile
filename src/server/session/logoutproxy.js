@@ -17,6 +17,7 @@ export default (router) => {
     ctx.cookies.set('over18');
     ctx.cookies.set('compact');
     ctx.cookies.set('theme');
+    ctx.cookies.set('redesign_beta_redirect');
     ctx.redirect('/');
   });
 };
