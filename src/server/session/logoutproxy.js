@@ -18,7 +18,7 @@ export default (router) => {
     ctx.cookies.set('compact');
     ctx.cookies.set('theme');
     // cookie to assist with redesign beta redirection
-    ctx.cookies.set('mrga');
+    ctx.cookies.set('wpsn');
     ctx.redirect('/');
   });
 };
