@@ -1,4 +1,2 @@
 project_name: reddit-mobile
-manifests:
-  - deployment.yml
-  - service.yml
+manifestFormat: helm

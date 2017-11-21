@@ -1,27 +1,59 @@
-build:
-  image: node:8.9.3
-  pull: true
-  commands:
-    - npm install
-    - npm run lint
-    - npm run test
-    - npm run build
+pipeline:
+  build:
+    image: node:8.9.3
+    commands:
+      - npm install
+      - npm run lint
+      - npm run test
+      - npm run build
+    when:
+      event: [ push, pull_request ]
 
-publish:
-  docker:
-    username: $$QUAY_USERNAME
-    password: $$QUAY_PASSWORD
-    email: sysops@reddit.com
-    registry: quay.io
-    repo: reddit/reddit-mobile
-    tag: $$BRANCH
-    file: Dockerfile.staging
+  publish-service-docker-image:
+    image: 258875347723.dkr.ecr.us-east-1.amazonaws.com/drone-plugin-docker-ecr
+    repo: 258875347723.dkr.ecr.us-east-1.amazonaws.com/reddit-mobile
+    registry: 258875347723.dkr.ecr.us-east-1.amazonaws.com
+    dockerfile: Dockerfile.staging
+    region: us-east-1
+    tag: ${DRONE_BRANCH}
+    when:
+      event: [ push ]
 
-notify:
-  slack:
-    webhook_url: $$CI_SLACK_WEBHOOK_URL
-    channel: ci-notifications
-  slack:
-    webhook_url: $$CI_SLACK_WEBHOOK_URL
-    repo: reddit/reddit-mobile
-    channel: mobile-web
+  notify:
+    image: plugins/slack
+    channel: mweb-salon
+    secrets: [ SLACK_WEBHOOK ]
+    when:
+      status: [ success, failure ]
+      event: [ pull_request ]
+      branch: 2X
+
+  create-github-deployment-for-push:
+    image: 258875347723.dkr.ecr.us-east-1.amazonaws.com/drone-plugin-github-deployment
+    repo: ${DRONE_REPO}
+    ref: ${DRONE_BRANCH}
+    deploy_env: staging
+    auto_merge: false
+    secrets:
+      - GITHUB_INTEGRATION_PRIVATE_KEY_PEM
+      - GITHUB_APP_INTEGRATION_ID
+      - GITHUB_INSTALLATION_ID
+    when:
+      event: [ push ]
+
+  add-github-comment:
+    image: 258875347723.dkr.ecr.us-east-1.amazonaws.com/drone-plugin-github-comment
+    repo: ${DRONE_REPO}
+    canonical_repo: reddit/reddit-mobile
+    issue_number: ${DRONE_PULL_REQUEST}
+    comment: |
+      ### ⏰ Branch is pending auto-deployment! ⏰
+      - [Your branch](https://${DRONE_COMMIT_REFSPEC%%:2X}.mobile.dev.snooguts.net) will soon be available here 👉 https://${DRONE_COMMIT_REFSPEC%%:2X}.mobile.dev.snooguts.net
+      - You can see all deployed branches [here](https://branches.mobile.dev.snooguts.net)
+      - Your branch will be available once the CI build finishes
+    secrets:
+      - GITHUB_INTEGRATION_PRIVATE_KEY_PEM
+      - GITHUB_APP_INTEGRATION_ID
+      - GITHUB_INSTALLATION_ID
+    when:
+      event: [ pull_request ]

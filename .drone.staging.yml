@@ -1,0 +1,36 @@
+# This file is used by the Drone CI Server and Agents to determine what
+# should happen (if anything) in response to a deployment request which
+# is triggered via a github deployment object
+
+pipeline:
+  deploy-staging:
+    image: 258875347723.dkr.ecr.us-east-1.amazonaws.com/drone-plugin-helm
+    chart: helm/reddit-mobile
+    # This must match kage's namespace!
+    namespace: staging-reddit-mobile
+    client_only: true
+    skip_tls_verify: true
+    tiller_ns: kube-system
+    wait: true
+    recreate_pods: true
+    timeout: 60
+    release: reddit-mobile-${DRONE_BRANCH}
+    values: branch_name=${DRONE_BRANCH},commit_sha=${DRONE_COMMIT},deployer_name=$$CI_PREV_COMMIT_AUTHOR_NAME
+    secrets: [ API_SERVER, SERVICE_ACCOUNT ]
+    when:
+      event: [ deployment ]
+      environment: staging
+
+  notify-deployment:
+    image: plugins/slack
+    channel: mweb-salon
+    secrets: [ SLACK_WEBHOOK ]
+    template: >
+      {{#success build.status}}
+        🚀 *Deployed* <{{build.link}}|{{repo.name}}@{{truncate build.commit 8}}> ({{build.branch}}) to *<https://{{build.branch}}.mobile.dev.snooguts.net|staging>*
+      {{else}}
+        🚨 *Failed* to deploy <{{build.link}}|{{repo.name}}@{{truncate build.commit 8}}> ({{build.branch}}) to staging
+      {{/success}}
+    when:
+      status: [ failure, success ]
+      event: [ deployment ]

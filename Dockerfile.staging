@@ -1,5 +1,4 @@
 # reddit-mobile Dockerfile for deploying on staging
-
 FROM node:8.9.3
 
 ADD . /src/
