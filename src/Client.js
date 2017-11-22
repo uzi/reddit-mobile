@@ -18,7 +18,6 @@ import { setupGoogleTag } from 'lib/dfp';
 import routes from 'app/router';
 import reducers from 'app/reducers';
 import reduxMiddleware from 'app/reduxMiddleware';
-import ravenMiddleware from 'app/reduxMiddleware/raven';
 import { sendTimings, onHandlerCompleteTimings } from 'lib/timing';
 import Session from 'app/models/Session';
 import Preferences from 'apiClient/models/Preferences';
@@ -110,7 +109,7 @@ window.onunhandledrejection = rejection => {
 const client = Client({
   routes,
   reducers,
-  reduxMiddleware: [ravenMiddleware(Raven)].concat(reduxMiddleware),
+  reduxMiddleware,
   modifyData: data => {
     // TODO if we start not using shell rendering in a serious way,
     // we'll need to unserialize all of the api models. This should

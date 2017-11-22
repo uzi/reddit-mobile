@@ -15,7 +15,6 @@ import routes from 'app/router';
 import main from 'server/templates/main';
 import reducers from 'app/reducers';
 import reduxMiddleware from 'app/reduxMiddleware';
-import ravenMiddleware from 'app/reduxMiddleware/raven';
 import loginproxy from 'server/session/loginproxy';
 import logoutproxy from 'server/session/logoutproxy';
 import registerproxy from 'server/session/registerproxy';
@@ -96,7 +95,7 @@ export function startServer() {
     routes,
     template: main,
     reducers,
-    reduxMiddleware: [ravenMiddleware(Raven)].concat(reduxMiddleware),
+    reduxMiddleware,
     dispatchBeforeNavigation: async (ctx, dispatch, getState) => {
       dispatchInitialShell(ctx, dispatch);
       dispatchAPIPassThroughHeaders(ctx, dispatch);
