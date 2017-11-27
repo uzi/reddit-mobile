@@ -100,9 +100,6 @@ window.onunhandledrejection = rejection => {
     ...getUserAgentAndURL(),
     rejection,
   }, ERROR_ENDPOINTS, ERROR_LOG_OPTIONS);
-
-  // raven does not automatically listen to this, unlike window.onerror
-  Raven.captureException(rejection.reason);
 };
 
 // start the app now
