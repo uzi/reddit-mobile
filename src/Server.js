@@ -4,7 +4,6 @@ import KoaStatic from 'koa-static';
 import cluster from 'cluster';
 import { cpus } from 'os';
 import urlParser from 'url';
-import Raven from 'raven';
 
 import Server from 'platform/Server';
 import { dispatchInitialShell } from 'platform/plugins';
@@ -35,14 +34,6 @@ import {
 import { dispatchInitialUser } from 'server/initialState/dispatchInitialUser';
 import metaRoutes from 'server/meta';
 import statsRouterMiddleware from 'server/meta/stats';
-
-Raven
-  .config(process.env.SENTRY_SERVER_PRIVATE_URL, {
-    release: __GLOBALS__.release,
-    captureUnhandledRejections: true,
-    environment: process.env.NODE_ENV,
-  })
-  .install();
 
 const buildFiles = KoaStatic('build');
 const processes = process.env.PROCESSES || cpus().length;

@@ -2,7 +2,6 @@ import 'babel-polyfill';
 import './lib/dnt';
 
 import React from 'react';
-import Raven from 'raven-js';
 import isEmpty from 'lodash/isEmpty';
 
 import localStorageAvailable from 'lib/localStorageAvailable';
@@ -22,16 +21,6 @@ import { sendTimings, onHandlerCompleteTimings } from 'lib/timing';
 import Session from 'app/models/Session';
 import Preferences from 'apiClient/models/Preferences';
 import * as xpromoActionsClientOnly from 'app/actions/xpromoClientOnly';
-
-Raven
-  .config(process.env.SENTRY_CLIENT_PUBLIC_URL, {
-    release: __GLOBALS__.release,
-    environment: process.env.NODE_ENV,
-    ignoreErrors: [
-      'a.o.postMessage',
-    ],
-  })
-  .install();
 
 // Bits to help in the gathering of client side timings to relay back
 // to the server
