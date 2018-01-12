@@ -1,6 +1,5 @@
 import { setStatus, redirect } from 'platform/actions';
 import { BaseHandler, METHODS } from 'platform/router';
-import * as adActions from 'app/actions/ads';
 import * as postsListActions from 'app/actions/postsList';
 import * as subredditActions from 'app/actions/subreddits';
 import { paramsToPostsListsId } from 'app/models/PostsList';
@@ -76,11 +75,6 @@ export default class PostsFromSubreddit extends BaseHandler {
     }
 
     await userAndListingFetches;
-
-    dispatch(adActions.fetchNewAdForPostsList(postsListId, {
-      urlParams: this.urlParams,
-      queryParams: this.queryParams,
-    }));
 
     const apiRequest = getState().postsLists[postsListId];
     const statusCode = apiRequest && apiRequest.responseCode
