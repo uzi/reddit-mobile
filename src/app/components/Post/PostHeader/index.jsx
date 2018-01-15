@@ -193,21 +193,19 @@ function renderPostFlair(post, single) {
     distinguished,
     stickied,
     gilded,
-    locked,
     promoted,
     spoiler,
   } = post;
 
   const showingGilded = gilded && single;
 
-  if (!(stickied || showingGilded || distinguished === 'admin' || locked || isNSFW || promoted || spoiler)) {
+  if (!(stickied || showingGilded || distinguished === 'admin' || isNSFW || promoted || spoiler)) {
     return null;
   }
 
   return (
     <span>
       { stickied ? STICKY_FLAIR : null }
-      { locked ? LOCKED_FLAIR : null }
       { showingGilded ? GILDED_FLAIR : null }
       { showingGilded && gilded !== 1 ? gilded : null }
       { distinguished === 'admin' ? ADMIN_FLAIR : null }
