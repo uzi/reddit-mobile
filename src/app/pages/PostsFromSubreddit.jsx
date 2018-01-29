@@ -2,7 +2,6 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
 
-import CommunityHeader from 'app/components/CommunityHeader';
 import LoadingXpromo from 'app/components/LoadingXpromo';
 import SuspensionBanner from 'app/components/SuspensionBanner';
 import PostsList from 'app/components/PostsList';
