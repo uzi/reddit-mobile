@@ -1,4 +1,4 @@
-FROM node:8.9.3
+FROM quay.io/reddit/reddit-nodejs:latest
 
 VOLUME ["/src"]
 WORKDIR /src

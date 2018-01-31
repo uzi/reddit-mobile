@@ -2,9 +2,6 @@
   "name": "r-project-blackbird",
   "version": "0.0.1",
   "description": "the newer, better, faster, stronger reddit-mobile",
-  "engines": {
-    "node": "8.9.3"
-  },
   "author": "reddit <schwers@reddit.com>",
   "license": "MIT",
   "scripts": {
