@@ -50,7 +50,7 @@ const appleAppSiteAssociation = JSON.stringify({
     details: [
       {
         appID: '2TDUX39LX8.com.reddit.Reddit',
-        paths: [ '/r/*', '/u/*', '/user/*', '/comments/*' ],
+        paths: [ '/', '/r/*', '/u/*', '/user/*', '/comments/*' ],
       },
     ],
   },
