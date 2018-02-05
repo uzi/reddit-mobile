@@ -17,9 +17,15 @@ export class CommentReplyForm extends React.Component {
   constructor (props) {
     super(props);
 
+    this.textarea = null;
+
     this.state = {
       disableButton: true,
     };
+  }
+
+  componentDidMount() {
+    if (this.textarea) { this.textarea.focus(); }
   }
 
   onTextChange = (e) => {
@@ -34,7 +40,7 @@ export class CommentReplyForm extends React.Component {
     return (
       <JSForm onSubmit={ onSubmitReply } className='CommentReplyForm'>
         <div className='CommentReplyForm__textarea'>
-          <textarea className='TextField' name='text' onChange={ this.onTextChange } />
+          <textarea ref={ (node) => { this.textarea = node; } } className='TextField' name='text' onChange={ this.onTextChange } />
         </div>
 
         <div className='CommentReplyForm__footer'>
