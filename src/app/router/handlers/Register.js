@@ -6,13 +6,7 @@ import * as sessionActions from 'app/actions/session';
 import * as loginActions from 'app/actions/login';
 import { getEventTracker } from 'lib/eventTracker';
 import { getBasePayload, trackPageEvents } from 'lib/eventUtils';
-import goBackDest from 'lib/goBackDest';
 
-function isCommentsUrl(url) {
-  if (!url) { return false; }
-  const segs = url.split('/');
-  return segs[1] === 'r' && segs[3] === 'comments';
-}
 
 export default class Register extends BaseHandler {
   async [METHODS.GET](dispatch, getState) {
@@ -31,11 +25,7 @@ export default class Register extends BaseHandler {
       dispatch(loginActions.loggedIn());
 
       // This is awaited to guarantee the user is loaded for event logging
-
-      const previousLocation = goBackDest(getState().platform, ['register', 'login']);
-      const nextLocation = isCommentsUrl(previousLocation) ? previousLocation : '/';
-
-      await dispatch(platformActions.navigateToUrl(METHODS.GET, nextLocation));
+      await dispatch(platformActions.navigateToUrl(METHODS.GET, '/'));
 
     } catch (e) {
       successful = false;

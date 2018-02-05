@@ -11,8 +11,6 @@ import * as rulesModalActions from 'app/actions/rulesModal';
 import { flags } from 'app/constants';
 import features from 'app/featureFlags';
 import modelFromThingId from 'app/reducers/helpers/modelFromThingId';
-import { navigateToUrl } from 'platform/actions';
-import { METHODS } from 'platform/router';
 
 
 export const TOGGLE = 'REPLY__TOGGLE';
@@ -20,16 +18,10 @@ export const SUCCESS = 'REPLY__SUCCESS';
 export const FAILURE = 'REPLY__FAILURE';
 
 export const toggle = parentId => async (dispatch, getState) => {
-  const state = getState();
-
   dispatch({ type: TOGGLE, parentId });
-
-  // If a logged out user tries to comment or reply to a comment redirect to sign up
-  if (!state.session.isValid) {
-    return dispatch(navigateToUrl(METHODS.GET, '/register'));
-  }
-
+  
   // Experiment to show subreddit rules at comment time.
+  const state = getState();
   const { subredditName } = state.platform.currentPage.urlParams;
   const featureName = 'rules_modal_on_comment';
   const key = rulesModalActions.getLocalStorageKey(featureName, subredditName);
@@ -41,7 +33,7 @@ export const toggle = parentId => async (dispatch, getState) => {
   if (!subredditName) { return; }
   // Disable if modal has been marked as "seen" in localStorage
   if (state.rulesModal[key]) { return; }
-
+  
   const feature = features.withContext({ state });
   const clickAnywhereEnabled = feature.enabled(flags.RULES_MODAL_ON_COMMENT_CLICK_ANYWHERE);
   const clickButtonEnabled = feature.enabled(flags.RULES_MODAL_ON_COMMENT_CLICK_BUTTON);
