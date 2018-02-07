@@ -29,6 +29,8 @@ import { removePrefix } from 'lib/eventUtils';
 import {
   listingClickEnabled,
 } from 'app/selectors/xpromo';
+import { setListingClickTarget } from '../../actions/xpromo';
+import { getExperimentVariant } from '../../../lib/experiments';
 
 const {
   VARIANT_TITLE_EXPANDO,
@@ -168,7 +170,15 @@ export function Post(props, context) {
         return false; // this should never happen :tm:
       }
 
-      return listingClickEnabled(store.getState(), postId);
+      const state = store.getState();
+      const isEnabled = listingClickEnabled(state, postId);
+
+      // if the xpromo interstitial modal is eligible add the click target into the store
+      if (isEnabled && getExperimentVariant(state, 'mweb_xpromo_modal_listing_click_daily_dismissible_link') !== 'treatment') {
+        store.dispatch(setListingClickTarget(e.target));
+      }
+
+      return isEnabled;
     };
 
     return unboundInterceptListingClick(checkEligibility, e, listingClickType);

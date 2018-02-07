@@ -16,6 +16,11 @@ export function getExperimentData(state, experimentName) {
   };
 }
 
+export function getExperimentVariant(state, experimentName) {
+  const data = getExperimentData(state, experimentName);
+  return data && data.variant;
+}
+
 export function featureEnabled(state, featureName) {
   // some feature flags are just true/false and don't have experiment
   // variants and their associated bucketing events. They're useful

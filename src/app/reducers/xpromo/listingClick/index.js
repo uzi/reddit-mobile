@@ -17,6 +17,10 @@ export const DEFAULT = {
 
   lastModalClick: 0, // Last Time in epoch-milliseconds that we triggered a modal listing click
 
+  target: null, // null or the dom element that was clicked.
+  // this is held in order to continue with the action the we initially intercepted
+  // if the user dismissed the modal.
+
   clickInfo: null, // null or an object with additional data about the
   // listing click that opened the app store modal. this info is used
   // for tracking and generating a branch link with relevant deep link info.
@@ -47,7 +51,14 @@ export default function(state=DEFAULT, action={}) {
       return merge(state, {
         ineligibilityReason,
         lastModalClick,
+        target: null,
       });
+    }
+
+    case xpromoActions.SET_LISTING_CLICK_TARGET: {
+      const { target } = action.payload;
+
+      return merge(state, { target });
     }
 
     case xpromoActions.LISTING_CLICK_MODAL_ACTIVATED: {
@@ -75,6 +86,7 @@ export default function(state=DEFAULT, action={}) {
       return merge(state, {
         active: false,
         clickInfo: null,
+        target: null,
         showingAppStoreModal: false,
         showingReturnerModal: false,
       });

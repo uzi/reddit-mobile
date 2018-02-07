@@ -13,6 +13,8 @@ import {
   XPROMO_DISMISS,
   XPROMO_VIEW,
 } from 'lib/eventUtils';
+import { getExperimentData } from '../../lib/experiments';
+import { trackBucketingEvents } from '../../lib/eventUtils';
 
 export const SHOW = 'XPROMO__SHOW';
 export const show = () => ({ type: SHOW });
@@ -65,6 +67,12 @@ export const markModalListingClickTimestamp = () => async (dispatch) => {
   });
   markListingClickTimestampLocalStorage(dateTime);
 };
+
+export const SET_LISTING_CLICK_TARGET = 'XPROMO__SET_LISTING_CLICK_TARGET';
+export const setListingClickTarget = target => ({
+  type: SET_LISTING_CLICK_TARGET,
+  payload: { target },
+});
 
 export const LISTING_CLICK_MODAL_ACTIVATED = 'XPROMO__LISTING_CLICK_MODAL_ACTIVATED';
 export const xpromoListingClickModalActivated = ({ postId='', listingClickType='' }) => ({
@@ -128,9 +136,14 @@ export const checkAndSet = () => async (dispatch, getState) => {
 };
 
 export const performListingClick = (postId, listingClickType) => async (dispatch, getState) => {
-  if (getState().xpromo.listingClick.active) {
+  const state = getState();
+
+  if (state.xpromo.listingClick.active) {
     return;
   }
+
+  const data = getExperimentData(state, 'mweb_xpromo_modal_listing_click_daily_dismissible_link');
+  if (data) { trackBucketingEvents(state, data, dispatch); }
 
   dispatch(xpromoListingClickModalActivated({ postId, listingClickType }));
   dispatch(trackXPromoEvent(XPROMO_VIEW));
@@ -159,17 +172,23 @@ export const listingClickModalAppStoreClicked = () => async (dispatch, getState)
 export const listingClickModalDismissClicked = () => async (dispatch, getState) => {
   // guard against duplicate clicks
   const state = getState();
+
   if (!state.xpromo.listingClick.active) {
     return;
   }
 
-  const { showingReturnerModal } = state.xpromo.listingClick;
+  const { showingReturnerModal, target } = state.xpromo.listingClick;
 
   dispatch(trackXPromoEvent(XPROMO_DISMISS, {
     dismiss_type: `${XPROMO_MODAL_LISTING_CLICK_NAME}${showingReturnerModal ? '_returner' : ''}`,
   }));
 
   dispatch(listingClickModalHidden());
+
+  // follow through with the original click if the original click target is non-null
+  // the listingClickModalHidden action will clear the target when handled by the reducer
+
+  if (target) { target.click(); }
 };
 
 export const logAppStoreNavigation = (visitType, extraData={}) => async (dispatch) => {
