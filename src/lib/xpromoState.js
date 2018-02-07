@@ -28,6 +28,8 @@ import {
   XPROMO_DISPLAY_THEMES,
 } from 'app/constants';
 
+import extractTaglist from 'lib/extractTagList';
+
 const {
   USUAL,
   LOGIN,
@@ -166,6 +168,8 @@ export function isInterstitialDimissed(state) {
 export function getBranchLink(state, path, payload={}) {
   const { user, accounts } = state;
 
+  const tags = extractTaglist(state);
+
   const { loid, loidCreated } = getLoidValues(accounts);
 
   let userName;
@@ -198,13 +202,15 @@ export function getBranchLink(state, path, payload={}) {
     ...buildSubredditData(state),
   };
 
+  const moreTags = payload.tags || [];
 
   return url.format({
     protocol: 'https',
     host: 'reddit.app.link',
     pathname: '/',
-    query: {...basePayload, ...payload},
+    query: {...basePayload, ...payload, tags: [...tags, ...moreTags]},
   });
+
 }
 
 /**
