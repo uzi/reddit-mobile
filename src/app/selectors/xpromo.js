@@ -3,6 +3,8 @@ import isEmpty from 'lodash/isEmpty';
 
 import {
   EVERY_DAY,
+  EVERY_TWO_WEEKS,
+  EVERY_TWELVE_WEEKS,
   flags as flagConstants,
   COLOR_SCHEME,
   XPROMO_AD_FEED_TYPES,
@@ -13,13 +15,12 @@ import {
 
 import features, { isNSFWPage } from 'app/featureFlags';
 import getRouteMetaFromState from 'lib/getRouteMetaFromState';
-import { getExperimentData } from 'lib/experiments';
+import { getExperimentData, getExperimentVariant } from 'lib/experiments';
 import { getDevice, IPHONE, ANDROID } from 'lib/getDeviceFromState';
 import { isInterstitialDimissed } from 'lib/xpromoState';
 import { trackXPromoIneligibleEvent } from 'lib/eventUtils';
 import { isCommentsPage } from 'platform/pageUtils';
 import { POST_TYPE } from 'apiClient/models/thingTypes';
-import { getExperimentVariant } from '../../lib/experiments';
 
 const { DAYMODE } = COLOR_SCHEME;
 const { USUAL, MINIMAL, PERSIST } = XPROMO_DISPLAY_THEMES;
@@ -40,6 +41,7 @@ const {
   // XPromo Modal Listing Click
   XPROMO_MODAL_LISTING_CLICK_DAILY_DISMISSIBLE_IOS,
   XPROMO_MODAL_LISTING_CLICK_DAILY_DISMISSIBLE_ANDROID,
+  XPROMO_MODAL_LISTING_CLICK_DAILY_DISMISSIBLE_THROTTLE,
 
   // XPromo Interstitial Frequrency
   VARIANT_XPROMO_INTERSTITIAL_FREQUENCY_IOS,
@@ -116,6 +118,7 @@ const EXPERIMENT_NAMES = {
   [VARIANT_XPROMO_INTERSTITIAL_COMMENTS_ANDROID]: 'mweb_xpromo_interstitial_comments_android',
   [XPROMO_MODAL_LISTING_CLICK_DAILY_DISMISSIBLE_IOS]: 'mweb_xpromo_modal_listing_click_daily_dismissible_ios',
   [XPROMO_MODAL_LISTING_CLICK_DAILY_DISMISSIBLE_ANDROID]: 'mweb_xpromo_modal_listing_click_daily_dismissible_android',
+  [XPROMO_MODAL_LISTING_CLICK_DAILY_DISMISSIBLE_THROTTLE]: 'mweb_xpromo_modal_listing_click_daily_dismissible_throttle',
   [VARIANT_XPROMO_INTERSTITIAL_FREQUENCY_IOS]: 'mweb_xpromo_interstitial_frequency_ios',
   [VARIANT_XPROMO_INTERSTITIAL_FREQUENCY_ANDROID]: 'mweb_xpromo_interstitial_frequency_android',
   [VARIANT_XPROMO_PERSISTENT_IOS]: 'mweb_xpromo_persistent_ios',
@@ -317,9 +320,10 @@ export function isXPromoInFeedEnabled(state) {
 
 /**
  * @func eligibleTimeForModalListingClick
- * @param {object} state - our applications redux state. Depends on
+ * @param {object} state - our applications redux state. Depends
+ *  - state.xpromo.listingClick.modalDimissCount
  *  - state.xpromo.listingClick.lastModalClick
- *  - state.accounts.me
+ *  - state.accounts
  *
  * Note: This function is time senstiive, it's result will vary based on the
  * current time.
@@ -328,11 +332,27 @@ export function isXPromoInFeedEnabled(state) {
  *   current user into one of the xpromo modal listing click experiments
  */
 function eligibleTimeForModalListingClick(state) {
-  const { lastModalClick } = state.xpromo.listingClick;
+  const { lastModalClick, modalDismissCount } = state.xpromo.listingClick;
+
   if (lastModalClick === 0) {
     return true;
   }
-  const ineligibleLimit = lastModalClick + EVERY_DAY;
+
+  let interval = EVERY_DAY;
+
+  const variant = getExperimentVariant(EXPERIMENT_NAMES[XPROMO_MODAL_LISTING_CLICK_DAILY_DISMISSIBLE_THROTTLE]);
+
+  if (variant === 'treatment') {
+    interval = modalDismissCount >= 3 ? EVERY_TWELVE_WEEKS : EVERY_TWO_WEEKS;
+  }
+
+  /*
+  GROW-1397 modal_listing_click_daily_dismissible_throttling
+  control and base experience should continue to see the modal every day
+  treatment group should see the modal once every two weeks, and once every 12 weeks after dismissing it 3 times
+  */
+
+  const ineligibleLimit = lastModalClick + interval;
   return Date.now() > ineligibleLimit;
 }
 

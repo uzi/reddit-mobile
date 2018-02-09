@@ -41,6 +41,7 @@ const {
 const {
   BANNER_LAST_CLOSED,
   XPROMO_LAST_MODAL_CLICK,
+  XPROMO_MODAL_DISMISS_COUNT,
 } = LOCAL_STORAGE_KEYS;
 
 // Get loid values either from the account state or the cookies.
@@ -256,12 +257,15 @@ export function shouldNotShowBanner(state) {
 
 export function listingClickInitialState() {
   // Check if there's been a listing click in the last two weeks
+  const modalDismissCountStr = localStorageAvailable() ? localStorage.getItem(XPROMO_MODAL_DISMISS_COUNT) : null;
+  const modalDismissCount = modalDismissCountStr ? Number(modalDismissCountStr) : 0;
   const lastClickedStr = localStorageAvailable() ? localStorage.getItem(XPROMO_LAST_MODAL_CLICK) : null;
   const lastModalClick = lastClickedStr ? new Date(lastClickedStr).getTime() : 0;
   const ineligibilityReason = localStorageAvailable() ? null : 'local_storage_unavailable';
   return {
     ineligibilityReason,
     lastModalClick,
+    modalDismissCount,
   };
 }
 
@@ -276,6 +280,12 @@ export const markListingClickTimestampLocalStorage = (dateTime) => {
   if (!localStorageAvailable()) { return; }
 
   localStorage.setItem(XPROMO_LAST_MODAL_CLICK, dateTime);
+};
+
+export const setModalDismissCountLocalStorage = (count) => {
+  if (!localStorageAvailable()) { return; }
+
+  localStorage.setItem(XPROMO_MODAL_DISMISS_COUNT, count);
 };
 
 export function interstitialType(state) {

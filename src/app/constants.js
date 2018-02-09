@@ -165,6 +165,7 @@ export const flags = {
   // XPromo Modal Listing Click
   XPROMO_MODAL_LISTING_CLICK_DAILY_DISMISSIBLE_IOS: 'XPromoModalListingClickDailyDismissibleIos',
   XPROMO_MODAL_LISTING_CLICK_DAILY_DISMISSIBLE_ANDROID: 'XPromoModalListingClickDailyDismissibleAndroid',
+  XPROMO_MODAL_LISTING_CLICK_DAILY_DISMISSIBLE_THROTTLE: 'XPromoModalListingClickDailyDismissibleThrottle',
 
   // XPromo Interstitial Frequrency
   VARIANT_XPROMO_INTERSTITIAL_FREQUENCY_IOS: 'experimentXPromoInterstitialFrequencyIos',
@@ -246,6 +247,7 @@ export const EVERY_DAY = 'every_day';
 export const EVERY_THREE_DAYS = 'every_three_days';
 export const EVERY_WEEK = 'every_week';
 export const EVERY_TWO_WEEKS = 'every_two_weeks';
+export const EVERY_TWELVE_WEEKS = 'every_twelve_weeks';
 
 const HOUR_IN_MS = 60 * 60 * 1000;
 
@@ -254,12 +256,14 @@ export const EXPERIMENT_FREQUENCY_VARIANTS = {
   [EVERY_THREE_DAYS]: 3 * 24 * HOUR_IN_MS,
   [EVERY_WEEK]: 1 * 7 * 24 * HOUR_IN_MS,
   [EVERY_TWO_WEEKS]: 2 * 7 * 24 * HOUR_IN_MS,
+  [EVERY_TWELVE_WEEKS]: 12 * 7 * 24 * HOUR_IN_MS,
 };
 
 export const LOCAL_STORAGE_KEYS = {
   BANNER_LAST_CLOSED : 'bannerLastClosed',
   XPROMO_LAST_MODAL_CLICK: 'lastModalListingClick',
   BANNER_PERSIST_SHOWED : 'lastPersistBannerShowed',
+  MODAL_DISMISS_COUNT: 'modalListingDismissCount',
 };
 
 export const VIDEO_EVENT = {

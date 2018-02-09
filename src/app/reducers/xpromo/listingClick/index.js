@@ -47,11 +47,18 @@ export const DEFAULT = {
 export default function(state=DEFAULT, action={}) {
   switch (action.type) {
     case xpromoActions.LISTING_CLICK_INITIAL_STATE: {
-      const { ineligibilityReason, lastModalClick } = action.payload;
+      const { ineligibilityReason, lastModalClick, modalDismissCount } = action.payload;
       return merge(state, {
         ineligibilityReason,
         lastModalClick,
         target: null,
+        modalDismissCount,
+      });
+    }
+
+    case xpromoActions.SET_MODAL_DISMISS_COUNT: {
+      return merge(state, {
+        modalDismissCount: action.modalDismissCount,
       });
     }
 

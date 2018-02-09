@@ -3,6 +3,7 @@ import {
   getXPromoListingClickLink,
   markBannerClosed,
   markListingClickTimestampLocalStorage,
+  setModalDismissCountLocalStorage,
   shouldNotShowBanner,
   listingClickInitialState as getListingClickInitialState,
   isXPromoPersistentEnabled,
@@ -50,11 +51,14 @@ export const promoDismissed = (dismissType) => async (dispatch, getState) => {
 };
 
 export const LISTING_CLICK_INITIAL_STATE = 'XPROMO__LISTING_CLICK_INITIAL_STATE';
-export const listingClickInitialState = ({ ineligibilityReason='', lastModalClick=0 }) => ({
+export const listingClickInitialState = (
+  { ineligibilityReason='', lastModalClick=0, modalDismissCount=0 }
+) => ({
   type: LISTING_CLICK_INITIAL_STATE,
   payload: {
     ineligibilityReason,
     lastModalClick,
+    modalDismissCount,
   },
 });
 
@@ -73,6 +77,17 @@ export const setListingClickTarget = target => ({
   type: SET_LISTING_CLICK_TARGET,
   payload: { target },
 });
+
+export const SET_MODAL_DISMISS_COUNT = 'XPROMO__INCREMENT_MODAL_DISMISS_COUNT';
+export const incrementModalDismissCount = () => async (dispatch, getState) => {
+  const state = getState();
+  const modalDismissCount = state.xpromo.listingClick.modalDismissCount || 0;
+  dispatch({
+    type: SET_MODAL_DISMISS_COUNT,
+    modalDismissCount: modalDismissCount + 1,
+  });
+  setModalDismissCountLocalStorage(modalDismissCount + 1);
+};
 
 export const LISTING_CLICK_MODAL_ACTIVATED = 'XPROMO__LISTING_CLICK_MODAL_ACTIVATED';
 export const xpromoListingClickModalActivated = ({ postId='', listingClickType='' }) => ({
@@ -148,6 +163,7 @@ export const performListingClick = (postId, listingClickType) => async (dispatch
   dispatch(xpromoListingClickModalActivated({ postId, listingClickType }));
   dispatch(trackXPromoEvent(XPROMO_VIEW));
   dispatch(markModalListingClickTimestamp());
+  dispatch(incrementModalDismissCount());
 };
 
 export const listingClickModalAppStoreClicked = () => async (dispatch, getState) => {
