@@ -33,7 +33,7 @@ export default function(data, store) {
         <title>{ state.pageMetadata.title }</title>
         <meta charSet='utf8'/>
         <meta name='viewport' content='width=device-width, initial-scale=1'/>
-        <meta name="apple-itunes-app" content="app-id=2TDUX39LX8.com.reddit.Reddit" />
+        <meta name="apple-itunes-app" content="app-id=1064216828" />
         <link rel='stylesheet' href={ `${assetPath}/${CSS_FILE}` } />
         <link href={ `${assetPath}/favicon/64x64.png` } rel="icon shortcut" sizes="64x64" />
         <link href={ `${assetPath}/favicon/128x128.png` } rel="icon shortcut" sizes="128x128" />
