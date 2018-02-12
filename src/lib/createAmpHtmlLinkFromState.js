@@ -21,11 +21,6 @@ export const ampLink = (currentPage, state) => {
     return null;
   }
 
-  if (post.media && post.media.reddit_video) {
-    // We don't support reddit video posts
-    return null;
-  }
-
   return post.cleanPermalink;
 };
 
