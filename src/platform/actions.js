@@ -1,5 +1,6 @@
 import { METHODS } from './router';
 
+export const INCOGNITO_DETECTED = 'PLATFORM__INCOGNITO_DETECTED';
 export const SET_PAGE = 'PLATFORM__SET_PAGE';
 export const SET_STATUS = 'PLATFORM__SET_STATUS';
 export const GOTO_PAGE_INDEX = 'PLATFORM__GOTO_PAGE_INDEX';
@@ -7,6 +8,10 @@ export const NAVIGATE_TO_URL = 'PLATFORM__NAVIGATE_TO_URL';
 export const SET_SHELL = 'PLATFORM__SET_SHELL';
 export const REDIRECT = 'PLATFORM__REDIRECT';
 export const REROUTE_PAGE = 'PLATFORM__REROUTE_PAGE'; // re-run the handlers for the page
+
+export const incognitoDetected = () => (
+  { type: INCOGNITO_DETECTED }
+);
 
 export const setPage = (url, { urlParams={}, queryParams={}, hashParams={}, referrer='' }={}) => ({
   type: SET_PAGE,

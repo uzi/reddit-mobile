@@ -19,6 +19,7 @@ import { isInterstitialDimissed } from 'lib/xpromoState';
 import { trackXPromoIneligibleEvent } from 'lib/eventUtils';
 import { isCommentsPage } from 'platform/pageUtils';
 import { POST_TYPE } from 'apiClient/models/thingTypes';
+import { getExperimentVariant } from '../../lib/experiments';
 
 const { DAYMODE } = COLOR_SCHEME;
 const { USUAL, MINIMAL, PERSIST } = XPROMO_DISPLAY_THEMES;
@@ -154,7 +155,7 @@ export function xpromoTheme(state) {
   switch (getRouteActionName(state)) {
     case 'comments':
       return MINIMAL;
-    default: 
+    default:
       return USUAL;
   }
 }
@@ -234,8 +235,16 @@ export function commentsInterstitialEnabled(state) {
  * @return {boolean} is this listing click eligible to be intercepted,
  * and redirected to the app store page for the reddit app
  */
+
+export function incognitoNoXPromo(state) {
+  return (
+    state.platform.incognito &&
+    (getExperimentVariant(state, 'mweb_xpromo_incognito_noxpromo') === 'treatment')
+  );
+}
+
 export function listingClickEnabled(state, postId) {
-  if (!isEligibleListingPage(state) || !isXPromoEnabledOnDevice(state)) {
+  if (incognitoNoXPromo(state) || !isEligibleListingPage(state) || !isXPromoEnabledOnDevice(state)) {
     return false;
   }
   if (!state.user.loggedOut) {

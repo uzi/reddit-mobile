@@ -21,6 +21,10 @@ import { sendTimings, onHandlerCompleteTimings } from 'lib/timing';
 import Session from 'app/models/Session';
 import Preferences from 'apiClient/models/Preferences';
 import * as xpromoActionsClientOnly from 'app/actions/xpromoClientOnly';
+import * as xpromoActions from 'app/actions/xpromo';
+import detectIncognito from 'lib/detectIncognito';
+import { trackXPromoIncognito } from './lib/eventUtils';
+import { incognitoNoXPromo } from './app/selectors/xpromo';
 
 // Bits to help in the gathering of client side timings to relay back
 // to the server
@@ -160,6 +164,16 @@ const client = Client({
   debug: (process.env.NODE_ENV || 'production') !== 'production',
   onHandlerComplete: onHandlerCompleteTimings,
 })();
+
+detectIncognito().then(result => {
+  if (result) {
+    trackXPromoIncognito(client.getState());
+    client.dispatch(platformActions.incognitoDetected());
+    if (incognitoNoXPromo(client.getState())) {
+      client.dispatch(xpromoActions.hide());
+    }
+  }
+});
 
 isShell = client.getState().platform.shell;
 client.dispatch(platformActions.activateClient());

@@ -9,10 +9,15 @@ const DEFAULT = {
   history: [],
   currentPage: {},
   shell: false,
+  incognito: false,
 };
 
 export default (state=DEFAULT, action={}) => {
   switch (action.type) {
+    case actions.INCOGNITO_DETECTED: {
+      return { ...state, incognito: true };
+    }
+
     case actions.SET_STATUS: {
       const pageData = merge(state.currentPage, { status: action.payload.status });
       const history = [...state.history];

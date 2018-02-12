@@ -38,6 +38,7 @@ export const XPROMO_DISMISS = 'cs.xpromo_dismiss';
 export const XPROMO_SCROLLUP = 'cs.xpromo_scrollup';
 export const XPROMO_SCROLLPAST = 'cs.xpromo_scrollpast';
 export const XPROMO_APP_STORE_VISIT = 'cs.xpromo_app_store_visit';
+export const XPROMO_INCOGNITO = 'cs.xpromo_client_settings_empty';
 
 const ID_REGEX = /(?:t\d+_)?(.*)/;
 
@@ -224,6 +225,10 @@ export function trackXPromoEvent(state, eventType, additionalEventData) {
       .addDoneToNewSend(() => resolve())
       .track('xpromo_events', eventType, payload);
   });
+}
+
+export function trackXPromoIncognito(state, additionalEventData) {
+  trackXPromoEvent(state, XPROMO_INCOGNITO, { ...additionalEventData });
 }
 
 export function trackXPromoView(state, additionalEventData) {
@@ -414,13 +419,13 @@ export function trackPagesXPromoEvents(state, additionalEventData) {
 /* Track bucketing event and the Client and Server side.
  *
  * @note: Each bucket events should be fired once per session.
- * Since this function works both on the Client and Server side: 
+ * Since this function works both on the Client and Server side:
  * — Client side will use the "new Set()" to store and check the unique of fired events.
- * — Server side will store the fired events into the Redux Store (this is the only option 
+ * — Server side will store the fired events into the Redux Store (this is the only option
  * to notify the Client side that the event occurred on the Server).
  *
  * @param {Object} state          - Redux Store state
- * @param {Object} experimentData - Experiments id, name, variant, owner (from incoming JSON) 
+ * @param {Object} experimentData - Experiments id, name, variant, owner (from incoming JSON)
  * @param {Fucntion} dispatch     - Redux Store Dispatch. If it exists, then the name of the bucket
  * event will be stored in the Redux Store to notify the client that it has already occurred.
  */
