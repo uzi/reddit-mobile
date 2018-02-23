@@ -169,7 +169,7 @@ export function isInterstitialDimissed(state) {
 export function getBranchLink(state, path, payload={}) {
   const { user, accounts } = state;
 
-  const tags = extractTaglist(state);
+  const extractedXPromoTags = extractTaglist(state);
 
   const { loid, loidCreated } = getLoidValues(accounts);
 
@@ -203,15 +203,30 @@ export function getBranchLink(state, path, payload={}) {
     ...buildSubredditData(state),
   };
 
-  const moreTags = payload.tags || [];
+  const payloadTags = payload.tags || [];
+  const basePayloadTags = basePayload.tags || [];
+  const finalTags = [...extractedXPromoTags, ...payloadTags, ...basePayloadTags];
+  const query = { ...basePayload, ...payload, tags: finalTags };
 
-  return url.format({
+  /*
+  The utm_content query parameter overwrites the tags parameter in the long form branch links.
+  If you happen to be wondering why it stopped appearing somewhere, look no further.
+  */
+
+  if (query.utm_content) {
+    const tag = query.utm_content;
+    query.tags.push(tag);
+    delete query.utm_content;
+  }
+
+  const link = url.format({
     protocol: 'https',
     host: 'reddit.app.link',
     pathname: '/',
-    query: {...basePayload, ...payload, tags: [...tags, ...moreTags]},
+    query,
   });
 
+  return link;
 }
 
 /**

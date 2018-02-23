@@ -5,11 +5,8 @@ const { keys } = Object;
 function featureToTaglist(name, data) {
   const tags = [];
 
-  if (data) {
-    tags.push(name);
-  }
-
   if (data instanceof Object) {
+    tags.push(`${name}`);
     tags.push(`${name}_variant_${data.variant}`);
     tags.push(`${name}_id_${data.experiment_id}`);
   }
