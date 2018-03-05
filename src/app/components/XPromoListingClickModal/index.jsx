@@ -9,7 +9,6 @@ import {
 } from 'app/actions/xpromo';
 
 import cx from 'lib/classNames';
-import { getExperimentVariant } from 'lib/experiments';
 
 const CLASS = 'XPromoListingClickModal';
 

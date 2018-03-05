@@ -30,7 +30,6 @@ import {
   listingClickEnabled,
 } from 'app/selectors/xpromo';
 import { setListingClickTarget } from '../../actions/xpromo';
-import { getExperimentVariant } from '../../../lib/experiments';
 
 const {
   VARIANT_TITLE_EXPANDO,
