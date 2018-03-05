@@ -15,14 +15,8 @@ const CLASS = 'XPromoListingClickModal';
 
 const showing = state => state.xpromo.listingClick.active;
 
-const takeMeBack = state => getExperimentVariant(
-  state,
-  'mweb_xpromo_modal_listing_click_daily_dismissible_link'
-) === 'treatment';
-
 const selector = createStructuredSelector({
   showing,
-  takeMeBack,
   dismissible: state => (showing(state)? 'dismissible': null),
   returner: state => state.xpromo.listingClick.showingReturnerModal,
 });
@@ -46,7 +40,6 @@ export default connect(selector, dispatcher)(props => {
     onDismiss,
     onGotoAppStore,
     returner,
-    takeMeBack,
   } = props;
 
   return (
@@ -59,7 +52,6 @@ export default connect(selector, dispatcher)(props => {
               dismissible={ dismissible }
               onDismiss={ onDismiss }
               onGotoAppStore={ onGotoAppStore }
-              takeMeBack={ takeMeBack }
             />
           ) }
       </div>
@@ -97,7 +89,7 @@ const Button = ({ children, onClick, outlined }) => (
   </div>
 );
 
-const AppStoreContent = ({ dismissible, onDismiss, onGotoAppStore, takeMeBack }) => (
+const AppStoreContent = ({ dismissible, onDismiss, onGotoAppStore }) => (
   <ModalContent>
     <PrimaryText>
       This content is best viewed in our mobile app.
@@ -105,7 +97,7 @@ const AppStoreContent = ({ dismissible, onDismiss, onGotoAppStore, takeMeBack })
     <ButtonGroup>
       { dismissible && (
           <Button outlined onClick={ onDismiss }>
-            { takeMeBack ? 'Take Me Back' : 'Not Now' }
+            Not Now
           </Button>
       ) }
       <Button onClick={ onGotoAppStore }>

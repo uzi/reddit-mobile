@@ -14,8 +14,6 @@ import {
   XPROMO_DISMISS,
   XPROMO_VIEW,
 } from 'lib/eventUtils';
-import { getExperimentData } from '../../lib/experiments';
-import { trackBucketingEvents } from '../../lib/eventUtils';
 
 export const SHOW = 'XPROMO__SHOW';
 export const show = () => ({ type: SHOW });
@@ -156,9 +154,6 @@ export const performListingClick = (postId, listingClickType) => async (dispatch
   if (state.xpromo.listingClick.active) {
     return;
   }
-
-  const data = getExperimentData(state, 'mweb_xpromo_modal_listing_click_daily_dismissible_link');
-  if (data) { trackBucketingEvents(state, data, dispatch); }
 
   dispatch(xpromoListingClickModalActivated({ postId, listingClickType }));
   dispatch(trackXPromoEvent(XPROMO_VIEW));

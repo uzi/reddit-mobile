@@ -173,8 +173,7 @@ export function Post(props, context) {
       const state = store.getState();
       const isEnabled = listingClickEnabled(state, postId);
 
-      // if the xpromo interstitial modal is eligible add the click target into the store
-      if (isEnabled && getExperimentVariant(state, 'mweb_xpromo_modal_listing_click_daily_dismissible_link') !== 'treatment') {
+      if (isEnabled) {
         store.dispatch(setListingClickTarget(e.target));
       }
 
