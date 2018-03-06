@@ -7,6 +7,7 @@ import { COMMENT } from 'apiClient/models/thingTypes';
 import { getEventTracker } from 'lib/eventTracker';
 import { getBasePayload, buildSubredditData, convertId } from 'lib/eventUtils';
 import { apiOptionsFromState } from 'lib/apiOptionsFromState';
+import { firePixelsOfType, AdEvents } from 'lib/ads';
 import * as rulesModalActions from 'app/actions/rulesModal';
 import { flags } from 'app/constants';
 import features from 'app/featureFlags';
@@ -80,8 +81,14 @@ export const submit = (parentId, { text }) => async (dispatch, getState) => {
   try {
     const apiResponse = await model.reply(apiOptionsFromState(state), text);
     const reply = apiResponse.getModelFromRecord(apiResponse.results[0]);
-
+    
     dispatch(success(parentId, reply));
+    
+    // Fire comment-submitted pixel if associated with promoted post
+    const post = state.posts[reply.linkId];
+    if (post.promoted) {
+      firePixelsOfType(post.events, AdEvents.CommentSubmitted);
+    }
 
     logReply(reply, getState());
   } catch (e) {
