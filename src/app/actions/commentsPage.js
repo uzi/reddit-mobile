@@ -7,6 +7,7 @@ import ResponseError from 'apiClient/errors/ResponseError';
 import { apiOptionsFromState } from 'lib/apiOptionsFromState';
 import getSubreddit from 'lib/getSubredditFromState';
 import { cleanObject } from 'lib/cleanObject';
+import { firePixelsOfType, AdEvents } from 'lib/ads';
 import features from 'app/featureFlags';
 
 import { paramsToCommentsPageId } from 'app/models/CommentsPage';
@@ -67,6 +68,15 @@ export const fetchCommentsPage = commentsPageParams => async (dispatch, getState
   try {
     const apiOptions = apiOptionsFromState(state);
     const apiResponse = await CommentsEndpoint.get(apiOptions, commentsPageParams);
+
+    // fire pixel if comments associated with promoted post
+    const postId = commentsPageParams.id;
+    // If post is not in state already than it was organic anyway.
+    const post = state.posts[postId]; 
+    if (post && post.promoted) {
+      firePixelsOfType(post.events, AdEvents.CommentsView);
+    }
+    
     dispatch(received(commentsPageId, apiResponse));
   } catch (e) {
     dispatch(failed(commentsPageId, e));

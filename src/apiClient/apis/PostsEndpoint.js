@@ -84,8 +84,7 @@ const handleGet = apiResponse => {
 export default {
   get(apiOptions, _query) {
     const path = getPath(_query);
-    const query = formatQuery({ raw_json: 1, ..._query }, 'get');
-
+    const query = formatQuery({ raw_json: 1, withAds: true, ..._query }, 'get');
     return apiRequest(apiOptions, 'GET', path, { query }).then(handleGet);
   },
 

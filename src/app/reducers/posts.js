@@ -18,13 +18,14 @@ import * as subredditsToPostsByPostActions from 'app/actions/subredditsToPostsBy
 
 const DEFAULT = {};
 
-// Helper function to maintain preview information, because it's inconsistent
+// Helper function to maintain preview information and pixel events, because it's inconsistent
 // depending on which api the post was received from initially
-const preservePostContentPreviews = (state, post) => {
+const preserveInconsistentProperties = (state, post) => {
   const currentPost = state[post.uuid];
   if (!currentPost) { return post; }
 
   return post.set({
+    events: currentPost.events,
     expandedContent: currentPost.expandedContent,
     media: currentPost.media,
     mediaOembed: currentPost.mediaOembed,
@@ -191,7 +192,7 @@ export default function(state=DEFAULT, action={}) {
       const newPosts = Object.keys(posts).reduce((newPosts, uuid) => {
         return {
           ...newPosts,
-          [uuid]: preservePostContentPreviews(state, posts[uuid]),
+          [uuid]: preserveInconsistentProperties(state, posts[uuid]),
         };
       }, {});
 
