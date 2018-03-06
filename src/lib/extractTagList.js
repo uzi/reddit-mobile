@@ -21,8 +21,14 @@ export default function extractTagList(state) {
 
   const features = user.features;
 
-  return keys(features)
+  const tags = keys(features)
     .filter(name => /xpromo/.test(name))
     .map(name => featureToTaglist(name, features[name]))
     .reduce((a, x) => [...a, ...x], []);
+
+  if (state.platform.incognito) {
+    tags.push('client_settings_empty');
+  }
+
+  return tags;
 }
