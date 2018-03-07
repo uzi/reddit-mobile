@@ -32,7 +32,7 @@ export default function DirectMessageComposition(props) {
         className='DirectMessageComposition__textarea'
         name='body'
         rows='5'
-        placeholder='Add a dank meme reference'
+        placeholder='Fill in your message'
         defaultValue={ props.message }
       />
       <button
