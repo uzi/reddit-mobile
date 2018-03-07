@@ -2,6 +2,7 @@ import React from 'react';
 import { findDOMNode } from 'react-dom';
 import { connect } from 'react-redux';
 
+import 'lib/intersectionObserverPolyfill'; // Must come before Observer import
 import Observer from '@researchgate/react-intersection-observer';
 
 import { isHidden } from 'lib/dom';
@@ -11,7 +12,7 @@ import Post from 'app/components/Post';
 
 const T = React.PropTypes;
 
-const IMPRESSION_THRESHOLD = 0;
+const IMPRESSION_THRESHOLD = 0.01;
 const VIEWABILITY_THRESHOLD = 0.5;
 const VIEWABILITY_TIME = 1000;
 
@@ -45,30 +46,22 @@ class Ad extends React.Component {
       this.props.onAdblockDetected();
     }
   }
-  
-  handleImpressionChange = e => {
+
+  handleObserver = e => {
+    const { madeImpression, madeViewableImpression } = this.state;
     // an element must enter the viewport to register as impression
-    if (e.isIntersecting) {
-      this.onImpression();
+    if (!madeImpression && e.isIntersecting && e.intersectionRatio >= IMPRESSION_THRESHOLD) {
+      this.setState({ madeImpression: true }, this.props.onImpression);
     }
-  }
 
-  onImpression() {
-    // we only need to track the impression once.
-    if (this.state.madeImpression) { return; }
-    this.setState({ madeImpression: true }, this.props.onImpression);
-  }
-
-  handleViewabilityChange = e => {
     // an element must be 50% viewable for at least 1 second
     // to be consider viewable per the IAB standard.
-    if (e.isIntersecting && e.intersectionRatio >= VIEWABILITY_THRESHOLD) {
+    if (!madeViewableImpression && e.isIntersecting && e.intersectionRatio >= VIEWABILITY_THRESHOLD) {
       this.timer = window.setTimeout(() => {
         this.onViewableImpression();
       }, VIEWABILITY_TIME);
       return;
     }
-
     // reset if the item is no longer in view.
     if (this.timer) {
       clearTimeout(this.timer);
@@ -85,17 +78,11 @@ class Ad extends React.Component {
     const { postProps, postId } = this.props;
     return (
       <Observer
-        threshold={ VIEWABILITY_THRESHOLD }
-        onChange={ this.handleViewabilityChange }
-        disabled={ this.state.madeViewableImpression }
+        threshold={ [IMPRESSION_THRESHOLD, VIEWABILITY_THRESHOLD] }
+        onChange={ this.handleObserver }
+        disabled={ false && this.state.madeImpression && this.state.madeViewableImpression }
       >
-        <Observer
-          threshold={ IMPRESSION_THRESHOLD }
-          onChange={ this.handleImpressionChange }
-          disabled={ this.state.madeImpression }
-        >
-          <Post { ...postProps } postId={ postId } key={ `post-id-${postId}` }/>
-        </Observer>
+        <Post { ...postProps } postId={ postId } key={ `post-id-${postId}` }/>
       </Observer>
     );
   }
