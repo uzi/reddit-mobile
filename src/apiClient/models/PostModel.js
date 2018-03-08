@@ -106,7 +106,7 @@ export default class PostModel extends RedditModel {
     hide_score: 'hideScore',
     imp_pixel: 'impPixel',
     is_self: 'isSelf',
-    is_blank_ad: 'isBlankAd',
+    is_blank: 'isBlankAd',
     link_flair_css_class: 'linkFlairCSSClass',
     link_flair_text: 'linkFlairText',
     media_oembed: 'mediaOembed',
