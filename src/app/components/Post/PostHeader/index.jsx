@@ -417,7 +417,7 @@ function renderPostTitleLink(
   let url;
   if (linkExternally) {
     if (post.outboundLink && post.outboundLink.url) {
-      url = post.outboundLink.url
+      url = post.outboundLink.url;
     } else {
       url = post.cleanUrl;
     }
