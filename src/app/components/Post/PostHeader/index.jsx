@@ -2,6 +2,7 @@ import './styles.less';
 import React from 'react';
 
 import { Anchor } from 'platform/components';
+import { firePixelsOfType, AdEvents } from 'lib/ads';
 import { short } from 'lib/formatDifference';
 import mobilify from 'lib/mobilify';
 import { getStatusBy, getApprovalStatus, sumReportsCount } from 'lib/modToolHelpers.js';
@@ -415,9 +416,8 @@ function renderPostTitleLink(
   titleOpensExpando,
   onTapExpand,
 ) {
-  const linkExternally = post.promoted && !post.isSelf;
   let url;
-  if (linkExternally) {
+  if (post.promoted) {
     if (post.outboundLink && post.outboundLink.url) {
       url = post.outboundLink.url;
     } else {
@@ -429,7 +429,7 @@ function renderPostTitleLink(
   const { title } = post;
 
   const titleLinkClass = `PostHeader__post-title-line ${post.visited ? 'm-visited' : ''}`;
-  const target = linkExternally && showLinksInNewTab ? '_blank' : null;
+  const target = post.promoted || showLinksInNewTab ? '_blank' : null;
 
   const props = {
     className: titleLinkClass,
@@ -437,10 +437,10 @@ function renderPostTitleLink(
     target,
   };
 
-  if (linkExternally) {
-    //promoted posts have their own tracking
+  if (post.promoted) {
+    // promoted posts have their own tracking
     return (
-      <a { ...props }>
+      <a { ...props } onClick={ () => firePixelsOfType(post.events, AdEvents.Click) }>
         { title }
       </a>
     );
