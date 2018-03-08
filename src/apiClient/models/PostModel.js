@@ -20,7 +20,7 @@ export default class PostModel extends RedditModel {
     author: T.string,
     brandSafe: T.bool,
     cleanPermalink: T.link,
-    cleanUrl: T.link,
+    cleanUrl: T.nop,
     crosspostParent: T.string,
     distinguished: T.string,
     domain: T.string,
@@ -130,7 +130,6 @@ export default class PostModel extends RedditModel {
     third_party_tracking: 'thirdPartyTracking',
     third_party_tracking_2: 'thirdPartyTracking2',
     third_party_trackers: 'thirdPartyTrackers',
-    url: 'cleanUrl',
     user_reports: 'userReports',
     whitelist_status: 'whitelistStatus',
   };
@@ -141,6 +140,13 @@ export default class PostModel extends RedditModel {
   // will have the derived property, but we might not have all of the original
   // json the api returns. To handle this, we re-use the computed props when necessary.
   static DERIVED_PROPERTIES = {
+    cleanUrl(data) {
+      if (data.promoted && data.outbound_link && data.outbound_link.url) {
+        return data.outbound_link.url;
+      }
+      return data.url;
+    },
+
     expandable(data) {
       if (data.expandable) {
         return data.expandable;
