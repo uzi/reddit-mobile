@@ -361,6 +361,7 @@ function renderPostDomain(post, interceptListingClick) {
       href={ mobilify(post.cleanUrl) }
       outboundLink={ post.outboundLink }
       onClick={ e => interceptListingClick(e, LISTING_CLICK_TYPES.DOMAIN) }
+      promoted={ post.promoted }
     >
       { cleanPostDomain(post.domain) }
     </OutboundLink>
@@ -398,6 +399,7 @@ function renderPostHeaderLink(post, interceptListingClick, showLinksInNewTab) {
       target={ target }
       outboundLink={ post.outboundLink }
       onClick={ e => interceptListingClick(e, LISTING_CLICK_TYPES.TITLE) }
+      promoted={ post.promoted }
     >
       { cleanPostDomain(post.domain) }
       <span className='PostHeader__post-link-icon icon icon-linkout blue' />

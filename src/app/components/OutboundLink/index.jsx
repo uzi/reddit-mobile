@@ -52,15 +52,16 @@ const resetOriginalURL = ($target, href) => {
 };
 
 function OutboundLink(props) {
-  const { outboundLink, userId, href, onClick } = props;
+  const { outboundLink, userId, href, onClick, promoted } = props;
   // get all of the props we want to pass to standard react components (styles, className, etc)
-  const linkProps = omit(props, ['outboundLink','userId','dispatch']);
+  const linkProps = omit(props, ['outboundLink','userId','dispatch', 'href']);
   const clickHandler = onClick || (() => null);
 
   if (!outboundLink) {
     // we don't have outbound link data, pass through to a normal anchor with no special handlers
     return <a { ...linkProps } />;
   }
+  const outboundOrHref = promoted && outboundLink && outboundLink.url ? outboundLink.url : href;
 
   // Note: this component very intentionally doesn't use `setState` to change the 
   // the href rendered in the DOM like a traditional React component might.
@@ -70,6 +71,7 @@ function OutboundLink(props) {
   return (
     <a
       { ...linkProps }
+      href={ outboundOrHref }
       onMouseDown={ e => {
         // don't show the redirect url for right-click context menus
         if (e.which === 3) {
@@ -92,6 +94,7 @@ OutboundLink.propTypes = {
     expiration: T.number.isRequired,
   }),
   onClick: T.func,
+  promoted: T.bool,
   // expected props from connect
   userId: T.number,
 };

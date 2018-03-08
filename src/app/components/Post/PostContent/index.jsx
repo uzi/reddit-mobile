@@ -97,7 +97,7 @@ export default function PostContent(props) {
       { renderMediaContent(mediaContentNode, isThumbnail, isDomainExternal,
                            cleanPostDomain(post.domain), linkUrl,
                            renderMediaFullbleed, showLinksInNewTab,
-                           post.outboundLink) }
+                           post.outboundLink, post.promoted) }
       { selftextNode }
     </div>
   );
@@ -105,7 +105,7 @@ export default function PostContent(props) {
 
 function renderMediaContent(mediaContentNode, isThumbnail, isDomainExternal,
                             linkDisplayText, linkUrl, renderMediaFullbleed,
-                            showLinksInNewTab, outboundLink) {
+                            showLinksInNewTab, outboundLink, promoted) {
   if (isThumbnail || !isDomainExternal || renderMediaFullbleed) {
     return mediaContentNode;
   }
@@ -114,7 +114,7 @@ function renderMediaContent(mediaContentNode, isThumbnail, isDomainExternal,
     <div className='PostContent__media-wrapper'>
       { mediaContentNode }
       { renderLinkBar(linkDisplayText, linkUrl,
-                      showLinksInNewTab, outboundLink) }
+                      showLinksInNewTab, outboundLink, promoted) }
     </div>
   );
 }
@@ -335,7 +335,7 @@ function renderImage(previewImage, imageURL, linkDescriptor, onClick,
     return renderImageWithAspectRatio(null, imageURL, linkDescriptor,
                                     aspectRatio, onClick, isThumbnail,
                                     playbackControlNode, obfuscatedNode, linkTarget,
-                                    post.outboundLink, forceHTTPS, isPlaying);
+                                    post.outboundLink, forceHTTPS, isPlaying, post.promoted);
   }
 
   const aspectRatio = getAspectRatio(single, previewImage.width,
@@ -344,13 +344,12 @@ function renderImage(previewImage, imageURL, linkDescriptor, onClick,
   if (previewImage && previewImage.url && !aspectRatio) {
     return renderImageOfUnknownSize(
       previewImage.url, linkDescriptor, onClick, playbackControlNode,
-      obfuscatedNode, linkTarget, post.outboundLink);
+      obfuscatedNode, linkTarget, post.outboundLink, post.promoted);
   }
-
   return renderImageWithAspectRatio(previewImage, imageURL, linkDescriptor,
                                     aspectRatio, onClick, isThumbnail,
                                     playbackControlNode, obfuscatedNode, linkTarget,
-                                    post.outboundLink, forceHTTPS, isPlaying);
+                                    post.outboundLink, forceHTTPS, isPlaying, post.promoted);
 }
 
 function baseImageLinkClass(imageUrl, isObfuscated) {
@@ -359,7 +358,7 @@ function baseImageLinkClass(imageUrl, isObfuscated) {
 
 function renderImageOfUnknownSize(imageURL, linkDescriptor, onClick,
                                   playbackControlNode, obfuscatedNode, linkTarget,
-                                  outboundLink) {
+                                  outboundLink, promoted) {
   const linkClass = baseImageLinkClass(imageURL, !!obfuscatedNode);
   return (
     <OutboundLink
@@ -368,6 +367,7 @@ function renderImageOfUnknownSize(imageURL, linkDescriptor, onClick,
       target={ linkTarget }
       onClick={ onClick }
       outboundLink={ outboundLink }
+      promoted={ promoted }
     >
       <img className='PostContent__image-img' src={ imageURL } />
       { playbackControlNode }
@@ -380,7 +380,7 @@ function renderImageOfUnknownSize(imageURL, linkDescriptor, onClick,
 function renderImageWithAspectRatio(previewImage, imageURL, linkDescriptor,
                                     aspectRatio, onClick, isThumbnail,
                                     playbackControlNode, obfuscatedNode, linkTarget,
-                                    outboundLink, forceHTTPS, isPlaying) {
+                                    outboundLink, forceHTTPS, isPlaying, promoted) {
 
   const style = {};
 
@@ -390,7 +390,6 @@ function renderImageWithAspectRatio(previewImage, imageURL, linkDescriptor,
       giphyPosterHref : previewImage.url;
     style.backgroundImage = `url("${forceProtocol(backgroundImage, forceHTTPS)}")`;
   }
-
   let linkClass = baseImageLinkClass(previewImage ? previewImage.url : null, !!obfuscatedNode);
   if (!isThumbnail) {
     linkClass += ` ${aspectRatioClass(aspectRatio)}`;
@@ -404,6 +403,7 @@ function renderImageWithAspectRatio(previewImage, imageURL, linkDescriptor,
       onClick={ onClick }
       style={ style }
       outboundLink={ outboundLink }
+      promoted={ promoted }
     >
       { isPlaying
         ? <img className='PostContent__inline-gif' src={ imageURL } />
@@ -524,7 +524,7 @@ function renderPlaybackIcon(playableType, isThumbnail) {
 }
 
 
-function renderLinkBar(displayText, href, showLinksInNewTab, outboundLink) {
+function renderLinkBar(displayText, href, showLinksInNewTab, outboundLink, promoted) {
   const target = showLinksInNewTab ? '_blank' : null;
 
   return (
@@ -533,6 +533,7 @@ function renderLinkBar(displayText, href, showLinksInNewTab, outboundLink) {
       href={ href }
       target={ target }
       outboundLink={ outboundLink }
+      promoted={ promoted }
     >
       <span className='PostContent__link-bar-text'>{ displayText }</span>
       <span className='PostContent__link-bar-icon icon icon-linkout blue' />
