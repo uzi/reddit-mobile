@@ -414,7 +414,12 @@ function renderPostTitleLink(
   onTapExpand,
 ) {
   const linkExternally = post.promoted && !post.isSelf;
-  const url = linkExternally ? post.cleanUrl : cleanPostHREF(mobilify(post.cleanPermalink));
+  let url;
+  if (linkExternally) {
+    url = post.outboundLink.url || post.cleanUrl;
+  } else {
+    url = cleanPostHREF(mobilify(post.cleanPermalink));
+  }
   const { title } = post;
 
   const titleLinkClass = `PostHeader__post-title-line ${post.visited ? 'm-visited' : ''}`;
