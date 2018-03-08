@@ -416,7 +416,11 @@ function renderPostTitleLink(
   const linkExternally = post.promoted && !post.isSelf;
   let url;
   if (linkExternally) {
-    url = post.outboundLink.url || post.cleanUrl;
+    if (post.outboundLink && post.outboundLink.url) {
+      url = post.outboundLink.url
+    } else {
+      url = post.cleanUrl;
+    }
   } else {
     url = cleanPostHREF(mobilify(post.cleanPermalink));
   }
