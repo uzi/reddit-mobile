@@ -74,7 +74,7 @@ export default class PostFooter extends React.Component {
 
   numCommentsText(numberOfComments) {
     if (numberOfComments === 0) {
-      return 'No Comments';
+      return 'Comment';
     } else if (numberOfComments === 1) {
       return '1 Comment';
     }
