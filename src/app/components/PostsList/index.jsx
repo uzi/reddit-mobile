@@ -73,7 +73,7 @@ const renderPostsList = props => {
   const postsList = postRecords.map((postRecord, i) => {
     const postId = postRecord.uuid;
     const post = posts[postId];
-    if (post.promoted) {
+    if (post && post.promoted) {
       return <Ad
         postId={ postId }
         placementIndex={ i }
