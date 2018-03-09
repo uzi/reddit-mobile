@@ -54,7 +54,7 @@ const resetOriginalURL = ($target, href) => {
 function OutboundLink(props) {
   const { outboundLink, userId, href, onClick, promoted } = props;
   // get all of the props we want to pass to standard react components (styles, className, etc)
-  const linkProps = omit(props, ['outboundLink','userId','dispatch', 'href']);
+  const linkProps = omit(props, ['outboundLink','userId','dispatch']);
   const clickHandler = onClick || (() => null);
 
   if (!outboundLink) {
