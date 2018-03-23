@@ -58,6 +58,10 @@ const {
   // XPromo Ad Feed inside the Listing pages
   VARIANT_XPROMO_AD_FEED_IOS,
   VARIANT_XPROMO_AD_FEED_ANDROID,
+
+  // Mobile Sharing
+  VARIANT_MOBILE_SHARING_WEB_SHARE_API,
+  VARIANT_MOBILE_SHARING_CLIPBOARD,
 } = flagConstants;
 
 const EXPERIMENT_FULL = [
@@ -109,7 +113,9 @@ const XPROMO_AD_FEED_FLAGS = [
   VARIANT_XPROMO_AD_FEED_ANDROID,
 ];
 
-const EXPERIMENT_NAMES = {
+export const EXPERIMENT_NAMES = {
+  [VARIANT_MOBILE_SHARING_WEB_SHARE_API]: 'mweb_sharing_web_share_api',
+  [VARIANT_MOBILE_SHARING_CLIPBOARD]: 'mweb_sharing_clipboard',
   [VARIANT_XPROMO_LOGIN_REQUIRED_IOS]: 'mweb_xpromo_require_login_ios',
   [VARIANT_XPROMO_LOGIN_REQUIRED_ANDROID]: 'mweb_xpromo_require_login_android',
   [VARIANT_XPROMO_LOGIN_REQUIRED_IOS_CONTROL]: 'mweb_xpromo_require_login_ios',

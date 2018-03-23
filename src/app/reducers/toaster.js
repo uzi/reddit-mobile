@@ -35,6 +35,7 @@ export default function(state=DEFAULT, action={}) {
     case postingActions.FAILURE:
     case postingActions.VALIDATION_FAILURE:
     case reportingActions.FAILURE:
+    case toasterActions.TYPES.ERROR:
     case votingActions.FAILURE: {
       return merge(state, {
         isOpen: true,
@@ -43,6 +44,7 @@ export default function(state=DEFAULT, action={}) {
       });
     }
 
+    case toasterActions.TYPES.SUCCESS:
     case reportingActions.SUCCESS: {
       return merge(state, {
         isOpen: true,
@@ -52,6 +54,7 @@ export default function(state=DEFAULT, action={}) {
     }
 
     case optOuts.OPTOUT_SET:
+    case toasterActions.TYPES.REPORT_SUCCESS:
     case replyActions.SUCCESS: {
       return merge(state, {
         isOpen: true,

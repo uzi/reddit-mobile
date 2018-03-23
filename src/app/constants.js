@@ -142,6 +142,10 @@ export const flags = {
   VARIANT_MIXED_VIEW: 'experimentMixedView',
   SHOW_AMP_LINK: 'showAmpLink',
 
+  // Mobile Sharing
+  VARIANT_MOBILE_SHARING_IOS: 'experimentMobileSharingIos',
+  VARIANT_MOBILE_SHARING_ANDROID: 'experimentMobileSharingAndroid',
+
   // Removing defaults experiment
   VARIANT_DEFAULT_SRS_TUTORIAL: 'experimentDefaultSrsTutorial',
   VARIANT_DEFAULT_SRS_POPULAR: 'experimentDefaultSrsPopular',
@@ -185,6 +189,10 @@ export const flags = {
   // XPromo Ad Feed inside the Listing pages
   VARIANT_XPROMO_AD_FEED_IOS: 'experimentXPromoAdFeedIos',
   VARIANT_XPROMO_AD_FEED_ANDROID: 'experimentXPromoAdFeedAndroid',
+
+  // Mobile Sharing by Browser Capability
+  VARIANT_MOBILE_SHARING_WEB_SHARE_API: 'experimentMobileSharingWebShareAPI',
+  VARIANT_MOBILE_SHARING_CLIPBOARD: 'experimentMobileSharingClipboard',
 };
 
 // Now we have 2 different types of XPromo

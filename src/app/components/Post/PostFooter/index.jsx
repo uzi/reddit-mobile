@@ -4,6 +4,7 @@ import React from 'react';
 import { Anchor } from 'platform/components';
 import PostModel from 'apiClient/models/PostModel';
 import PostDropdown from '../PostDropdown';
+import Share from 'app/components/Share';
 import VotingBox from 'app/components/VotingBox';
 import InterceptableModalTarget from 'app/components/InterceptableModalTarget';
 
@@ -152,6 +153,7 @@ export default class PostFooter extends React.Component {
         className={ `PostFooter ${compact ? 'size-compact' : ''}` }
         onClick={ e => interceptListingClick(e, LISTING_CLICK_TYPES.FOOTER) }
       >
+        <Share url={ post.cleanPermalink } />
         { this.renderCommentsLink(post, interceptListingClick) }
         <div className='PostFooter__vote-and-tools-wrapper'>
           <InterceptableModalTarget

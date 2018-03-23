@@ -26,6 +26,12 @@ import detectIncognito from 'lib/detectIncognito';
 import { trackXPromoIncognito } from './lib/eventUtils';
 import { incognitoNoXPromo } from './app/selectors/xpromo';
 
+// importing these to populate the branch.link property needed for mobile sharing
+import { branchProxy } from 'app/actions/sharing';
+import branch from 'branch-sdk';
+
+import { trackExposeSharing } from 'lib/eventUtils';
+
 // Bits to help in the gathering of client side timings to relay back
 // to the server
 const beginMount = Date.now();
@@ -183,3 +189,9 @@ if (isShell) {
   // the branch SDK will use the global window object
   client.dispatch(xpromoActionsClientOnly.checkAndSet());
 }
+
+// expose mobile sharing
+trackExposeSharing(client.getState());
+
+// populate the branchProxy object with branch.link
+branchProxy.link = (payload, callback) => { return branch.link(payload, callback); };

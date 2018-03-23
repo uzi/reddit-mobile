@@ -5,6 +5,8 @@ import omitBy from 'lodash/omitBy';
 import isNull from 'lodash/isNull';
 import values from 'lodash/values';
 import url from 'url';
+import { flags } from 'app/constants';
+import { EXPERIMENT_NAMES } from 'app/selectors/xpromo';
 
 import { xpromoAddBucketingEvent } from 'app/actions/xpromo';
 import {
@@ -31,6 +33,7 @@ import { getEventTracker } from 'lib/eventTracker';
 import * as gtm from 'lib/gtm';
 import { hasAdblock } from 'lib/adblock';
 import { shouldNotShowBanner } from 'lib/xpromoState';
+import { getExperimentVariant } from './experiments';
 
 export const XPROMO_VIEW = 'cs.xpromo_view';
 export const XPROMO_INELIGIBLE = 'cs.xpromo_ineligible';
@@ -204,6 +207,42 @@ export function xPromoExtraScreenViewData(state) {
   }
 
   return extraPageData;
+}
+
+export function trackSharingEvent(state, eventType) {
+  const { VARIANT_MOBILE_SHARING_WEB_SHARE_API, VARIANT_MOBILE_SHARING_CLIPBOARD } = flags;
+  const isWebShare = !!(window && window.navigator && window.navigator.share);
+  const experiment = isWebShare ? VARIANT_MOBILE_SHARING_WEB_SHARE_API : VARIANT_MOBILE_SHARING_CLIPBOARD;
+  const name = EXPERIMENT_NAMES[experiment];
+  const variant = getExperimentVariant(state, name);
+
+  if (!variant) {
+    return;
+  }
+
+  const payload = {
+    experiment: name,
+    variant,
+  };
+
+  return new Promise((resolve) => {
+    getEventTracker()
+      .replaceToNewSend()
+      .addDoneToNewSend(() => resolve())
+      .track('sharing_events', eventType, payload);
+  });
+}
+
+export function trackExposeSharing(state) {
+  trackSharingEvent(state, 'mobile_sharing_expose');
+}
+
+export function trackSharingPrepare(state) {
+  trackSharingEvent(state, 'mobile_sharing_prepare');
+}
+
+export function trackSharingExecute(state) {
+  trackSharingEvent(state, 'mobile_sharing_execute');
 }
 
 export function trackXPromoEvent(state, eventType, additionalEventData) {

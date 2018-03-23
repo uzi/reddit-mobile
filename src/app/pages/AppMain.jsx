@@ -26,6 +26,7 @@ import PostSubmitCommunityModal from 'app/components/PostSubmitCommunityModal';
 import PostSubmitModal from 'app/components/PostSubmitModal';
 import Register from 'app/components/Register';
 import Toaster from 'app/components/Toaster';
+import CTA from 'app/components/Share/CTA';
 import NavFrame from 'app/components/NavFrame';
 
 const SORTS = SUPPORTED_SORTS.join('|');
@@ -163,6 +164,7 @@ const AppMain = props => {
       { showDropdownCover ? <DropdownCover /> : null }
       { isToasterOpen ? <Toaster /> : null }
       { isModalOpen ? <ModalSwitch /> : null }
+      <CTA />
     </div>
   );
 };

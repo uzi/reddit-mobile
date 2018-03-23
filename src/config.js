@@ -99,7 +99,7 @@ const config = () => ({
 
   placeDomain: process.env.PLACE_DOMAIN || 'https://www.reddit.com',
 
-  branchKey: process.env.BRANCH_KEY || 'XXX_BRANCH_KEY',
+  branchKey: process.env.BRANCH_KEY || 'key_live_hoc05HaCXaME10UMwyj3filpqzfu2Ue6',
 });
 
 export default config();

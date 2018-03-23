@@ -33,12 +33,12 @@ class Toaster extends React.Component {
     const { isShowing } = this.state;
 
     const startStyles = isShowing
-      ? { bottom: -HEIGHT, opacity: 0 }
-      : { bottom: 0, opacity: 1 };
+      ? { bottom: -HEIGHT }
+      : { bottom: 0 };
 
     const finishStyles = isShowing
-      ? { bottom: spring(0, STIFFNESS), opacity: spring(1) }
-      : { bottom: spring(-HEIGHT, STIFFNESS), opacity: spring(0) };
+      ? { bottom: spring(0, STIFFNESS) }
+      : { bottom: spring(-HEIGHT, STIFFNESS) };
 
     // If not showing, trigger an unmount as the final step of the animation
     const onRest = isShowing ? NOOP : this.props.onClose;

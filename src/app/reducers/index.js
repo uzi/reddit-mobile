@@ -39,6 +39,7 @@ import session from './session';
 import sessionRefresing from './sessionRefreshing';
 import sessionTracker from './sessionTracker';
 import scrollPositions from './scrollPositions';
+import sharing from './sharing';
 import subredditRequests from './subredditRequests';
 import subredditRules from './subredditRules';
 import subredditRulesRequests from './subredditRulesRequests';
@@ -99,6 +100,7 @@ export default {
   sessionRefresing,
   sessionTracker,
   scrollPositions,
+  sharing,
   subredditRules,
   subredditRulesRequests,
   subreddits,
