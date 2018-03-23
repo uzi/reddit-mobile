@@ -3,9 +3,11 @@ import every from 'lodash/every';
 import isEmpty from 'lodash/isEmpty';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
+import { parse } from 'url';
 
 import { Anchor, JSForm } from 'platform/components';
 import cx from 'lib/classNames';
+import forceHttps from 'lib/forceHttps';
 import Modal from '../Modal';
 import ReCaptchaBox from '../ReCaptchaBox';
 import * as postingActions from 'app/actions/posting';
@@ -16,6 +18,10 @@ const T = React.PropTypes;
 const MODAL_TITLE_TEXT = { self: 'Text', link: 'Link' };
 const SELECT_COMMUNITY = 'Select a community';
 const TITLE_PLACEHOLDER = 'Add an interesting title';
+const SAFE_HARBOR_TEXT = 'Posting this link saves the image or gif to Reddit';
+
+const SCRAPED_DOMAIN_REGEX = /\b(gfycat\.com|imgur\.com)$/i;
+const SCRAPED_EXTENSION_REGEX = /\.(gif|jpeg|jpg|png|tiff)$/;
 
 class PostSubmitModal extends React.Component {
   static propTypes = {
@@ -31,8 +37,23 @@ class PostSubmitModal extends React.Component {
     onCloseCaptcha: T.func.isRequired,
   };
 
+  // Safe Harbor check
+  isUrlScraped = url => {
+    const parsedUrl = parse(forceHttps(url));
+    // Check if domain is from scraped domain list
+    if (parsedUrl.hostname && SCRAPED_DOMAIN_REGEX.test(parsedUrl.hostname)) {
+      return true;
+    }
+    // Check if pathname has an extension from scraped extension list
+    if (parsedUrl.pathname && SCRAPED_EXTENSION_REGEX.test(parsedUrl.pathname)) {
+      return true;
+    }
+    return false;
+  }
+
   render() {
     const {
+      meta,
       submissionType,
       readyToPost,
       onSubmit,
@@ -45,6 +66,7 @@ class PostSubmitModal extends React.Component {
 
     const modalTitle = MODAL_TITLE_TEXT[submissionType];
     const buttonClass = cx('PostSubmitModal__submit-button', { ready: readyToPost });
+    const showSafeHarborText = this.isUrlScraped(meta);
 
     return (
       <Modal exitTo='/' titleText={ modalTitle }>
@@ -69,13 +91,19 @@ class PostSubmitModal extends React.Component {
           </div>
         </JSForm>
 
-        { showCaptcha ?
-          <ReCaptchaBox
-            onCloseCaptcha={ onCloseCaptcha }
-            onRecaptchaLoaded={ onRecaptchaLoaded }
-            onSubmit={ onSubmit }
-          /> :
-          null }
+        { showCaptcha
+          ? <ReCaptchaBox
+              onCloseCaptcha={ onCloseCaptcha }
+              onRecaptchaLoaded={ onRecaptchaLoaded }
+              onSubmit={ onSubmit }
+            />
+          : null }
+        { showSafeHarborText
+          ? <div className='PostSubmitModal__safeHarborText'>
+              { SAFE_HARBOR_TEXT }
+            </div>
+          : null
+        }
       </Modal>
     );
   }
