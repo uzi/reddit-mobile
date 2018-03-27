@@ -29,9 +29,10 @@
   // representation of the preview state, then we can really
   // know whether or not to apply .m-thumbnail-margin.
   .PostContent.size-compact + &.m-thumbnail-margin {
-    @rendered-thumbnail-size: @compact-listing-thumbnail-size + 2 * @grid-size;
-    margin-left: @rendered-thumbnail-size;
-    min-height: @rendered-thumbnail-size;
+    @rendered-thumbnail-width: @compact-listing-thumbnail-width + 2 * @grid-size;
+    @rendered-thumbnail-height: @compact-listing-thumbnail-height + 2 * @grid-size;
+    margin-left: @rendered-thumbnail-width;
+    min-height: @rendered-thumbnail-height;
 
     // & is that complex next child selector so reset the component name
     .PostHeader {
