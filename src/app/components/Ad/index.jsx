@@ -12,6 +12,8 @@ import Post from 'app/components/Post';
 
 const T = React.PropTypes;
 
+// TODO: handle multiple thresholds and times
+// -- track viewability and fully viewability for video
 const IMPRESSION_THRESHOLD = 0.01;
 const VIEWABILITY_THRESHOLD = 0.5;
 const VIEWABILITY_TIME = 1000;

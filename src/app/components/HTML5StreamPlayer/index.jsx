@@ -4,6 +4,11 @@ import { debounce } from 'lodash';
 import './styles.less';
 import PostModel from 'apiClient/models/PostModel';
 import { trackVideoEvent } from 'app/actions/posts';
+import {
+  trackVideoPlayedWithSound,
+  trackVideoPlayedExpanded,
+  trackVideoWatchedPercent,
+} from 'app/actions/ads';
 import { connect } from 'react-redux';
 import { VIDEO_EVENT } from 'app/constants';
 import { createSelector } from 'reselect';
@@ -309,13 +314,31 @@ class HTML5StreamPlayer extends React.Component {
       this.muteVideo();
     }
 
+    this.sendTrackVideoPlayedExpanded(); // video ad tracking
     this.sendTrackVideoEvent(VIDEO_EVENT.FULLSCREEN);
+  }
+
+  // video ad metric -- video ad played fullscreen
+  sendTrackVideoPlayedExpanded = () => {
+    if (!this.isPromoted()) {
+      return;
+    }
+    this.props.dispatch(trackVideoPlayedExpanded(this.getPostId()));
+  }
+
+  // video ad metric -- video ad played with sound
+  sendTrackVideoPlayedWithSound = () => {
+    if (!this.isPromoted()) {
+      return;
+    }
+    this.props.dispatch(trackVideoPlayedWithSound(this.getPostId()));
   }
 
   muteVideo = () => {
     const video = this.refs.HTML5StreamPlayerVideo;
 
     if (video.muted) {
+      this.sendTrackVideoPlayedWithSound(); // video ad tracking
       this.sendTrackVideoEvent(VIDEO_EVENT.UNMUTE);
     } else {
       this.sendTrackVideoEvent(VIDEO_EVENT.MUTE);
@@ -403,7 +426,7 @@ class HTML5StreamPlayer extends React.Component {
       context.strokeStyle = '#939393';
 
       const inc = bufferBar.width / video.duration;
-      
+
       //draw buffering each update
       for (let i = 0; i < video.buffered.length; i++) {
         const startX = video.buffered.start(i) * inc;
@@ -413,7 +436,7 @@ class HTML5StreamPlayer extends React.Component {
         context.fillRect(startX, 0, width, bufferBar.height);
         context.stroke();
       }
-      
+
       context.fillStyle = '#0DD3BB';
       context.strokeStyle = '#0DD3BB';
       context.fillRect(0, 0, video.currentTime * inc, bufferBar.height);
@@ -472,7 +495,7 @@ class HTML5StreamPlayer extends React.Component {
           </video>
         </div>
       </div>
-    );  
+    );
   }
 
   scrubEnd = () => {
@@ -503,6 +526,14 @@ class HTML5StreamPlayer extends React.Component {
     });
     const video = this.refs.HTML5StreamPlayerVideo;
     video.pause();
+  }
+
+  getPostId = () => {
+    return this.props.postData.name;
+  }
+
+  isPromoted = () => {
+    return this.props.postData.promoted;
   }
 
   render() {
@@ -538,7 +569,7 @@ class HTML5StreamPlayer extends React.Component {
               <source src={ this.props.hlsSource } type={ 'application/vnd.apple.mpegURL' }/>
             </video>
           </div>
-          
+
           <div className = 'HTML5StreamPlayer__controlPanel' id='html5-video-stream-controls'>
             <div className = 'HTML5StreamPlayer__control__play'>
               <button
@@ -578,9 +609,9 @@ class HTML5StreamPlayer extends React.Component {
 
               { !this.props.isGif &&
               <div className = 'HTML5StreamPlayer__control__scrubberContainer'>
-                <div className = 'HTML5StreamPlayer__control__barMargin'>    
+                <div className = 'HTML5StreamPlayer__control__barMargin'>
                   <div className = 'HTML5StreamPlayer__control__timeTotal'>
-                    { this.state.totalTime }  
+                    { this.state.totalTime }
                   </div>
 
                   <div className = 'HTML5StreamPlayer__control__timeCurrent'>
@@ -592,7 +623,7 @@ class HTML5StreamPlayer extends React.Component {
                     className = { 'HTML5StreamPlayer__control__scrubBar__buffer' }
                   >
                   </canvas>
-                  
+
                   <input
                     type='range'
                     step='any'
@@ -687,6 +718,7 @@ class HTML5StreamPlayer extends React.Component {
         servedTime = video.currentTime;
       }
       pctServed = servedTime / parseInt(video.duration * 1000);
+      console.log('percent is ', pctServed);
     }
     const payload = {
       max_timestamp_served: parseInt(this.state.totalServedTime),

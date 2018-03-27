@@ -54,6 +54,54 @@ export const trackViewableImpression = id => async (dispatch, getState) => {
   firePixelsOfType(post.events, AdEvents.ViewableImpression);
 };
 
+export const trackVideoViewableImpression = id => async (dispatch, getState) => {
+  const state = getState();
+  const post = state.posts[id];
+
+  firePixelsOfType(post.events, AdEvents.VideoViewableImpression);
+};
+
+export const trackVideoFullyViewableImpression = id => async (dispatch, getState) => {
+  const state = getState();
+  const post = state.posts[id];
+
+  firePixelsOfType(post.events, AdEvents.VideoFullyViewableImpression);
+};
+
+export const trackVideoPlayedWithSound = id => async (dispatch, getState) => {
+  const state = getState();
+  const post = state.posts[id];
+  console.log(' ******* dispatched played with sound');
+  // According to specs, all viewable events also fire when a video ad
+  // is played with sound
+  firePixelsOfType(post.events, AdEvents.VideoViewableImpression);
+  firePixelsOfType(post.events, AdEvents.VideoFullyViewableImpression);
+  firePixelsOfType(post.events, AdEvents.VideoPlayedWithSound);
+};
+
+export const trackVideoPlayedExpanded = id => async (dispatch, getState) => {
+  const state = getState();
+  const post = state.posts[id];
+  console.log(' ******* dispatched played expanded');
+  // According to specs, all viewable events also fire when a video ad
+  // is played in full screen
+  firePixelsOfType(post.events, AdEvents.VideoViewableImpression);
+  firePixelsOfType(post.events, AdEvents.VideoFullyViewableImpression);
+  firePixelsOfType(post.events, AdEvents.VideoPlayedExpanded);
+};
+
+export const trackVideoWatchedPercent = (id, percent) => async (dispatch, getState) => {
+  const state = getState();
+  const post = state.posts[id];
+  const adEvent = percent === 25 ? AdEvents.VideoWatched25 :
+                  percent === 50 ? AdEvents.VideoWatched50 :
+                  percent === 75 ? AdEvents.VideoWatched75 :
+                  percent === 95 ? AdEvents.VideoWatched95 :
+                  AdEvents.VideoWatched100;
+
+  firePixelsOfType(post.events, adEvent);
+};
+
 // Used by Rendered Ads if they detect that adblock has hidden
 // their content node. This only a thunk'd action because
 // `logClientAdblock` needs access to state
