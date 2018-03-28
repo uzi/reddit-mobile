@@ -50,6 +50,14 @@ class HTML5StreamPlayer extends React.Component {
       totalServedTime: 0,
       isLoading: false,
     };
+    this.percentWatchedInterval = null;
+    this.percentagePixelsTriggered = {
+      25: null,
+      50: null,
+      75: null,
+      95: null,
+      100: null,
+    };
   }
 
   getMobileOperatingSystem() {
@@ -190,6 +198,8 @@ class HTML5StreamPlayer extends React.Component {
 
     const debounceFunc = debounce(this.isScrolledIntoView, 50);
     window.addEventListener('scroll', debounceFunc);
+
+    this.trackVideoWatchedPercent();
 
     //store function handler for removal
     this.setState({debounceFunc, mediaPlayer: player});
@@ -334,6 +344,45 @@ class HTML5StreamPlayer extends React.Component {
     this.props.dispatch(trackVideoPlayedWithSound(this.getPostId()));
   }
 
+  // TODO: handle skipping in video --> should trigger all relevant pixels
+  sendTrackVideoWatchedPercent = percent => {
+    if (!this.isPromoted()) {
+      return;
+    }
+    const triggers = [25, 50, 75, 95, 100];
+    const id = this.getPostId();
+    triggers.forEach(trigger => {
+      if (percent < trigger || this.didTriggerPercentagePixel(trigger)) {
+        return;
+      }
+      this.percentagePixelsTriggered[trigger] = true;
+      this.props.dispatch(trackVideoWatchedPercent(id, trigger));
+      console.log('dispatched percent: ', trigger);
+      // we can clear the interval after firing all video metrics
+      if (trigger === 100) {
+        console.log('clearing interval? ');
+        clearInterval(this.percentWatchedInterval);
+      }
+    });
+  }
+
+  didTriggerPercentagePixel = percent => {
+    return this.percentagePixelsTriggered[percent];
+  }
+
+  trackVideoWatchedPercent = () => {
+    if (!this.isPromoted()) {
+      return;
+    }
+    let percentServed;
+    this.percentWatchedInterval = window.setInterval(() => {
+      percentServed = this.getPercentServed().percent_served;
+      if (percentServed > 0) {
+        this.sendTrackVideoWatchedPercent(percentServed * 100);
+      }
+    }, 100);
+  }
+
   muteVideo = () => {
     const video = this.refs.HTML5StreamPlayerVideo;
 
@@ -459,6 +508,7 @@ class HTML5StreamPlayer extends React.Component {
       newTime += performance.now() - this.state.lastUpdate;
     }
 
+
     if (video.currentTime && video.duration) {
       this.setState({
         videoPosition: ((video.currentTime/video.duration) * 100),
@@ -469,6 +519,12 @@ class HTML5StreamPlayer extends React.Component {
         wasPlaying: !this.videoIsPaused(),
         scrubPosition: ((video.currentTime/video.duration) * 100),
       });
+
+      // if video has ended, make sure to fire relevant ad pixels
+      if (video.currentTime === video.duration) {
+        this.sendTrackVideoWatchedPercent(100);
+      }
+
       this.props.onUpdatePostPlaytime(video.currentTime);
     }
   }
@@ -718,7 +774,6 @@ class HTML5StreamPlayer extends React.Component {
         servedTime = video.currentTime;
       }
       pctServed = servedTime / parseInt(video.duration * 1000);
-      console.log('percent is ', pctServed);
     }
     const payload = {
       max_timestamp_served: parseInt(this.state.totalServedTime),
