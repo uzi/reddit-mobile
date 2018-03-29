@@ -58,6 +58,7 @@ class HTML5StreamPlayer extends React.Component {
       95: null,
       100: null,
     };
+    this.didSeek = false;
   }
 
   getMobileOperatingSystem() {
@@ -344,25 +345,25 @@ class HTML5StreamPlayer extends React.Component {
     this.props.dispatch(trackVideoPlayedWithSound(this.getPostId()));
   }
 
-  // TODO: handle skipping in video --> should trigger all relevant pixels
+  // video ad metric -- percentage of video ad watched
   sendTrackVideoWatchedPercent = percent => {
     if (!this.isPromoted()) {
       return;
     }
-    const triggers = [25, 50, 75, 95, 100];
+    const pixelPercents = [25, 50, 75, 95, 100]; // percentage benchmarks to fire ad pixels
     const id = this.getPostId();
-    triggers.forEach(trigger => {
-      if (percent < trigger || this.didTriggerPercentagePixel(trigger)) {
+    pixelPercents.forEach(pixelPercent => {
+      if (percent < pixelPercent || this.didTriggerPercentagePixel(pixelPercent)) {
         return;
       }
-      this.percentagePixelsTriggered[trigger] = true;
-      this.props.dispatch(trackVideoWatchedPercent(id, trigger));
-      console.log('dispatched percent: ', trigger);
+      this.percentagePixelsTriggered[pixelPercent] = true;
+      this.props.dispatch(trackVideoWatchedPercent(id, pixelPercent));
+
       // we can clear the interval after firing all video metrics
-      if (trigger === 100) {
-        console.log('clearing interval? ');
-        clearInterval(this.percentWatchedInterval);
+      if (pixelPercent !== 100) {
+        return;
       }
+      clearInterval(this.percentWatchedInterval);
     });
   }
 
@@ -374,11 +375,13 @@ class HTML5StreamPlayer extends React.Component {
     if (!this.isPromoted()) {
       return;
     }
-    let percentServed;
+    let percent;
     this.percentWatchedInterval = window.setInterval(() => {
-      percentServed = this.getPercentServed().percent_served;
-      if (percentServed > 0) {
-        this.sendTrackVideoWatchedPercent(percentServed * 100);
+      // because of potential video skipping, scrubPosition
+      // is the best percentage watched indicator
+      percent = this.state.scrubPosition;
+      if (percent > 20) {
+        this.sendTrackVideoWatchedPercent(percent);
       }
     }, 100);
   }
@@ -520,8 +523,13 @@ class HTML5StreamPlayer extends React.Component {
         scrubPosition: ((video.currentTime/video.duration) * 100),
       });
 
-      // if video has ended, make sure to fire relevant ad pixels
-      if (video.currentTime === video.duration) {
+      // HACK: most times after seeking, the video doesn't "end"
+      // (i.e. it hangs at around 99.6% complete)
+      // for all intents and purposes, it has finished, so we
+      // account for this bug here
+      const videoEnded = (video.currentTime === video.duration) ||
+                         (this.didSeek && this.state.scrubPosition > 99);
+      if (videoEnded) {
         this.sendTrackVideoWatchedPercent(100);
       }
 
@@ -561,6 +569,9 @@ class HTML5StreamPlayer extends React.Component {
 
     video.currentTime = (video.duration/100) * this.state.scrubPosition;
     this.sendTrackVideoEvent(VIDEO_EVENT.SEEK);
+
+    // keep track of seeking to handle ad viewabilty
+    this.didSeek = true;
 
     if (this.state.wasPlaying) {
       video.play();
