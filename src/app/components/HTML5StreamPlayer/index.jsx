@@ -8,6 +8,7 @@ import {
   trackVideoPlayedWithSound,
   trackVideoPlayedExpanded,
   trackVideoWatchedPercent,
+  updateBufferedStatus,
 } from 'app/actions/ads';
 import { connect } from 'react-redux';
 import { VIDEO_EVENT } from 'app/constants';
@@ -49,6 +50,7 @@ class HTML5StreamPlayer extends React.Component {
       lastUpdate: null,
       totalServedTime: 0,
       isLoading: false,
+      buffered: 0,
     };
     this.percentWatchedInterval = null;
     this.percentagePixelsTriggered = {
@@ -236,6 +238,7 @@ class HTML5StreamPlayer extends React.Component {
       //Entered or exited fullscreen, send page type event
       this.sendTrackVideoEvent(VIDEO_EVENT.CHANGED_PAGETYPE, this.getPercentServed());
     }
+    this.sendBufferedStatus();
   }
 
   //paused attribute and 'currently paused' are two different states, must check for additional conditions
@@ -365,6 +368,15 @@ class HTML5StreamPlayer extends React.Component {
       }
       clearInterval(this.percentWatchedInterval);
     });
+  }
+
+  sendBufferedStatus = () => {
+    const video = this.refs.HTML5StreamPlayerVideo;
+    if (!this.isPromoted() || video.buffered.length === this.state.buffered) {
+      return;
+    }
+    this.setState({ buffered: video.buffered.length });
+    this.props.dispatch(updateBufferedStatus(this.getPostId(), !!video.buffered.length));
   }
 
   didTriggerPercentagePixel = percent => {

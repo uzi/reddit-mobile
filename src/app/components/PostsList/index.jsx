@@ -22,7 +22,6 @@ export const PostsList = props => {
   if (loading || (!postRecords.length)) {
     return <LoadingXpromo />;
   }
-
   return (
     <div className='PostsList PostAndCommentList'>
       { renderPostsList(props) }
@@ -61,6 +60,7 @@ const renderPostsList = props => {
     subredditShowSpoilers,
     onPostClick,
     isXPromoEnabled,
+    videoAds,
     posts,
   } = props;
   const postProps = {
@@ -69,7 +69,7 @@ const renderPostsList = props => {
     subredditShowSpoilers,
     onPostClick,
   };
-  
+
   const postsList = postRecords.map((postRecord, i) => {
     const postId = postRecord.uuid;
     const post = posts[postId];
@@ -77,6 +77,8 @@ const renderPostsList = props => {
       return <Ad
         postId={ postId }
         placementIndex={ i }
+        isVideo={ !!(post.media && post.media.reddit_video) }
+        videoAdsStatus={ videoAds }
         postProps={ {
           ...postProps,
           key: 'native-ad',
@@ -85,7 +87,7 @@ const renderPostsList = props => {
     }
     return <Post { ...postProps } postId={ postId } key={ `post-id-${postId}` }/>;
   });
-  
+
   if (isXPromoEnabled) {
     addXPromoToPostsList(postsList, 5);
   }
@@ -108,14 +110,27 @@ const selector = createSelector(
   (_, props) => props.nextUrl,
   (_, props) => props.prevUrl,
   isXPromoInFeedEnabled,
-  (postsList, posts, nextUrl, prevUrl, isXPromoEnabled) => ({
+  state => state.videoAds,
+  (postsList, posts, nextUrl, prevUrl, isXPromoEnabled, videoAds) => ({
     loading: !!postsList && postsList.loading,
     postRecords: postsList ? postsList.results.filter(p => !posts[p.uuid].hidden) : [],
     prevUrl,
     nextUrl,
     isXPromoEnabled,
+    videoAds,
     posts,
   }),
 );
 
 export default connect(selector)(PostsList);
+
+/**
+ * TODO:
+ * - add buffering status to redux state
+ * - add skipped status to redux state
+ * - create actions to change buffering status and skipped status
+ * - dispatch those actions from the HTML5StreamPlayer
+ * - pass buffering and skipped info to ad component as props
+ * - on component change in ad component, handle viewability metrics
+ *   according to whether we are skipping and/or buffering in state
+ */

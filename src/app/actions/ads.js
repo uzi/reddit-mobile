@@ -40,6 +40,13 @@ export const tracking = adId => ({
   adId,
 });
 
+export const VIDEO_AD_BUFFERING = 'VIDEO_AD_BUFFERING';
+export const videoAdBuffering = (postId, hasBuffered) => ({
+  type: VIDEO_AD_BUFFERING,
+  hasBuffered,
+  postId,
+});
+
 export const trackImpression = id => async (dispatch, getState) => {
   const state = getState();
   const post = state.posts[id];
@@ -47,24 +54,28 @@ export const trackImpression = id => async (dispatch, getState) => {
   firePixelsOfType(post.events, AdEvents.Impression);
 };
 
+export const updateBufferedStatus = (postId, hasBuffered) => async dispatch => {
+  dispatch(videoAdBuffering(postId, hasBuffered));
+};
+
 export const trackViewableImpression = id => async (dispatch, getState) => {
   const state = getState();
   const post = state.posts[id];
-
+  console.log('FIRING VIEWABLE IMPRESSION PIXEL');
   firePixelsOfType(post.events, AdEvents.ViewableImpression);
 };
 
 export const trackVideoViewableImpression = id => async (dispatch, getState) => {
   const state = getState();
   const post = state.posts[id];
-
+  console.log('FIRING VIDEO VIEWABLE IMPRESSION PIXEL');
   firePixelsOfType(post.events, AdEvents.VideoViewableImpression);
 };
 
 export const trackVideoFullyViewableImpression = id => async (dispatch, getState) => {
   const state = getState();
   const post = state.posts[id];
-
+  console.log('FIRING VIDEO FULLY VIEWABLE IMPRESSION PIXEL');
   firePixelsOfType(post.events, AdEvents.VideoFullyViewableImpression);
 };
 
