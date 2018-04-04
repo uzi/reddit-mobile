@@ -78,7 +78,7 @@ class Ad extends React.Component {
     this.event = null;
     this.state = {
       madeImpression: false,
-      madeAllImpressions: false,
+      shouldDisableObserver: false,
       shouldTrackVideoImpression: isVideo && this.hasBuffered,
     };
   }
@@ -91,9 +91,7 @@ class Ad extends React.Component {
     const { isVideo, postId, videoAdsStatus } = this.props;
     const { hasBuffered, currentViewStartedAt } = videoAdsStatus;
     const userSkippedInVideo = currentViewStartedAt[postId] !== this.latestViewStartTime;
-    if (!isVideo || this.state.madeAllImpressions) {
-      return;
-    }
+    if (!isVideo) { return; }
     if (userSkippedInVideo) {
       this.handleVideoSkip(currentViewStartedAt[postId]);
     }
@@ -119,11 +117,9 @@ class Ad extends React.Component {
       // remaining time in the video to record an impression, we disable the stat.
       // however, if a user then skips back to an earlier part of the video, we
       // may re-enable the impression
-      if (this.props.videoAdsStatus.length - newViewStartTime * 1000 < impression.time) {
-        impression.disabled = true;
-        return;
-      }
-      impression.disabled = false;
+      const { length } = this.props.videoAdsStatus;
+      impression.disabled = length - newViewStartTime * 1000 < impression.time ? true : false;
+      this.checkIfShouldDisableObserver();
     });
   }
 
@@ -172,11 +168,7 @@ class Ad extends React.Component {
       }
       impression.timer = window.setTimeout(() => {
         this.onViewabilityImpression(impression);
-        if (!this.props.isVideo) {
-          this.setState({ madeAllImpressions: true });
-          return;
-        }
-        this.checkIfMadeAllImpressions();
+        this.checkIfShouldDisableObserver();
       }, time);
       return;
     }
@@ -191,18 +183,24 @@ class Ad extends React.Component {
     impression.onImpression();
   }
 
-  checkIfMadeAllImpressions() {
+  checkIfShouldDisableObserver() {
+    // we only need to check all impressions when the ad is a video
+    if (!this.props.isVideo) {
+      this.setState({ shouldDisableObserver: true });
+      return;
+    }
     const impressions = [
       this.viewableImpression,
       this.videoViewableImpression,
       this.videoFullyViewableImpression,
     ];
-    const madeAllImpressions = impressions.reduce((madeAllImps, imp) => (
-      (madeAllImps && imp.madeImpression)
+    const shouldDisableObserver = impressions.reduce((shouldDisable, imp) => (
+      (shouldDisable && (imp.madeImpression || imp.disabled))
     ), true);
-    if (!madeAllImpressions) { return; }
-    // setting madeAllImpressions to true disables the observer once we no longer need it
-    this.setState({ madeAllImpressions });
+    if (shouldDisableObserver === this.state.shouldDisableObserver) { return; }
+    // enable or disable the observer based on whether all impressions have been made
+    // or whether impressions are disabled
+    this.setState({ shouldDisableObserver });
   }
 
   render() {
@@ -211,7 +209,7 @@ class Ad extends React.Component {
       <Observer
         threshold={ THRESHOLDS }
         onChange={ this.handleObserver }
-        disabled={ this.state.madeAllImpressions }
+        disabled={ this.state.shouldDisableObserver }
       >
         <Post { ...postProps } postId={ postId } key={ `post-id-${postId}` }/>
       </Observer>
