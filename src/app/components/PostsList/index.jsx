@@ -127,14 +127,3 @@ const selector = createSelector(
 );
 
 export default connect(selector)(PostsList);
-
-/**
- * TODO:
- * - add buffering status to redux state
- * - add skipped status to redux state
- * - create actions to change buffering status and skipped status
- * - dispatch those actions from the HTML5StreamPlayer
- * - pass buffering and skipped info to ad component as props
- * - on component change in ad component, handle viewability metrics
- *   according to whether we are skipping and/or buffering in state
- */
