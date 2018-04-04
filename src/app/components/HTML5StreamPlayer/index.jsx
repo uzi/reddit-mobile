@@ -4,6 +4,13 @@ import { debounce } from 'lodash';
 import './styles.less';
 import PostModel from 'apiClient/models/PostModel';
 import { trackVideoEvent } from 'app/actions/posts';
+import {
+  trackVideoPlayedWithSound,
+  trackVideoPlayedExpanded,
+  trackVideoWatchedPercent,
+  updateBufferedStatus,
+  updateVideoSeekedStatus,
+} from 'app/actions/ads';
 import { connect } from 'react-redux';
 import { VIDEO_EVENT } from 'app/constants';
 import { createSelector } from 'reselect';
@@ -44,7 +51,18 @@ class HTML5StreamPlayer extends React.Component {
       lastUpdate: null,
       totalServedTime: 0,
       isLoading: false,
+      buffered: 0,
     };
+    this.percentWatchedInterval = null;
+    this.percentagePixelsTriggered = {
+      25: null,
+      50: null,
+      75: null,
+      95: null,
+      100: null,
+    };
+    this.didSeek = false;
+    this.latestStartTime = 0;
   }
 
   getMobileOperatingSystem() {
@@ -186,6 +204,8 @@ class HTML5StreamPlayer extends React.Component {
     const debounceFunc = debounce(this.isScrolledIntoView, 50);
     window.addEventListener('scroll', debounceFunc);
 
+    this.trackVideoWatchedPercent();
+
     //store function handler for removal
     this.setState({debounceFunc, mediaPlayer: player});
   }
@@ -220,6 +240,7 @@ class HTML5StreamPlayer extends React.Component {
       //Entered or exited fullscreen, send page type event
       this.sendTrackVideoEvent(VIDEO_EVENT.CHANGED_PAGETYPE, this.getPercentServed());
     }
+    this.sendBufferedStatus();
   }
 
   //paused attribute and 'currently paused' are two different states, must check for additional conditions
@@ -309,13 +330,88 @@ class HTML5StreamPlayer extends React.Component {
       this.muteVideo();
     }
 
+    this.sendTrackVideoPlayedExpanded(); // video ad tracking
     this.sendTrackVideoEvent(VIDEO_EVENT.FULLSCREEN);
+  }
+
+  // video ad metric -- video ad played fullscreen
+  sendTrackVideoPlayedExpanded = () => {
+    if (!this.isPromoted()) {
+      return;
+    }
+    this.props.dispatch(trackVideoPlayedExpanded(this.getPostId()));
+  }
+
+  // video ad metric -- video ad played with sound
+  sendTrackVideoPlayedWithSound = () => {
+    if (!this.isPromoted()) {
+      return;
+    }
+    this.props.dispatch(trackVideoPlayedWithSound(this.getPostId()));
+  }
+
+  // video ad metric -- percentage of video ad watched
+  sendTrackVideoWatchedPercent = percent => {
+    if (!this.isPromoted()) {
+      return;
+    }
+    const pixelPercents = [25, 50, 75, 95, 100]; // percentage benchmarks to fire ad pixels
+    const id = this.getPostId();
+    pixelPercents.forEach(pixelPercent => {
+      if (percent < pixelPercent || this.didTriggerPercentagePixel(pixelPercent)) {
+        return;
+      }
+      this.percentagePixelsTriggered[pixelPercent] = true;
+      this.props.dispatch(trackVideoWatchedPercent(id, pixelPercent));
+
+      // we can clear the interval after firing all video metrics
+      if (pixelPercent !== 100) {
+        return;
+      }
+      clearInterval(this.percentWatchedInterval);
+    });
+  }
+
+  sendBufferedStatus = () => {
+    const video = this.refs.HTML5StreamPlayerVideo;
+    if (!this.isPromoted() || video.buffered.length === this.state.buffered) {
+      return;
+    }
+    this.setState({ buffered: video.buffered.length });
+    this.props.dispatch(updateBufferedStatus(this.getPostId(), !!video.buffered.length));
+  }
+
+  sendVideoSeekedStatus = () => {
+    if (!this.isPromoted()) {
+      return;
+    }
+    this.props.dispatch(updateVideoSeekedStatus(this.getPostId(), this.latestStartTime));
+  }
+
+  didTriggerPercentagePixel = percent => {
+    return this.percentagePixelsTriggered[percent];
+  }
+
+  trackVideoWatchedPercent = () => {
+    if (!this.isPromoted()) {
+      return;
+    }
+    let percent;
+    this.percentWatchedInterval = window.setInterval(() => {
+      // because of potential video skipping, scrubPosition
+      // is the best percentage watched indicator
+      percent = this.state.scrubPosition;
+      if (percent > 20) {
+        this.sendTrackVideoWatchedPercent(percent);
+      }
+    }, 100);
   }
 
   muteVideo = () => {
     const video = this.refs.HTML5StreamPlayerVideo;
 
     if (video.muted) {
+      this.sendTrackVideoPlayedWithSound(); // video ad tracking
       this.sendTrackVideoEvent(VIDEO_EVENT.UNMUTE);
     } else {
       this.sendTrackVideoEvent(VIDEO_EVENT.MUTE);
@@ -403,7 +499,7 @@ class HTML5StreamPlayer extends React.Component {
       context.strokeStyle = '#939393';
 
       const inc = bufferBar.width / video.duration;
-      
+
       //draw buffering each update
       for (let i = 0; i < video.buffered.length; i++) {
         const startX = video.buffered.start(i) * inc;
@@ -413,7 +509,7 @@ class HTML5StreamPlayer extends React.Component {
         context.fillRect(startX, 0, width, bufferBar.height);
         context.stroke();
       }
-      
+
       context.fillStyle = '#0DD3BB';
       context.strokeStyle = '#0DD3BB';
       context.fillRect(0, 0, video.currentTime * inc, bufferBar.height);
@@ -436,6 +532,7 @@ class HTML5StreamPlayer extends React.Component {
       newTime += performance.now() - this.state.lastUpdate;
     }
 
+
     if (video.currentTime && video.duration) {
       this.setState({
         videoPosition: ((video.currentTime/video.duration) * 100),
@@ -446,6 +543,17 @@ class HTML5StreamPlayer extends React.Component {
         wasPlaying: !this.videoIsPaused(),
         scrubPosition: ((video.currentTime/video.duration) * 100),
       });
+
+      // HACK: most times after seeking, the video doesn't "end"
+      // (i.e. it hangs at around 99.6% complete)
+      // for all intents and purposes, it has finished, so we
+      // account for this bug here
+      const videoEnded = (video.currentTime === video.duration) ||
+                         (this.didSeek && this.state.scrubPosition > 99);
+      if (videoEnded) {
+        this.sendTrackVideoWatchedPercent(100);
+      }
+
       this.props.onUpdatePostPlaytime(video.currentTime);
     }
   }
@@ -472,7 +580,7 @@ class HTML5StreamPlayer extends React.Component {
           </video>
         </div>
       </div>
-    );  
+    );
   }
 
   scrubEnd = () => {
@@ -482,6 +590,11 @@ class HTML5StreamPlayer extends React.Component {
 
     video.currentTime = (video.duration/100) * this.state.scrubPosition;
     this.sendTrackVideoEvent(VIDEO_EVENT.SEEK);
+
+    // keep track of seeking to handle ad viewabilty
+    this.didSeek = true;
+    this.latestStartTime = video.currentTime;
+    this.sendVideoSeekedStatus();
 
     if (this.state.wasPlaying) {
       video.play();
@@ -503,6 +616,14 @@ class HTML5StreamPlayer extends React.Component {
     });
     const video = this.refs.HTML5StreamPlayerVideo;
     video.pause();
+  }
+
+  getPostId = () => {
+    return this.props.postData.name;
+  }
+
+  isPromoted = () => {
+    return this.props.postData.promoted;
   }
 
   render() {
@@ -538,7 +659,7 @@ class HTML5StreamPlayer extends React.Component {
               <source src={ this.props.hlsSource } type={ 'application/vnd.apple.mpegURL' }/>
             </video>
           </div>
-          
+
           <div className = 'HTML5StreamPlayer__controlPanel' id='html5-video-stream-controls'>
             <div className = 'HTML5StreamPlayer__control__play'>
               <button
@@ -578,9 +699,9 @@ class HTML5StreamPlayer extends React.Component {
 
               { !this.props.isGif &&
               <div className = 'HTML5StreamPlayer__control__scrubberContainer'>
-                <div className = 'HTML5StreamPlayer__control__barMargin'>    
+                <div className = 'HTML5StreamPlayer__control__barMargin'>
                   <div className = 'HTML5StreamPlayer__control__timeTotal'>
-                    { this.state.totalTime }  
+                    { this.state.totalTime }
                   </div>
 
                   <div className = 'HTML5StreamPlayer__control__timeCurrent'>
@@ -592,7 +713,7 @@ class HTML5StreamPlayer extends React.Component {
                     className = { 'HTML5StreamPlayer__control__scrubBar__buffer' }
                   >
                   </canvas>
-                  
+
                   <input
                     type='range'
                     step='any'

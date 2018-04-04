@@ -22,7 +22,6 @@ export const PostsList = props => {
   if (loading || (!postRecords.length)) {
     return <LoadingXpromo />;
   }
-
   return (
     <div className='PostsList PostAndCommentList'>
       { renderPostsList(props) }
@@ -61,6 +60,7 @@ const renderPostsList = props => {
     subredditShowSpoilers,
     onPostClick,
     isXPromoEnabled,
+    videoAds,
     posts,
   } = props;
   const postProps = {
@@ -69,14 +69,20 @@ const renderPostsList = props => {
     subredditShowSpoilers,
     onPostClick,
   };
-  
+
   const postsList = postRecords.map((postRecord, i) => {
     const postId = postRecord.uuid;
     const post = posts[postId];
     if (post && post.promoted) {
+      const isVideo = !!(post.media && post.media.reddit_video);
+      const videoAdsStatus = isVideo ?
+                            { ...videoAds, length: post.media.reddit_video.duration * 1000 } :
+                            videoAds;
       return <Ad
         postId={ postId }
         placementIndex={ i }
+        isVideo={ isVideo }
+        videoAdsStatus={ videoAdsStatus }
         postProps={ {
           ...postProps,
           key: 'native-ad',
@@ -85,7 +91,7 @@ const renderPostsList = props => {
     }
     return <Post { ...postProps } postId={ postId } key={ `post-id-${postId}` }/>;
   });
-  
+
   if (isXPromoEnabled) {
     addXPromoToPostsList(postsList, 5);
   }
@@ -108,12 +114,14 @@ const selector = createSelector(
   (_, props) => props.nextUrl,
   (_, props) => props.prevUrl,
   isXPromoInFeedEnabled,
-  (postsList, posts, nextUrl, prevUrl, isXPromoEnabled) => ({
+  state => state.videoAds,
+  (postsList, posts, nextUrl, prevUrl, isXPromoEnabled, videoAds) => ({
     loading: !!postsList && postsList.loading,
     postRecords: postsList ? postsList.results.filter(p => !posts[p.uuid].hidden) : [],
     prevUrl,
     nextUrl,
     isXPromoEnabled,
+    videoAds,
     posts,
   }),
 );

@@ -12,11 +12,20 @@ export const AdEvents = {
   ViewableImpression: 7,
   CommentUpvote: 8,
   CommentDownvote: 9,
+  VideoViewableImpression: 100,
+  VideoFullyViewableImpression: 101,
+  VideoPlayedWithSound: 102,
+  VideoPlayedExpanded: 103,
+  VideoWatched25: 104,
+  VideoWatched50: 105,
+  VideoWatched75: 106,
+  VideoWatched95: 107,
+  VideoWatched100: 108,
 };
 
 export const firePixel = (pixel) => {
   if (firedPixels.get(pixel)) { return; }
-  
+
   const img = new Image();
   img.src = pixel;
   firedPixels.set(pixel, true);

@@ -53,6 +53,7 @@ import toaster from './toaster';
 import tracking from './tracking';
 import unblurredPosts from './unblurredPosts';
 import user from './user';
+import videoAds from './videoAds';
 import visitedPosts from './visitedPosts';
 import wikiRequests from './wikiRequests';
 import wikis from './wikis';
@@ -112,6 +113,7 @@ export default {
   tracking,
   unblurredPosts,
   user,
+  videoAds,
   visitedPosts,
   widgets,
   wikis,
