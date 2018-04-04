@@ -47,6 +47,13 @@ export const videoAdBuffering = (postId, hasBuffered) => ({
   postId,
 });
 
+export const VIDEO_CURRENT_VIEW_STARTED_AT = 'VIDEO_CURRENT_VIEW_STARTED_AT';
+export const videoCurrentViewStartedAt = (postId, newTime) => ({
+  type: VIDEO_CURRENT_VIEW_STARTED_AT,
+  newTime,
+  postId,
+});
+
 export const trackImpression = id => async (dispatch, getState) => {
   const state = getState();
   const post = state.posts[id];
@@ -58,31 +65,31 @@ export const updateBufferedStatus = (postId, hasBuffered) => async dispatch => {
   dispatch(videoAdBuffering(postId, hasBuffered));
 };
 
+export const updateVideoSeekedStatus = (postId, newTime) => async dispatch => {
+  dispatch(videoCurrentViewStartedAt(postId, newTime));
+};
+
 export const trackViewableImpression = id => async (dispatch, getState) => {
   const state = getState();
   const post = state.posts[id];
-  console.log('FIRING VIEWABLE IMPRESSION PIXEL');
   firePixelsOfType(post.events, AdEvents.ViewableImpression);
 };
 
 export const trackVideoViewableImpression = id => async (dispatch, getState) => {
   const state = getState();
   const post = state.posts[id];
-  console.log('FIRING VIDEO VIEWABLE IMPRESSION PIXEL');
   firePixelsOfType(post.events, AdEvents.VideoViewableImpression);
 };
 
 export const trackVideoFullyViewableImpression = id => async (dispatch, getState) => {
   const state = getState();
   const post = state.posts[id];
-  console.log('FIRING VIDEO FULLY VIEWABLE IMPRESSION PIXEL');
   firePixelsOfType(post.events, AdEvents.VideoFullyViewableImpression);
 };
 
 export const trackVideoPlayedWithSound = id => async (dispatch, getState) => {
   const state = getState();
   const post = state.posts[id];
-  console.log(' ******* dispatched played with sound');
   // According to specs, all viewable events also fire when a video ad
   // is played with sound
   firePixelsOfType(post.events, AdEvents.VideoViewableImpression);
@@ -93,7 +100,6 @@ export const trackVideoPlayedWithSound = id => async (dispatch, getState) => {
 export const trackVideoPlayedExpanded = id => async (dispatch, getState) => {
   const state = getState();
   const post = state.posts[id];
-  console.log(' ******* dispatched played expanded');
   // According to specs, all viewable events also fire when a video ad
   // is played in full screen
   firePixelsOfType(post.events, AdEvents.VideoViewableImpression);
@@ -109,7 +115,6 @@ export const trackVideoWatchedPercent = (id, percent) => async (dispatch, getSta
                   percent === 75 ? AdEvents.VideoWatched75 :
                   percent === 95 ? AdEvents.VideoWatched95 :
                   AdEvents.VideoWatched100;
-
   firePixelsOfType(post.events, adEvent);
 };
 

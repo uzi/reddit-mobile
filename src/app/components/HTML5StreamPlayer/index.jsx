@@ -9,6 +9,7 @@ import {
   trackVideoPlayedExpanded,
   trackVideoWatchedPercent,
   updateBufferedStatus,
+  updateVideoSeekedStatus,
 } from 'app/actions/ads';
 import { connect } from 'react-redux';
 import { VIDEO_EVENT } from 'app/constants';
@@ -61,6 +62,7 @@ class HTML5StreamPlayer extends React.Component {
       100: null,
     };
     this.didSeek = false;
+    this.latestStartTime = 0;
   }
 
   getMobileOperatingSystem() {
@@ -379,6 +381,13 @@ class HTML5StreamPlayer extends React.Component {
     this.props.dispatch(updateBufferedStatus(this.getPostId(), !!video.buffered.length));
   }
 
+  sendVideoSeekedStatus = () => {
+    if (!this.isPromoted()) {
+      return;
+    }
+    this.props.dispatch(updateVideoSeekedStatus(this.getPostId(), this.latestStartTime));
+  }
+
   didTriggerPercentagePixel = percent => {
     return this.percentagePixelsTriggered[percent];
   }
@@ -584,6 +593,8 @@ class HTML5StreamPlayer extends React.Component {
 
     // keep track of seeking to handle ad viewabilty
     this.didSeek = true;
+    this.latestStartTime = video.currentTime;
+    this.sendVideoSeekedStatus();
 
     if (this.state.wasPlaying) {
       video.play();

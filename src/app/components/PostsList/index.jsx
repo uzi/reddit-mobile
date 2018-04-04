@@ -74,11 +74,15 @@ const renderPostsList = props => {
     const postId = postRecord.uuid;
     const post = posts[postId];
     if (post && post.promoted) {
+      const isVideo = !!(post.media && post.media.reddit_video);
+      const videoAdsStatus = isVideo ?
+                            { ...videoAds, length: post.media.reddit_video.duration * 1000 } :
+                            videoAds;
       return <Ad
         postId={ postId }
         placementIndex={ i }
-        isVideo={ !!(post.media && post.media.reddit_video) }
-        videoAdsStatus={ videoAds }
+        isVideo={ isVideo }
+        videoAdsStatus={ videoAdsStatus }
         postProps={ {
           ...postProps,
           key: 'native-ad',

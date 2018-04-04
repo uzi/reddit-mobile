@@ -45,6 +45,7 @@ class Ad extends React.Component {
     timer: null,
     onImpression: this.props.onViewableImpression,
     madeImpression: false,
+    disabled: false,
   }
   // a video ad element must be 50% viewable for at least
   // 2 seconds continuously post-buffering to be considered viewable
@@ -55,6 +56,7 @@ class Ad extends React.Component {
     timer: null,
     onImpression: this.props.onVideoViewableImpression,
     madeImpression: false,
+    disabled: false,
   }
   // a video ad element must be 100% viewable for at least
   // 3 seconds continuously post-buffering to be considered
@@ -65,20 +67,20 @@ class Ad extends React.Component {
     timer: null,
     onImpression: this.props.onVideoFullyViewableImpression,
     madeImpression: false,
+    disabled: false,
   }
 
   constructor(props) {
     super(props);
     const { isVideo, postId, videoAdsStatus } = props;
     this.hasBuffered = videoAdsStatus.hasBuffered[postId];
+    this.latestViewStartTime = videoAdsStatus.currentViewStartedAt[postId];
     this.event = null;
     this.state = {
       madeImpression: false,
-      // handle isVideo, isBuffering, hasSkipped, etc.
       madeAllImpressions: false,
-      shouldTrackVideoImpression: isVideo && !this.state.madeAllImpressions && this.hasBuffered,
+      shouldTrackVideoImpression: isVideo && this.hasBuffered,
     };
-    console.log('props ', props);
   }
 
   componentDidMount() {
@@ -86,14 +88,55 @@ class Ad extends React.Component {
   }
 
   componentDidUpdate() {
-    console.log('i updated as ', this);
     const { isVideo, postId, videoAdsStatus } = this.props;
-    if (!isVideo || videoAdsStatus.hasBuffered[postId] === this.hasBuffered) {
+    const { hasBuffered, currentViewStartedAt } = videoAdsStatus;
+    const userSkippedInVideo = currentViewStartedAt[postId] !== this.latestViewStartTime;
+    if (!isVideo || this.state.madeAllImpressions) {
       return;
     }
-    this.hasBuffered = videoAdsStatus.hasBuffered[postId];
-    this.setState({ shouldTrackVideoImpression: this.hasBuffered });
-    this.handleObserver(this.event);
+    if (userSkippedInVideo) {
+      this.handleVideoSkip(currentViewStartedAt[postId]);
+    }
+    this.handleBufferingUpdate(hasBuffered[postId]);
+  }
+
+  handleVideoSkip(newViewStartTime) {
+    this.latestViewStartTime = newViewStartTime;
+    const impressions = [
+      this.viewableImpression,
+      this.videoViewableImpression,
+      this.videoFullyViewableImpression,
+    ];
+    // when a user skips around in a video, the view isn't considered to be
+    // continuous, therefore, we must reset the view timers whenever
+    // a user skips
+    impressions.forEach(impression => {
+      if (impression.madeImpression) { return; }
+      clearTimeout(impression.timer);
+      impression.timer = null;
+      // user can skip to the end of the video, but we can only count viewable
+      // impressions when the video is playing. hence, if there isn't enough
+      // remaining time in the video to record an impression, we disable the stat.
+      // however, if a user then skips back to an earlier part of the video, we
+      // may re-enable the impression
+      if (this.props.videoAdsStatus.length - newViewStartTime * 1000 < impression.time) {
+        impression.disabled = true;
+        return;
+      }
+      impression.disabled = false;
+    });
+  }
+
+  handleBufferingUpdate(bufferedStatus) {
+    // tracking video impressions is dependent on whether or not the video is buffering
+    if (this.hasBuffered === bufferedStatus) {
+      this.handleObserver(this.event);
+      return;
+    }
+    this.hasBuffered = bufferedStatus;
+    this.setState({ shouldTrackVideoImpression: this.hasBuffered }, () => {
+      this.handleObserver(this.event);
+    });
   }
 
   checkAdblock() {
@@ -124,16 +167,20 @@ class Ad extends React.Component {
   handleImpression(e, impression) {
     const { madeImpression, threshold, time } = impression;
     if (!madeImpression && e.isIntersecting && e.intersectionRatio >= threshold) {
+      if (impression.timer || impression.disabled) {
+        return;
+      }
       impression.timer = window.setTimeout(() => {
         this.onViewabilityImpression(impression);
         if (!this.props.isVideo) {
           this.setState({ madeAllImpressions: true });
+          return;
         }
+        this.checkIfMadeAllImpressions();
       }, time);
       return;
     }
     if (impression.timer) {
-      console.log('clearing timeout for ', impression);
       clearTimeout(impression.timer);
     }
   }
@@ -144,13 +191,26 @@ class Ad extends React.Component {
     impression.onImpression();
   }
 
+  checkIfMadeAllImpressions() {
+    const impressions = [
+      this.viewableImpression,
+      this.videoViewableImpression,
+      this.videoFullyViewableImpression,
+    ];
+    const madeAllImpressions = impressions.reduce((madeAllImps, imp) => (
+      (madeAllImps && imp.madeImpression)
+    ), true);
+    if (!madeAllImpressions) { return; }
+    // setting madeAllImpressions to true disables the observer once we no longer need it
+    this.setState({ madeAllImpressions });
+  }
+
   render() {
     const { postProps, postId } = this.props;
     return (
       <Observer
         threshold={ THRESHOLDS }
         onChange={ this.handleObserver }
-        // TODO: elegant disable
         disabled={ this.state.madeAllImpressions }
       >
         <Post { ...postProps } postId={ postId } key={ `post-id-${postId}` }/>
@@ -159,7 +219,6 @@ class Ad extends React.Component {
   }
 }
 
-// TODO: make sure that these don't need to come from somewhere else too
 const mapDispatchToProps = (dispatch, { postId, placementIndex }) => ({
   onImpression() { dispatch(adActions.trackImpression(postId)); },
   onViewableImpression() { dispatch(adActions.trackViewableImpression(postId)); },

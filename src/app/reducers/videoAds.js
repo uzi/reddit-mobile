@@ -3,7 +3,7 @@ import merge from 'platform/merge';
 
 const DEFAULT = {
   hasBuffered: {},
-  skipped: {},
+  currentViewStartedAt: {},
 };
 
 export default (state = DEFAULT, action={}) => {
@@ -16,7 +16,14 @@ export default (state = DEFAULT, action={}) => {
         },
       });
     }
-    // TODO: add skipped case
+    case adActions.VIDEO_CURRENT_VIEW_STARTED_AT: {
+      const { newTime, postId } = action;
+      return merge(state, {
+        currentViewStartedAt: {
+          [postId]: newTime,
+        },
+      });
+    }
     default: return state;
   }
 };
