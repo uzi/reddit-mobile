@@ -185,15 +185,12 @@ class Ad extends React.Component {
 
   checkIfShouldDisableObserver() {
     // we only need to check all impressions when the ad is a video
-    if (!this.props.isVideo) {
-      this.setState({ shouldDisableObserver: true });
-      return;
-    }
     const impressions = [
       this.viewableImpression,
-      this.videoViewableImpression,
-      this.videoFullyViewableImpression,
     ];
+    if (this.props.isVideo) {
+      impressions.push(this.videoViewableImpression, this.videoFullyViewableImpression);
+    }
     const shouldDisableObserver = impressions.reduce((shouldDisable, imp) => (
       (shouldDisable && (imp.madeImpression || imp.disabled))
     ), true);
