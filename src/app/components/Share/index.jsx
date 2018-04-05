@@ -12,7 +12,7 @@ const SHARE_ICON_2 = `${config.assetPath}/img/icon_share_ios_32.png`;
 
 export const getSharingData = (state) => {
   const experiment = (window && window.navigator && window.navigator.share) ?
-    flags.VARIANT_MOBILE_SHARING_WEB_API :
+    flags.VARIANT_MOBILE_SHARING_WEB_SHARE_API :
     flags.VARIANT_MOBILE_SHARING_CLIPBOARD;
 
   const name = EXPERIMENT_NAMES[experiment];
