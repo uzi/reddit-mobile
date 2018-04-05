@@ -5,9 +5,10 @@ import { prepareShare } from 'app/actions/sharing';
 import { flags } from 'app/constants';
 import { getExperimentVariant } from 'lib/experiments';
 import { EXPERIMENT_NAMES } from 'app/selectors/xpromo';
+import config from 'config';
 
-const SHARE_ICON_1 = '/img/icon_share_32.png';
-const SHARE_ICON_2 = '/img/icon_share_ios_32.png';
+const SHARE_ICON_1 = `${config.assetPath}/img/icon_share_32.png`;
+const SHARE_ICON_2 = `${config.assetPath}/img/icon_share_ios_32.png`;
 
 export const getSharingData = (state) => {
   const experiment = (window && window.navigator && window.navigator.share) ?
