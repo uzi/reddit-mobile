@@ -234,15 +234,15 @@ export function trackSharingEvent(state, eventType) {
 }
 
 export function trackExposeSharing(state) {
-  trackSharingEvent(state, 'cs.mweb_sharing_expose');
+  trackSharingEvent(state, 'cs.mweb_share_expose');
 }
 
 export function trackSharingPrepare(state) {
-  trackSharingEvent(state, 'cs.mweb_sharing_prepare');
+  trackSharingEvent(state, 'cs.mweb_share_prepare');
 }
 
 export function trackSharingExecute(state) {
-  trackSharingEvent(state, 'cs.mweb_sharing_execute');
+  trackSharingEvent(state, 'cs.mweb_share_execute');
 }
 
 export function trackXPromoEvent(state, eventType, additionalEventData) {
