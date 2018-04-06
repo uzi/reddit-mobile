@@ -3,7 +3,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { prepareShare } from 'app/actions/sharing';
 import { flags } from 'app/constants';
-import { getExperimentVariant } from 'lib/experiments';
+import { getActiveExperimentVariant } from 'lib/experiments';
 import { EXPERIMENT_NAMES } from 'app/selectors/xpromo';
 import config from 'config';
 
@@ -17,7 +17,7 @@ export const getSharingData = (state) => {
 
   const name = EXPERIMENT_NAMES[experiment];
 
-  const variant = getExperimentVariant(state, name);
+  const variant = getActiveExperimentVariant(state, name);
   let icon = SHARE_ICON_1;
   let iconType = 'v1';
 
@@ -38,7 +38,10 @@ class DisconnectedShare extends React.Component {
 
   render() {
     const { icon, iconType, variant } = this.props.sharingData;
-    if (!variant) { return null; }
+
+    if (!variant) {
+      return null;
+    }
 
     return (
       <span className="Share" onClick={ (e) => { this.handleShare(e); } }>
@@ -56,7 +59,7 @@ const mapDispatchToProps = {
 const mapStateToProps = (state, ownProps) => {
   const sharingData = getSharingData(state);
   const { experiment, variant } = sharingData;
-  const payload = { url: ownProps.url, tags: [] };
+  const payload = { post: ownProps.post, url: ownProps.post.cleanPermalink, tags: [] };
 
   if (variant) { payload.tags = [experiment, `${experiment}_${variant}`]; }
 

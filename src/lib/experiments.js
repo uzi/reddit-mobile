@@ -16,6 +16,12 @@ export function getExperimentData(state, experimentName) {
   };
 }
 
+export function getActiveExperimentVariant(state, experimentName) {
+  const data = getExperimentData(state, experimentName);
+  const enabled = data && !/control/.test(data.variant);
+  return enabled ? data.variant : null;
+}
+
 export function getExperimentVariant(state, experimentName) {
   const data = getExperimentData(state, experimentName);
   return data && data.variant;

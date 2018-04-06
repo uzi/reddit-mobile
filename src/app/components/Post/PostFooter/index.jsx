@@ -153,7 +153,7 @@ export default class PostFooter extends React.Component {
         className={ `PostFooter ${compact ? 'size-compact' : ''}` }
         onClick={ e => interceptListingClick(e, LISTING_CLICK_TYPES.FOOTER) }
       >
-        <Share url={ post.cleanPermalink } />
+        <Share post={ post } />
         { this.renderCommentsLink(post, interceptListingClick) }
         <div className='PostFooter__vote-and-tools-wrapper'>
           <InterceptableModalTarget

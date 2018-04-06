@@ -33,7 +33,7 @@ import { getEventTracker } from 'lib/eventTracker';
 import * as gtm from 'lib/gtm';
 import { hasAdblock } from 'lib/adblock';
 import { shouldNotShowBanner } from 'lib/xpromoState';
-import { getExperimentVariant } from './experiments';
+import { getExperimentData } from './experiments';
 
 export const XPROMO_VIEW = 'cs.xpromo_view';
 export const XPROMO_INELIGIBLE = 'cs.xpromo_ineligible';
@@ -209,20 +209,38 @@ export function xPromoExtraScreenViewData(state) {
   return extraPageData;
 }
 
-export function trackSharingEvent(state, eventType) {
+export function getSharingTargetData(payload) {
+  const { post } = payload;
+
+  return {
+    link_title: post.title,
+    link_fullname: post.name,
+    post_id: post.id,
+    sr_id: post.subredditId,
+  };
+}
+
+export function trackSharingEvent(state, eventType, additionalEventData = {}) {
   const { VARIANT_MOBILE_SHARING_WEB_SHARE_API, VARIANT_MOBILE_SHARING_CLIPBOARD } = flags;
   const isWebShare = !!(window && window.navigator && window.navigator.share);
   const experiment = isWebShare ? VARIANT_MOBILE_SHARING_WEB_SHARE_API : VARIANT_MOBILE_SHARING_CLIPBOARD;
-  const name = EXPERIMENT_NAMES[experiment];
-  const variant = getExperimentVariant(state, name);
+  const experiment_name = EXPERIMENT_NAMES[experiment];
+  const data = getExperimentData(state, experiment_name);
+
+  if (!data) { return; }
+
+  const { variant, experiment_id } = data;
 
   if (!variant) {
     return;
   }
 
   const payload = {
-    experiment: name,
+    ...getBasePayload(state),
+    experiment_name,
+    experiment_id,
     variant,
+    ...additionalEventData,
   };
 
   return new Promise((resolve) => {
@@ -237,12 +255,14 @@ export function trackExposeSharing(state) {
   trackSharingEvent(state, 'cs.mweb_share_expose');
 }
 
-export function trackSharingPrepare(state) {
-  trackSharingEvent(state, 'cs.mweb_share_prepare');
+export function trackSharingPrepare(payload, state) {
+  const additionalEventData = getSharingTargetData(payload);
+  trackSharingEvent(state, 'cs.mweb_share_prepare', additionalEventData);
 }
 
-export function trackSharingExecute(state) {
-  trackSharingEvent(state, 'cs.mweb_share_execute');
+export function trackSharingExecute(payload, state) {
+  const additionalEventData = getSharingTargetData(payload);
+  trackSharingEvent(state, 'cs.mweb_share_execute', additionalEventData);
 }
 
 export function trackXPromoEvent(state, eventType, additionalEventData) {

@@ -37,7 +37,7 @@ class CTA extends React.Component {
 
   handleShare() {
     const { link } = this.props;
-    if (link) { this.props.executeShare(link); }
+    if (link) { this.props.executeShare(); }
   }
 }
 

@@ -485,8 +485,8 @@ const SEO_REFERRERS = [
 
 flags.addRule('loggedin', function(val) {
   return (
-    !!this.state.user && 
-    !this.state.user.loggedOut && 
+    !!this.state.user &&
+    !this.state.user.loggedOut &&
     this.state.user.user_name
   ) === val;
 });
@@ -567,9 +567,9 @@ flags.addRule('variant', function (name) {
     const firstBuckets = this.state.xpromo.serverSide.firstBuckets;
     const isNotFiredOnServer = (firstBuckets.indexOf(experiment_name)<0);
 
-    // Here the "trackBucketingEvents" should be fired only on the Client Side 
+    // Here the "trackBucketingEvents" should be fired only on the Client Side
     // For the Server Side it's better to run "trackBucketingEvents" manually
-    // And of course we need to be shure that this event is not fired twice 
+    // And of course we need to be shure that this event is not fired twice
     // (both on the Client and Server sides)
     if (this.state.meta.env === 'CLIENT' && isNotFiredOnServer) {
       trackBucketingEvents(this.state, experimentData);
