@@ -229,20 +229,20 @@ export function trackSharingEvent(state, eventType) {
     getEventTracker()
       .replaceToNewSend()
       .addDoneToNewSend(() => resolve())
-      .track('sharing_events', eventType, payload);
+      .track('share_events', eventType, payload);
   });
 }
 
 export function trackExposeSharing(state) {
-  trackSharingEvent(state, 'mobile_sharing_expose');
+  trackSharingEvent(state, 'cs.mweb_sharing_expose');
 }
 
 export function trackSharingPrepare(state) {
-  trackSharingEvent(state, 'mobile_sharing_prepare');
+  trackSharingEvent(state, 'cs.mweb_sharing_prepare');
 }
 
 export function trackSharingExecute(state) {
-  trackSharingEvent(state, 'mobile_sharing_execute');
+  trackSharingEvent(state, 'cs.mweb_sharing_execute');
 }
 
 export function trackXPromoEvent(state, eventType, additionalEventData) {
