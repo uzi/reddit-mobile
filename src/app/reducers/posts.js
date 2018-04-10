@@ -30,6 +30,7 @@ const preserveInconsistentProperties = (state, post) => {
     media: currentPost.media,
     mediaOembed: currentPost.mediaOembed,
     preview: currentPost.preview,
+    promoted: currentPost.promoted,
     selfTextMD: currentPost.selfTextMD,
     selfTextHTML: currentPost.selfTextHTML,
   });
@@ -173,7 +174,7 @@ export default function(state=DEFAULT, action={}) {
       const { thing, isStickied } = action;
 
       if (thing.type !== POST) { return state; }
-      
+
       return mergeUpdatedModel(
         state,
         {
