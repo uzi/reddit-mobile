@@ -20,6 +20,7 @@ import {
 } from 'app/selectors/xpromo';
 
 import getSessionIdFromCookie from 'lib/getSessionIdFromCookie';
+import { getReddaidFromCookie } from 'lib/getReddaidFromCookie';
 import { interstitialData } from 'lib/xpromoState';
 import {
   buildAdditionalEventData as listingPageEventData,
@@ -150,6 +151,7 @@ export function getBasePayload(state) {
     adblock: hasAdblock(),
     session_id: getSessionId(state),
     ...getUserInfoOrLoid(state),
+    reddaid: getReddaidFromCookie(),
   };
 
   return payload;
