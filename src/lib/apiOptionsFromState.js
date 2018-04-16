@@ -28,6 +28,7 @@ export const apiOptionsFromState = state => {
       ...options,
       queryParams: {
         redditWebClient: 'mweb2x',
+        layout: state.compact ? 'classic' : 'card',
       },
     };
   }
