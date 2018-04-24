@@ -2,31 +2,17 @@ import './styles.less';
 import React from 'react';
 import { connect } from 'react-redux';
 import { prepareShare } from 'app/actions/sharing';
-import { flags } from 'app/constants';
-import { getActiveExperimentVariant } from 'lib/experiments';
-import { EXPERIMENT_NAMES } from 'app/selectors/xpromo';
 import config from 'config';
 
 const SHARE_ICON_1 = `${config.assetPath}/img/icon_share_32.png`;
 const SHARE_ICON_2 = `${config.assetPath}/img/icon_share_ios_32.png`;
 
 export const getSharingData = (state) => {
-  const experiment = (window && window.navigator && window.navigator.share) ?
-    flags.VARIANT_MOBILE_SHARING_WEB_SHARE_API :
-    flags.VARIANT_MOBILE_SHARING_CLIPBOARD;
+  const hasWebShare = state.sharing.hasWebShare;
+  const icon = hasWebShare ? SHARE_ICON_1 : SHARE_ICON_2;
+  const iconType = hasWebShare ? 'v1' : 'v2';
 
-  const name = EXPERIMENT_NAMES[experiment];
-
-  const variant = getActiveExperimentVariant(state, name);
-  let icon = SHARE_ICON_1;
-  let iconType = 'v1';
-
-  if (variant === 'treatment_2') {
-    icon = SHARE_ICON_2;
-    iconType = 'v2';
-  }
-
-  return { experiment, variant, icon, iconType };
+  return { hasWebShare, icon, iconType };
 };
 
 
@@ -37,11 +23,7 @@ class DisconnectedShare extends React.Component {
   }
 
   render() {
-    const { icon, iconType, variant } = this.props.sharingData;
-
-    if (!variant) {
-      return null;
-    }
+    const { icon, iconType } = this.props.sharingData;
 
     return (
       <span className="Share" onClick={ (e) => { this.handleShare(e); } }>
@@ -58,10 +40,10 @@ const mapDispatchToProps = {
 
 const mapStateToProps = (state, ownProps) => {
   const sharingData = getSharingData(state);
-  const { experiment, variant } = sharingData;
+  const { hasWebShare } = sharingData;
   const payload = { post: ownProps.post, url: ownProps.post.cleanPermalink, tags: [] };
 
-  if (variant) { payload.tags = [experiment, `${experiment}_${variant}`]; }
+  payload.tags = hasWebShare ? ['WebShare'] : ['ClipboardShare'];
 
   return { sharingData, payload };
 };

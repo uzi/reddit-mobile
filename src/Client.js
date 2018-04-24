@@ -8,6 +8,7 @@ import localStorageAvailable from 'lib/localStorageAvailable';
 
 import Client from 'platform/Client';
 import * as platformActions from 'platform/actions';
+import * as sharingActions from 'app/actions/sharing';
 
 import App from 'app';
 import config from 'config';
@@ -180,6 +181,8 @@ detectIncognito().then(result => {
     }
   }
 });
+
+client.dispatch(sharingActions.detectWebShareCapability());
 
 isShell = client.getState().platform.shell;
 client.dispatch(platformActions.activateClient());

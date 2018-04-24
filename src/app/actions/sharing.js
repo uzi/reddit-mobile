@@ -5,6 +5,7 @@ export const TOAST_ERROR_COPY = 'NO SHARING!';
 export const SHOW_CTA = 'SHARING__SHOW_CTA';
 export const HIDE_CTA = 'SHARING__HIDE_CTA';
 export const SET_LINK = 'SHARING__SET_LINK';
+export const DETECT_WEB_SHARE_CAPABILITY = 'SHARING__DETECT_WEB_SHARE_CAPABILITY';
 
 import { urlWith } from 'lib/urlWith';
 import { copy } from 'lib/clipboard';
@@ -26,16 +27,21 @@ export const setLink = (link) => ({
   link,
 });
 
+export const detectWebShareCapability = () => ({
+  type: DETECT_WEB_SHARE_CAPABILITY,
+  result: !!window.navigator.share,
+});
+
 export const executeShare = () => (dispatch, getState) => {
   const state = getState();
   const { link, post } = state.sharing;
 
   trackSharingExecute({ url: link, post }, getState());
+  const hasWebShare = typeof window.navigator.share === 'function';
 
-  const hasWebShareAPI = window && window.navigator && window.navigator.share;
   let result;
 
-  if (hasWebShareAPI) {
+  if (hasWebShare) {
     result = window.navigator.share({ url: link });
   } else {
     result = copy(link);
@@ -60,7 +66,7 @@ export const prepareShare = (payload) => (dispatch, getState) => {
 export const branchProxy = {};
 
 export const getBranchLinkFromAPI = ({ url: rawUrl, tags }) => {
-  const url = urlWith(rawUrl, { utm_source: 'sharing', utm_medium: 'mweb' });
+  const url = urlWith(rawUrl, { utm_source: 'share', utm_medium: 'mweb' });
 
   const canonicalUrl = `${config.reddit}${url}`;
 
