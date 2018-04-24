@@ -193,6 +193,10 @@ export const flags = {
   // Mobile Sharing by Browser Capability
   VARIANT_MOBILE_SHARING_WEB_SHARE_API: 'experimentMobileSharingWebShareAPI',
   VARIANT_MOBILE_SHARING_CLIPBOARD: 'experimentMobileSharingClipboard',
+
+  // Card view as default view experiment
+  VARIANT_CARD_VIEW_AS_DEFAULT_LOGGED_OUT: 'experimentCardViewAsDefaultLoggedOutUsers',
+  VARIANT_CARD_VIEW_AS_DEFAULT_LOGGED_IN: 'experimentCardViewAsDefaultLoggedInUsers',
 };
 
 // Now we have 2 different types of XPromo
