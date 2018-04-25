@@ -22,10 +22,8 @@ import { sendTimings, onHandlerCompleteTimings } from 'lib/timing';
 import Session from 'app/models/Session';
 import Preferences from 'apiClient/models/Preferences';
 import * as xpromoActionsClientOnly from 'app/actions/xpromoClientOnly';
-import * as xpromoActions from 'app/actions/xpromo';
 import detectIncognito from 'lib/detectIncognito';
 import { trackXPromoIncognito } from './lib/eventUtils';
-import { incognitoNoXPromo } from './app/selectors/xpromo';
 
 // importing these to populate the branch.link property needed for mobile sharing
 import { branchProxy } from 'app/actions/sharing';
@@ -176,9 +174,6 @@ detectIncognito().then(result => {
   if (result) {
     trackXPromoIncognito(client.getState());
     client.dispatch(platformActions.incognitoDetected());
-    if (incognitoNoXPromo(client.getState())) {
-      client.dispatch(xpromoActions.hide());
-    }
   }
 });
 

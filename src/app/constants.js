@@ -275,7 +275,7 @@ export const LOCAL_STORAGE_KEYS = {
   BANNER_LAST_CLOSED : 'bannerLastClosed',
   XPROMO_LAST_MODAL_CLICK: 'lastModalListingClick',
   BANNER_PERSIST_SHOWED : 'lastPersistBannerShowed',
-  MODAL_DISMISS_COUNT: 'modalListingDismissCount',
+  XPROMO_MODAL_DISMISS_COUNT: 'modalListingDismissCount',
 };
 
 export const VIDEO_EVENT = {

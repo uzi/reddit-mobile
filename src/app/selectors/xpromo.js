@@ -245,15 +245,8 @@ export function commentsInterstitialEnabled(state) {
  * and redirected to the app store page for the reddit app
  */
 
-export function incognitoNoXPromo(state) {
-  return (
-    state.platform.incognito &&
-    (getExperimentVariant(state, 'mweb_xpromo_incognito_noxpromo') === 'treatment')
-  );
-}
-
 export function listingClickEnabled(state, postId) {
-  if (incognitoNoXPromo(state) || !isEligibleListingPage(state) || !isXPromoEnabledOnDevice(state)) {
+  if (!isEligibleListingPage(state) || !isXPromoEnabledOnDevice(state)) {
     return false;
   }
   if (!state.user.loggedOut) {

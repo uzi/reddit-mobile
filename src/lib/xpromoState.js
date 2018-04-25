@@ -17,7 +17,6 @@ import {
   loginRequiredEnabled,
   getExperimentRange,
   isXPromoPersistent,
-  incognitoNoXPromo,
 } from 'app/selectors/xpromo';
 
 import {
@@ -238,11 +237,6 @@ export function getBranchLink(state, path, payload={}) {
 export function shouldNotShowBanner(state) {
   // Do not show the banner:
   // If localStorage is not available
-
-  if (incognitoNoXPromo(state)) {
-    return 'incognito';
-  }
-
   if (!localStorageAvailable()) {
     return 'local_storage_unavailable';
   }
