@@ -124,7 +124,6 @@ export const PostsFromSubredditPage = connect(mapStateToProps)(props => {
           postsListId={ postsListId }
           subredditIsNSFW={ !!subreddit && subreddit.over18 }
           subredditShowSpoilers={ !!subreddit && subreddit.spoilersEnabled }
-          whitelistStatus={ subreddit && subreddit.whitelistStatus }
           />
       }
       <XPromoListingClickModal />
