@@ -53,6 +53,7 @@ export default class PostModel extends RedditModel {
     approved: T.bool,
     spam: T.bool,
     whitelistStatus: T.nop,
+    wls: T.nop,
 
     // aliases
     approvedBy: T.string,
@@ -133,6 +134,7 @@ export default class PostModel extends RedditModel {
     url: 'cleanUrl',
     user_reports: 'userReports',
     whitelist_status: 'whitelistStatus',
+    wls: 'wls',
   };
 
   // Note: derived properties operate on the json passed to

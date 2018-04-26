@@ -30,11 +30,13 @@ class BannerAd extends React.Component {
       shouldCollapse,
       a9,
       whitelistStatus,
+      wls,
     } = this.props;
 
     const requestProperties = {
       ...properties,
       whitelist_status: whitelistStatus,
+      wls: wls,
     };
 
     this.destroySlot();

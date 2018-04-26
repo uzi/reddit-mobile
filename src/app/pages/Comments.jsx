@@ -65,6 +65,7 @@ function CommentsPage(props) {
           listingName='comments'
           a9
           whitelistStatus={ post.whitelistStatus }
+          wls={ post.wls }
         />
       }
       <RecommendedPosts
