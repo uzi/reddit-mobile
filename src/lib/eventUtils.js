@@ -267,21 +267,6 @@ export function trackSharingExecute(payload, state) {
   trackSharingEvent(state, 'cs.mweb_share_execute', additionalEventData);
 }
 
-export function trackCardViewExperimentEvent(state, event, experiment_name) {
-  // track when users in active experiment change their view style between card and compact
-  if (!experiment_name) { return; }
-  const data = getExperimentData(state, experiment_name);
-  if (!data) { return; }
-  const { variant, experiment_id } = data;
-  const payload = {
-    ...getBasePayload(state),
-    experiment_name,
-    experiment_id,
-    variant,
-  };
-  return getEventTracker().track('mweb_card_view_as_default_experiment_events', event, payload);
-}
-
 export function trackXPromoEvent(state, eventType, additionalEventData) {
   const payload = {
     ...getBasePayload(state),

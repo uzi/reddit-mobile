@@ -82,10 +82,6 @@ const {
   // XPromo Ad Feed inside the Listing pages
   VARIANT_XPROMO_AD_FEED_IOS,
   VARIANT_XPROMO_AD_FEED_ANDROID,
-
-  // Card view as default view experiments for logged out and logged in users
-  VARIANT_CARD_VIEW_AS_DEFAULT_LOGGED_OUT,
-  VARIANT_CARD_VIEW_AS_DEFAULT_LOGGED_IN,
 } = flagConstants;
 
 const config = {
@@ -477,20 +473,6 @@ const config = {
         { url: 'rulesmodaloncommentclickbutton' },
         { variant: 'mweb_rules_modal_on_comment:click_button' },
       ] },
-    ],
-  },
-  [VARIANT_CARD_VIEW_AS_DEFAULT_LOGGED_OUT]: {
-    and: [
-      { loggedin: false },
-      { enabled: 'mweb_card_view_as_default_logged_out_users'},
-      { variant: 'mweb_card_view_as_default_logged_out_users:treatment' },
-    ],
-  },
-  [VARIANT_CARD_VIEW_AS_DEFAULT_LOGGED_IN]: {
-    and: [
-      { loggedin: true },
-      { enabled: 'mweb_card_view_as_default_logged_in_users' },
-      { variant: 'mweb_card_view_as_default_logged_in_users:treatment' },
     ],
   },
 };

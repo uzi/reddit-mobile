@@ -1,20 +1,11 @@
 import * as compactActions from '../../app/actions/compact';
 import { DEFAULT } from '../../app/reducers/compact';
 import { permanentCookieOptions } from './permanentCookieOptions';
-import { cardViewEnabled } from 'app/actions/cardViewExperiment';
 
-export const dispatchInitialCompact = async (ctx, dispatch, getState) => {
+export const dispatchInitialCompact = async (ctx, dispatch) => {
   const compactFromCookie = ctx.cookies.get('compact');
   const compactFromQueryParam = ctx.query.compact;
   let compact = compactFromCookie || compactFromQueryParam;
-
-  // as part of card view experiment, explicitly set card view for users in relevant variants
-  const state = getState();
-  const loggedOut = state.user.loggedOut;
-  const optedOut = state.getOptedOutOfCardViewExperiment;
-  if (cardViewEnabled(state, loggedOut, optedOut)) {
-    compact = 'false';
-  }
 
   const ua = (ctx.headers['user-agent'] || '').toLowerCase();
 

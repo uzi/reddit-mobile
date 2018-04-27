@@ -92,15 +92,12 @@ export function startServer() {
       dispatchAPIPassThroughHeaders(ctx, dispatch);
       await dispatchSession(ctx, dispatch, ConfigedAPIOptions);
       dispatchInitialTheme(ctx, dispatch);
+      dispatchInitialCompact(ctx, dispatch);
       dispatchInitialMeta(ctx, dispatch);
       dispatchInitialEUCookieNotice(ctx, dispatch, getState);
       dispatchInitialOver18(ctx, dispatch);
       dispatchInitialRecentSubreddits(ctx, dispatch);
       await dispatchInitialUser(ctx, dispatch, getState);
-      // while card view experiment is running, we need the populated state object to check
-      // whether the user is in an active experiment
-      // hence, this dispatchInitialCompact comes last
-      dispatchInitialCompact(ctx, dispatch, getState);
     },
     dispatchAfterNavigation: async (ctx, dispatch, getState) => {
       dispatchInitialXPromo(ctx, dispatch, getState);

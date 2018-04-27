@@ -19,7 +19,6 @@ import meta from './meta';
 import messages from './messages';
 import modal from './modal';
 import moderatingSubreddits from './moderatingSubreddits';
-import optedOutOfCardViewExperiment from './optedOutOfCardViewExperiment';
 import optOuts from './optOuts';
 import overlay from './overlay';
 import pageMetadata from './pageMetadata';
@@ -81,7 +80,6 @@ export default {
   messages,
   modal,
   moderatingSubreddits,
-  optedOutOfCardViewExperiment,
   optOuts,
   overlay,
   pageMetadata,
