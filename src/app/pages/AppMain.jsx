@@ -109,6 +109,10 @@ const AppMain = props => {
         <Page url='/r/:subredditName(place)' component={ FramedPlace } />
         <Page url='/r/:subredditName' component={ FramedPostsFromSubredditPage } />
         <Page
+          url={ `/:sort(${SORTS})` }
+          component={ FramedPostsFromSubredditPage }
+        />
+        <Page
           url={ `/r/:subredditName(place)/:sort(${SORTS})` }
           component={ FramedPlace }
         />
