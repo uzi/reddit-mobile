@@ -61,7 +61,10 @@ function OutboundLink(props) {
     // we don't have outbound link data, pass through to a normal anchor with no special handlers
     return <a { ...linkProps } />;
   }
-  const outboundOrHref = promoted && outboundLink && outboundLink.url ? outboundLink.url : href;
+
+  if (promoted && outboundLink && outboundLink.url) {
+    return <a { ...linkProps } href={ outboundLink.url } />;
+  }
 
   // Note: this component very intentionally doesn't use `setState` to change the 
   // the href rendered in the DOM like a traditional React component might.
@@ -71,7 +74,7 @@ function OutboundLink(props) {
   return (
     <a
       { ...linkProps }
-      href={ outboundOrHref }
+      href={ href }
       onMouseDown={ e => {
         // don't show the redirect url for right-click context menus
         if (e.which === 3) {
