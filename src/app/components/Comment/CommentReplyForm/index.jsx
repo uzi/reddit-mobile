@@ -2,6 +2,7 @@ import './styles.less';
 
 import React from 'react';
 import { connect } from 'react-redux';
+import { createStructuredSelector } from 'reselect';
 
 import { JSForm } from 'platform/components';
 import cx from 'lib/classNames';
@@ -12,6 +13,7 @@ const T = React.PropTypes;
 export class CommentReplyForm extends React.Component {
   static propTypes = {
     onToggleReply: T.func.isRequired,
+    pending: T.bool.isRequired,
   };
 
   constructor (props) {
@@ -33,9 +35,10 @@ export class CommentReplyForm extends React.Component {
   }
 
   render () {
-    const { onToggleReply, onSubmitReply } = this.props;
+    const { onToggleReply, onSubmitReply, pending } = this.props;
     const { disableButton } = this.state;
-    const buttonClass = cx('Button', { 'm-disabled': disableButton });
+    const shouldDisable = disableButton || pending;
+    const buttonClass = cx('Button', { 'm-disabled': shouldDisable });
 
     return (
       <JSForm onSubmit={ onSubmitReply } className='CommentReplyForm'>
@@ -50,7 +53,7 @@ export class CommentReplyForm extends React.Component {
           />
 
           <div className='CommentReplyForm__button'>
-            <button type='submit' className={ buttonClass } disabled={ disableButton }>
+            <button type='submit' className={ buttonClass } disabled={ shouldDisable }>
               ADD COMMENT
             </button>
           </div>
@@ -60,8 +63,12 @@ export class CommentReplyForm extends React.Component {
   }
 }
 
+const stateProps = createStructuredSelector({
+  replyApi: (state, { parentId }) => !!state.replyRequests[parentId] && state.replyRequests[parentId].pending,
+});
+
 const mapDispatchToProps = (dispatch, { parentId }) => ({
   onSubmitReply: formData => dispatch(replyActions.submit(parentId, formData)),
 });
 
-export default connect(null, mapDispatchToProps)(CommentReplyForm);
+export default connect(stateProps, mapDispatchToProps)(CommentReplyForm);

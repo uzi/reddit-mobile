@@ -17,6 +17,7 @@ import { METHODS } from 'platform/router';
 
 
 export const TOGGLE = 'REPLY__TOGGLE';
+export const PENDING = 'REPLY__PENDING';
 export const SUCCESS = 'REPLY__SUCCESS';
 export const FAILURE = 'REPLY__FAILURE';
 
@@ -69,21 +70,33 @@ export const success = (parentId, reply) => ({
   message: 'Comment added!',
 });
 
+export const pending = parentId => ({
+  type: PENDING,
+  parentId,
+});
+
+export const failure = parentId => ({
+  type: FAILURE,
+  parentId,
+});
+
 export const submit = (parentId, { text }) => async (dispatch, getState) => {
   const state = getState();
   const model = modelFromThingId(parentId, state);
 
+  if (state.replyRequests[parentId] && state.replyRequests[parentId].pending) { return; }
   if (!model) {
-    dispatch({ type: FAILURE });
+    dispatch(failure(parentId));
     return;
   }
 
   try {
+    dispatch(pending(parentId));
     const apiResponse = await model.reply(apiOptionsFromState(state), text);
     const reply = apiResponse.getModelFromRecord(apiResponse.results[0]);
-    
+
     dispatch(success(parentId, reply));
-    
+
     // Fire comment-submitted pixel if associated with promoted post
     const post = state.posts[reply.linkId];
     if (post.promoted) {
@@ -92,7 +105,7 @@ export const submit = (parentId, { text }) => async (dispatch, getState) => {
 
     logReply(reply, getState());
   } catch (e) {
-    dispatch({ type: FAILURE });
+    dispatch(failure(parentId));
   }
 };
 

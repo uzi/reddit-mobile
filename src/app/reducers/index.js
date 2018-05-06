@@ -31,6 +31,7 @@ import preferencesRequest from './preferencesRequest';
 import recentSubreddits from './recentSubreddits';
 import recommendedSubreddits from './recommendedSubreddits';
 import replying from './replying';
+import replyRequests from './replyRequests';
 import reports from './reports';
 import rulesModal from './rulesModal';
 import savedRequests from './savedRequests';
@@ -90,6 +91,7 @@ export default {
   preferences,
   preferencesRequest,
   replying,
+  replyRequests,
   recentSubreddits,
   recommendedSubreddits,
   reports,
