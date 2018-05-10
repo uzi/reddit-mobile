@@ -8,7 +8,8 @@ import mobilify from 'lib/mobilify';
 import { getStatusBy, getApprovalStatus, sumReportsCount } from 'lib/modToolHelpers.js';
 import PostModel from 'apiClient/models/PostModel';
 
-import { LISTING_CLICK_TYPES } from 'app/constants';
+import { flags, LISTING_CLICK_TYPES } from 'app/constants';
+import features from 'app/featureFlags';
 
 import {
   isPostNSFW,
@@ -24,6 +25,10 @@ const T = React.PropTypes;
 const SEPERATOR = (
   <span className='PostHeader__seperator PostHeader__flush-w-icon' />
 );
+
+const {
+  VARIANT_CALL_TO_ACTION,
+} = flags;
 
 const NSFW_FLAIR = (
   <span className='PostHeader__nsfw-text'>
@@ -386,8 +391,7 @@ function renderDetailViewSubline(post, hideWhen) {
 
 function renderPostHeaderLink(post, interceptListingClick, showLinksInNewTab) {
   const href = cleanPostHREF(mobilify(post.cleanUrl));
-
-  if (!href) {
+  if (!href || (features.enabled(VARIANT_CALL_TO_ACTION) && post.callToAction)) {
     return;
   }
 

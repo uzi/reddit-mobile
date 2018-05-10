@@ -22,6 +22,8 @@ import PostHeader from './PostHeader';
 import PostContent from './PostContent';
 import PostFooter from './PostFooter';
 
+import AdLinkBar from 'app/components/AdLinkBar';
+
 import features from 'app/featureFlags';
 import { flags, LISTING_CLICK_TYPES } from 'app/constants';
 import { removePrefix } from 'lib/eventUtils';
@@ -34,6 +36,7 @@ import { setListingClickTarget } from '../../actions/xpromo';
 const {
   VARIANT_TITLE_EXPANDO,
   VARIANT_MIXED_VIEW,
+  VARIANT_CALL_TO_ACTION,
 } = flags;
 
 const noExpandoPostTypes = new Set(['link', 'self', '']);
@@ -156,7 +159,6 @@ export function Post(props, context) {
   const shouldPlay = !isPlaying && ((compact && !hasExpandedCompact) || !compact);
   const onTogglePlaying = shouldPlay ? onStartPlaying : onStopPlaying;
   const isSubredditModerator = includes(moderatingSubreddits.names, post.subreddit.toLowerCase());
-
   // Bind a new copy of interceptListingClick that uses `redux.getState` to check eligilibility
   const interceptListingClick = (e, listingClickType) => {
     const checkEligibility = postId => {
@@ -269,6 +271,14 @@ export function Post(props, context) {
         />
       </div>
       { contentOrNil }
+      { features.enabled(VARIANT_CALL_TO_ACTION) && post.promoted && (
+        <AdLinkBar
+          post={ post }
+          renderMediaFullbleed={ renderMediaFullbleed }
+          showLinksInNewTab={ showLinksInNewTab }
+          displayCompact={ displayCompact }
+        />
+      ) }
       <PostFooter
         user={ user }
         single={ single }

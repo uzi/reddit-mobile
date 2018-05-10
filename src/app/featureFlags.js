@@ -79,6 +79,9 @@ const {
   VARIANT_XPROMO_AD_LOADING_IOS,
   VARIANT_XPROMO_AD_LOADING_ANDROID,
 
+  // Call to action
+  VARIANT_CALL_TO_ACTION,
+
   // XPromo Ad Feed inside the Listing pages
   VARIANT_XPROMO_AD_FEED_IOS,
   VARIANT_XPROMO_AD_FEED_ANDROID,
@@ -426,6 +429,11 @@ const config = {
     }, {
       variant: 'default_srs_holdout:popular',
     }],
+  },
+  [VARIANT_CALL_TO_ACTION]: {
+    and: [
+      { is_employee: true },
+    ],
   },
   [RULES_MODAL_ON_SUBMIT_CLICK_ANYWHERE]: {
     and: [

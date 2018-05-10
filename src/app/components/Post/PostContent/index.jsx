@@ -10,7 +10,8 @@ import EditForm from 'app/components/EditForm';
 import RedditLinkHijacker from 'app/components/RedditLinkHijacker';
 import OutboundLink from 'app/components/OutboundLink';
 
-import { LISTING_CLICK_TYPES } from 'app/constants';
+import { flags, LISTING_CLICK_TYPES } from 'app/constants';
+import features from 'app/featureFlags';
 
 import HTML5StreamPlayer from 'app/components/HTML5StreamPlayer';
 
@@ -36,6 +37,10 @@ class LinkDescriptor {
     this.outbound = outbound;
   }
 }
+
+const {
+  VARIANT_CALL_TO_ACTION,
+} = flags;
 
 // PostContent is used to render:
 //  * Post thumbnail, if there is one
@@ -74,12 +79,10 @@ PostContent.defaultProps = {
 export default function PostContent(props) {
   const { post, isDomainExternal, compact, isThumbnail, interceptListingClick,
           renderMediaFullbleed, showLinksInNewTab } = props;
-
   const linkUrl = cleanPostHREF(mobilify(post.cleanUrl));
   const linkDescriptor = new LinkDescriptor(linkUrl, true);
   const mediaContentNode = buildMediaContent(post, linkDescriptor, props);
   const selftextNode = buildSelfTextContent(props);
-
   if (!mediaContentNode && !selftextNode) {
     if (!isDomainExternal || compact) {
       // When in compact mode, the PostHeader Component is responsible for rendering
@@ -97,7 +100,7 @@ export default function PostContent(props) {
       { renderMediaContent(mediaContentNode, isThumbnail, isDomainExternal,
                            cleanPostDomain(post.domain), linkUrl,
                            renderMediaFullbleed, showLinksInNewTab,
-                           post.outboundLink, post.promoted) }
+                           post.outboundLink, post.promoted, post.callToAction) }
       { selftextNode }
     </div>
   );
@@ -105,15 +108,15 @@ export default function PostContent(props) {
 
 function renderMediaContent(mediaContentNode, isThumbnail, isDomainExternal,
                             linkDisplayText, linkUrl, renderMediaFullbleed,
-                            showLinksInNewTab, outboundLink, promoted) {
+                            showLinksInNewTab, outboundLink, promoted, callToAction) {
   if (isThumbnail || !isDomainExternal || renderMediaFullbleed) {
     return mediaContentNode;
   }
-
+  
   return (
     <div className='PostContent__media-wrapper'>
       { mediaContentNode }
-      { renderLinkBar(linkDisplayText, linkUrl,
+      { !(features.enabled(VARIANT_CALL_TO_ACTION) && callToAction) && renderLinkBar(linkDisplayText, linkUrl,
                       showLinksInNewTab, outboundLink, promoted) }
     </div>
   );
