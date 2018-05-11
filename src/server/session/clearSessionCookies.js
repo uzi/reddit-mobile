@@ -4,6 +4,7 @@ export const SESSION_COOKIES = [
   'token', // v1+ cookie
   'tokenExpires', // v1 only
   'refreshToken', // v1 only
+  'reddit_session',
 ];
 
 export default ctx => {
