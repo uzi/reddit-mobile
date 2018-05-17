@@ -15,6 +15,7 @@ import * as subscribedSubredditsActions from 'app/actions/subscribedSubreddits';
 
 import Logo from 'app/components/Logo';
 import SnooIcon from 'app/components/SnooIcon';
+import XPromoTopButton from 'app/components/XPromoTopButton';
 
 export const TopNav = props => {
   const { assetPath, overlay } = props;
@@ -49,6 +50,7 @@ export const TopNav = props => {
 
   return (
     <nav className={ `TopNav${settingsOpen ? ' opened' : ''}` }>
+      <XPromoTopButton />
       <div className='pull-left TopNav-padding TopNav-left' key='topnav-menu'>
         <Anchor
           className='MobileButton TopNav-padding TopNav-snoo'
