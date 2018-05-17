@@ -49,6 +49,7 @@ export const defineSlot = (element, {
       window.apstag.fetchBids({
         slots: [{
           slotID: id,
+          slotName: [slot, id].join('/'),
           sizes,
         }],
         timeout: 2e3,
