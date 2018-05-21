@@ -24,6 +24,8 @@ import getSubreddit from 'lib/getSubredditFromState';
 import CommentsPageHandler from 'app/router/handlers/CommentsPage';
 import { paramsToCommentsPageId } from 'app/models/CommentsPage';
 
+import XPromoPill from 'app/components/XPromoPill';
+
 const T = React.PropTypes;
 
 function CommentsPage(props) {
@@ -95,6 +97,7 @@ function CommentsPage(props) {
         post={ post }
         isCrawlerRequest={ isCrawlerRequest }
       />
+      { post && post.over18 && <XPromoPill url={ post && post.cleanPermalink }/> }
     </div>
   );
 }

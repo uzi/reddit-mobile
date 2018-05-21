@@ -62,6 +62,9 @@ const {
   // Mobile Sharing
   VARIANT_MOBILE_SHARING_WEB_SHARE_API,
   VARIANT_MOBILE_SHARING_CLIPBOARD,
+
+  // Porn Pill
+  VARIANT_NSFW_XPROMO,
 } = flagConstants;
 
 const EXPERIMENT_FULL = [
@@ -133,6 +136,7 @@ export const EXPERIMENT_NAMES = {
   [VARIANT_XPROMO_AD_LOADING_ANDROID]: 'mweb_xpromo_ad_loading_android',
   [VARIANT_XPROMO_AD_FEED_IOS]: 'mweb_xpromo_ad_feed_ios',
   [VARIANT_XPROMO_AD_FEED_ANDROID]: 'mweb_xpromo_ad_feed_android',
+  [VARIANT_NSFW_XPROMO]: 'mweb_nsfw_xpromo',
 };
 
 export function getRouteActionName(state) {

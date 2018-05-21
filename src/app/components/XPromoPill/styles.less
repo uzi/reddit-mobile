@@ -1,0 +1,32 @@
+.XPromoPill {
+  position: fixed;
+  bottom: 8px;
+  width: 180px;
+  color: white;
+  background-color: #0079D3;
+  font-weight: bold;
+  border-radius: 16px;
+  left: 50%;
+  margin-left: -70px;
+  text-align: center;
+  padding: 8px 0px;
+  opacity: 1;
+  box-shadow: 2px 2px 2px 0px rgba(0, 0, 0, 0.2);
+
+  transition: all 300ms;
+}
+
+a.XPromoPill, a:visited.XPromoPill, a:link.XPromoPill, a:active.XPromoPill {
+  color: white;
+  text-decoration: none;
+}
+
+.XPromoPill__close {
+  float: right;
+  margin-right: 12px;
+}
+
+.XPromoPill.dismissed {
+  opacity: 0;
+  pointer-events: none;
+}

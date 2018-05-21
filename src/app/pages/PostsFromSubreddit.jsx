@@ -11,6 +11,7 @@ import SortAndTimeSelector from 'app/components/SortAndTimeSelector';
 import SubNav from 'app/components/SubNav';
 import Tutorial from 'app/components/Tutorial';
 import XPromoListingClickModal from 'app/components/XPromoListingClickModal';
+import XPromoPill from 'app/components/XPromoPill';
 
 import PostsFromSubredditHandler from 'app/router/handlers/PostsFromSubreddit';
 import { paramsToPostsListsId } from 'app/models/PostsList';
@@ -127,6 +128,7 @@ export const PostsFromSubredditPage = connect(mapStateToProps)(props => {
           />
       }
       <XPromoListingClickModal />
+      { subreddit && subreddit.over18 && <XPromoPill url={ subreddit && subreddit.url }/> }
     </div>
   );
 });
