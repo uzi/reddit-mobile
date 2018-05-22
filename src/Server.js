@@ -35,6 +35,9 @@ import { dispatchInitialUser } from 'server/initialState/dispatchInitialUser';
 import metaRoutes from 'server/meta';
 import statsRouterMiddleware from 'server/meta/stats';
 
+import observeproxy from 'server/scaledInference/observeproxy';
+import outcomeproxy from 'server/scaledInference/outcomeproxy';
+
 const buildFiles = KoaStatic('build');
 const processes = process.env.PROCESSES || cpus().length;
 
@@ -134,6 +137,10 @@ export function startServer() {
       registerproxy(router, ConfigedAPIOptions);
       refreshproxy(router, ConfigedAPIOptions);
       metaRoutes(router, ConfigedAPIOptions);
+
+      // scaled inference proxy routes
+      observeproxy(router);
+      outcomeproxy(router);
     },
   })();
 }

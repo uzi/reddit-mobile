@@ -24,6 +24,7 @@ import Preferences from 'apiClient/models/Preferences';
 import * as xpromoActionsClientOnly from 'app/actions/xpromoClientOnly';
 import detectIncognito from 'lib/detectIncognito';
 import { trackXPromoIncognito } from './lib/eventUtils';
+import { handshake } from 'app/actions/scaledInference';
 
 // importing these to populate the branch.link property needed for mobile sharing
 import { branchProxy } from 'app/actions/sharing';
@@ -170,15 +171,6 @@ const client = Client({
   onHandlerComplete: onHandlerCompleteTimings,
 })();
 
-detectIncognito().then(result => {
-  if (result) {
-    trackXPromoIncognito(client.getState());
-    client.dispatch(platformActions.incognitoDetected());
-  }
-});
-
-client.dispatch(sharingActions.detectWebShareCapability());
-
 isShell = client.getState().platform.shell;
 client.dispatch(platformActions.activateClient());
 
@@ -188,8 +180,20 @@ if (isShell) {
   client.dispatch(xpromoActionsClientOnly.checkAndSet());
 }
 
-// expose mobile sharing
+client.dispatch(sharingActions.detectWebShareCapability());
 trackExposeSharing(client.getState());
+
+detectIncognito().then(result => {
+  if (result) {
+    trackXPromoIncognito(client.getState());
+    client.dispatch(platformActions.incognitoDetected());
+  }
+
+  return client.dispatch(handshake());
+});
+
+// expose mobile sharing
+
 
 // populate the branchProxy object with branch.link
 branchProxy.link = (payload, callback) => { return branch.link(payload, callback); };

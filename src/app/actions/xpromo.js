@@ -14,11 +14,23 @@ import {
   XPROMO_DISMISS,
   XPROMO_VIEW,
 } from 'lib/eventUtils';
+import * as scaledInferenceActions from './scaledInference';
 
 export const SHOW = 'XPROMO__SHOW';
-export const show = () => ({ type: SHOW });
+export const _show = () => ({ type: SHOW });
+export const show = () => async (dispatch) => {
+  dispatch(scaledInferenceActions.setMetadata({ trigger: null }));
+  dispatch(scaledInferenceActions.reportOutcome('view'));
+  dispatch(_show());
+};
+
 export const HIDE = 'XPROMO__HIDE';
-export const hide = () => ({ type: HIDE });
+export const _hide = () => ({ type: HIDE });
+export const hide = () => async (dispatch) => {
+  dispatch(scaledInferenceActions.reportOutcome('dismiss'));
+  dispatch(_hide());
+};
+
 export const PROMO_CLICKED = 'XPROMO__PROMO_CLICKED';
 export const promoClicked = () => ({ type: PROMO_CLICKED });
 
@@ -39,6 +51,7 @@ export const promoPersistActivate = () => async (dispatch) => {
 
 export const XPROMO_DISMISS_CLICKED = 'XPROMO__DISMISS_CLICKED';
 export const promoDismissed = (dismissType) => async (dispatch, getState) => {
+  dispatch(scaledInferenceActions.reportOutcome('dismiss'));
   dispatch({ type: XPROMO_DISMISS_CLICKED });
   if (dismissType) {
     dispatch(trackXPromoEvent(XPROMO_DISMISS, { dismiss_type: dismissType }));
@@ -88,13 +101,19 @@ export const incrementModalDismissCount = () => async (dispatch, getState) => {
 };
 
 export const LISTING_CLICK_MODAL_ACTIVATED = 'XPROMO__LISTING_CLICK_MODAL_ACTIVATED';
-export const xpromoListingClickModalActivated = ({ postId='', listingClickType='' }) => ({
+export const _xpromoListingClickModalActivated = ({ postId='', listingClickType='' }) => ({
   type: LISTING_CLICK_MODAL_ACTIVATED,
   payload: {
     postId,
     listingClickType,
   },
 });
+
+export const xpromoListingClickModalActivated = (...args) => (dispatch) => {
+  dispatch(scaledInferenceActions.setMetadata({ trigger: 'click' }));
+  dispatch(scaledInferenceActions.reportOutcome('view'));
+  dispatch(_xpromoListingClickModalActivated(...args));
+};
 
 export const LISTING_CLICK_RETURNER_MODAL_ACTIVATED =
   'XPROMO__LISTING_CLICK_RETURNER_MODAL_ACTIVATED';
@@ -142,9 +161,11 @@ export const checkAndSet = () => async (dispatch, getState) => {
   if (!shouldNotShowBanner(getState())) {
     dispatch(show());
   }
+
   if (isXPromoPersistentEnabled(getState())) {
     dispatch(promoPersistActivate());
   }
+
   dispatch(listingClickInitialState(getListingClickInitialState()));
 };
 
