@@ -424,7 +424,7 @@ function renderIframe(src, aspectRatio) {
         src={ src }
         frameBorder='0'
         allowFullScreen=''
-        sandbox='allow-scripts allow-forms allow-same-origin'
+        sandbox='allow-scripts allow-forms allow-same-origin allow-popups'
       />
     </div>
   );
