@@ -1,7 +1,15 @@
+@import (reference) '~app/less/themes/themeify';
+
 .adLinkBar {
+  .themeify(
+  @inDayMode: {
+    background-color: #F6F7F8;
+  };
+  @inNightMode: {
+    background-color: #272729;
+  });
   display: flex;
   justify-content: space-between;
-  background-color: #F6F7F8;
   align-items: center;
   height: 43px;
   padding-left: 16px;

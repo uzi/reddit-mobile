@@ -8,8 +8,7 @@ import mobilify from 'lib/mobilify';
 import { getStatusBy, getApprovalStatus, sumReportsCount } from 'lib/modToolHelpers.js';
 import PostModel from 'apiClient/models/PostModel';
 
-import { flags, LISTING_CLICK_TYPES } from 'app/constants';
-import features from 'app/featureFlags';
+import { LISTING_CLICK_TYPES } from 'app/constants';
 
 import {
   isPostNSFW,
@@ -25,10 +24,6 @@ const T = React.PropTypes;
 const SEPERATOR = (
   <span className='PostHeader__seperator PostHeader__flush-w-icon' />
 );
-
-const {
-  VARIANT_CALL_TO_ACTION,
-} = flags;
 
 const NSFW_FLAIR = (
   <span className='PostHeader__nsfw-text'>
@@ -389,9 +384,9 @@ function renderDetailViewSubline(post, hideWhen) {
   );
 }
 
-function renderPostHeaderLink(post, interceptListingClick, showLinksInNewTab) {
+function renderPostHeaderLink(post, interceptListingClick, showLinksInNewTab, showCallToAction) {
   const href = cleanPostHREF(mobilify(post.cleanUrl));
-  if (!href || (features.enabled(VARIANT_CALL_TO_ACTION) && post.callToAction)) {
+  if (!href || showCallToAction) {
     return;
   }
 
@@ -486,6 +481,7 @@ export default function PostHeader(props) {
     nextToThumbnail,
     showingLink,
     renderMediaFullbleed,
+    showCallToAction,
     showLinksInNewTab,
     onElementClick,
     titleOpensExpando,
@@ -531,7 +527,7 @@ export default function PostHeader(props) {
       { renderPostTitleLink(post, interceptListingClick, showLinksInNewTab,
                            onElementClick, titleOpensExpando, onTapExpand) }
       { showSourceLink
-        ? renderPostHeaderLink(post, interceptListingClick, showLinksInNewTab)
+        ? renderPostHeaderLink(post, interceptListingClick, showLinksInNewTab, showCallToAction)
         : null }
       { single && !isPromotedUserPost
         ? renderDetailViewSubline(post, interceptListingClick, hideWhen) : null }

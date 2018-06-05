@@ -1,4 +1,11 @@
+@import (reference) '~app/less/themes/themeify';
+
 .callToAction {
+  .themeify(
+  @inNightMode: {
+    color: white;
+    border: 1px solid white;
+  });
   border: 1px solid #0079D3;
   box-sizing: border-box;
   font-weight: 500;
@@ -14,3 +21,4 @@
   padding-top: 3px;
   background-color: transparent;
 }
+
