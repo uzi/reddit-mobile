@@ -60,12 +60,12 @@ function CommentsPage(props) {
       />
       { !post.promoted &&
         <BannerAd
-          id='comments-banner'
+          id='atf-comments-banner'
           shouldCollapse
           listingName='comments'
-          a9
           whitelistStatus={ post.whitelistStatus }
           wls={ post.wls }
+          placement='ATF'
         />
       }
       <RecommendedPosts

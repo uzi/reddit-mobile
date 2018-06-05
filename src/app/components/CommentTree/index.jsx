@@ -9,11 +9,14 @@ import { Anchor } from 'platform/components';
 
 import includes from 'lodash/includes';
 
+import BannerAd from 'app/components/BannerAd';
 import Comment from 'app/components/Comment';
 import GoogleCarouselMetadata from 'app/components/GoogleCarouselMetadata';
+import { AD_MID_COMMENT_SCREENS, flags } from 'app/constants';
 import cx from 'lib/classNames';
 import createCommentList from 'lib/createCommentList';
 import * as commentActions from 'app/actions/comment';
+import features from 'app/featureFlags';
 
 import commentDispatchers, { returnDispatchers } from 'app/components/Comment/dispatchers';
 
@@ -42,41 +45,87 @@ const PADDING = 16;
  * @param   {function} [props.pageId] - The id of the current page (derived from url params).
  * @returns {React.Element}
  */
-export function CommentTree(props) {
-  const {
-    comments,
-    post,
-    pageUrl,
-    isCrawlerRequest,
-    commentsPending,
-  } = props;
-
-  if (commentsPending) {
-    return <LoadingXpromo type='comments'/>;
+export class CommentTree extends React.Component {
+  state = {
+    bannerCommentName: null,
   }
 
-  return (
-    <div className='CommentTree'>
-    { isCrawlerRequest && comments.length ?
-     <GoogleCarouselMetadata
-       post={ post }
-       comments={ comments.filter(c => c.depth === 0).map(c => c.data) }
-       pageUrl={ pageUrl }
-     />
-     : null
+  refByCommentName = {}
+
+  componentDidMount() {
+    if (!this.props.features.enabled(flags.MID_COMMENT_BANNER)) {
+      return;
     }
-      <div className='CommentTree__tree'>
-        { comments.map(({ depth, data, isHidden }) => {
-          return renderNode(
-            props,
-            depth,
-            data,
-            isHidden,
-          );
-        }) }
+
+    const minimumDistanceFromTop = window.innerHeight * AD_MID_COMMENT_SCREENS;
+    // TODO: Only check top level nodes
+    for (let idx = 0; idx < this.props.comments.length; idx++) {
+      // Ads can only be inserted between top level comments
+      const comment = this.props.comments[idx];
+      if (comment.depth === 0) {
+        const nodeRef = this.refByCommentName[comment.data.name];
+        const distanceFromTop = nodeRef.getBoundingClientRect().top + window.scrollY;
+        if (distanceFromTop > minimumDistanceFromTop && idx > 0) {
+          this.setState({
+            bannerCommentName: comment.data.name,
+          });
+          break;
+        }
+      }
+    }
+  }
+
+  render() {
+    const {
+      comments,
+      post,
+      pageUrl,
+      isCrawlerRequest,
+      commentsPending,
+    } = this.props;
+
+    if (commentsPending) {
+      return <LoadingXpromo type='comments'/>;
+    }
+
+    return (
+      <div className='CommentTree'>
+      { isCrawlerRequest && comments.length ?
+      <GoogleCarouselMetadata
+        post={ post }
+        comments={ comments.filter(c => c.depth === 0).map(c => c.data) }
+        pageUrl={ pageUrl }
+      />
+      : null
+      }
+        <div className='CommentTree__tree'>
+          { comments.map(({ depth, data, isHidden }) => {
+            return renderNode(
+              this.props,
+              depth,
+              data,
+              isHidden,
+              ref => { this.refByCommentName[data.name] = ref; },
+              this.state.bannerCommentName === data.name &&
+                this.props.features.enabled(flags.MID_COMMENT_BANNER),
+            );
+          }) }
+        </div>
+        { !post.promoted && this.props.features.enabled(flags.BOTTOM_COMMENT_BANNER) &&
+          <BannerAd
+            id='btf-comments-banner'
+            shouldCollapse
+            listingName='comments'
+            a9
+            whitelistStatus={ post.whitelistStatus }
+            wls={ post.wls }
+            placement='BTF'
+            withBottomSpacing
+          />
+        }
       </div>
-    </div>
-  );
+    );
+  }
 }
 
 CommentTree.propTypes = {
@@ -90,7 +139,7 @@ CommentTree.defaultProps = {
   isCrawlerRequest: false,
 };
 
-const renderNode = (props, depth, data, isHidden) => {
+const renderNode = (props, depth, data, isHidden, innerRef, withAd) => {
   const {
     onLoadMore,
     replyingList,
@@ -118,7 +167,19 @@ const renderNode = (props, depth, data, isHidden) => {
         'm-hidden': isHidden,
       }) }
       style={ { paddingLeft: maxedNestingLevel * PADDING } }
+      ref={ innerRef }
     >
+      { withAd && !post.promoted &&
+          <BannerAd
+            id='mid-comments-banner'
+            shouldCollapse
+            listingName='comments'
+            a9
+            whitelistStatus={ post.whitelistStatus }
+            wls={ post.wls }
+            sizes={ [300, 250] }
+          />
+      }
       { renderLines(maxedNestingLevel) /* render out the depth lines on the left of the comment */ }
       { data.type === 'comment'
         ?
@@ -232,6 +293,7 @@ const selector = createSelector(
   state => state.replying,
   state => state.moderatingSubreddits.names,
   state => state.reports,
+  state => features.withContext({ state }),
   (
     subreddit,
     user,
@@ -247,6 +309,7 @@ const selector = createSelector(
     replyingList,
     moderatingSubreddits,
     reports,
+    features,
   ) => ({
     user,
     thingsBeingEdited,
@@ -263,6 +326,7 @@ const selector = createSelector(
     }) : [],
     reports,
     commentsPending,
+    features,
   })
 );
 

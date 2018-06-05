@@ -52,7 +52,7 @@ class BannerAd extends React.Component {
   }
 
   destroySlot() {
-    destroySlot(this.props.slot);
+    destroySlot(this.props.id);
   }
 
   componentDidMount() {
@@ -73,7 +73,7 @@ class BannerAd extends React.Component {
   }
 
   render() {
-    const { id, slot, hideAds } = this.props;
+    const { id, slot, hideAds, withBottomSpacing } = this.props;
     if (!slot || hideAds) {
       return null;
     }
@@ -84,6 +84,7 @@ class BannerAd extends React.Component {
         className={ classNames('BannerAd', {
           'BannerAd__320x50': !this.props.sizes.includes('fluid'),
           'BannerAd__fluid': this.props.sizes.includes('fluid'),
+          'BannerAd__bottom': withBottomSpacing,
         }) }
       >
         <div ref={ ref => { this.frame = ref; } } id={ id }></div>

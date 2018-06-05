@@ -26,6 +26,8 @@ const {
   BETA,
   XPROMOBANNER,
   USE_BRANCH,
+  BOTTOM_COMMENT_BANNER,
+  MID_COMMENT_BANNER,
   // Recommended Content experiments
   VARIANT_NEXTCONTENT_BOTTOM,
   VARIANT_RECOMMENDED_BOTTOM,
@@ -102,6 +104,22 @@ const config = {
     ],
   },
   [USE_BRANCH]: true,
+  [BOTTOM_COMMENT_BANNER]: {
+    url: 'mweb_comments_banner',
+    and: [{
+      variant: 'mweb_comments_banner:banner',
+    }, {
+      loggedin: false,
+    }],
+  },
+  [MID_COMMENT_BANNER]: {
+    url: 'mweb_comments_banner',
+    and: [{
+      variant: 'mweb_comments_banner:banner',
+    }, {
+      loggedin: false,
+    }],
+  },
   [VARIANT_NEXTCONTENT_BOTTOM]: {
     url: 'experimentnextcontentbottom',
     and: [{

@@ -34,12 +34,12 @@ export const defineSlot = (element, {
     const makeAdRequest = () => {
       googletag.cmd.push(function() {
         // slot was destroyed already
-        if (!adSlots[slot]) {
+        if (!adSlots[id]) {
           return;
         }
 
         googletag.display(id);
-        googletag.pubads().refresh([adSlots[slot]]);
+        googletag.pubads().refresh([adSlots[id]]);
       });
 
       resolve();
@@ -56,7 +56,7 @@ export const defineSlot = (element, {
       }, () => {
         googletag.cmd.push(function() {
           // slot was destroyed already
-          if (!adSlots[slot]) {
+          if (!adSlots[id]) {
             return;
           }
 
@@ -69,7 +69,7 @@ export const defineSlot = (element, {
 
     googletag.cmd.push(function() {
       // make sure we don't try to create the same ad slot twice.
-      destroySlot(slot);
+      destroySlot(id);
 
       const adSlot = googletag
         .defineSlot(slot, sizes, id)
@@ -78,7 +78,7 @@ export const defineSlot = (element, {
       // save a reference so we can look this up later.
       // outside of this closure we should always be using this
       // reference, not `adSlot`.
-      adSlots[slot] = adSlot;
+      adSlots[id] = adSlot;
 
       if (shouldCollapse) {
         adSlot.setCollapseEmptyDiv(true);
@@ -95,8 +95,8 @@ export const defineSlot = (element, {
   });
 };
 
-export const destroySlot = (slotId) => {
-  const adSlot = adSlots[slotId];
+export const destroySlot = (id) => {
+  const adSlot = adSlots[id];
   if (!adSlot) {
     return;
   }
@@ -106,7 +106,7 @@ export const destroySlot = (slotId) => {
 
   googletag.cmd.push(function() {
     googletag.destroySlots([adSlot]);
-    delete adSlots[slotId];
+    delete adSlots[id];
   });
 };
 

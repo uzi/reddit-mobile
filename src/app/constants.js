@@ -1,5 +1,7 @@
 export const AD_LOCATION = 11;
 
+export const AD_MID_COMMENT_SCREENS = 3;
+
 export const GTM_JAIL_ID = 'gtm-jail';
 
 export const ADBLOCK_TEST_ID = 'adblock-test';
@@ -127,6 +129,8 @@ export const flags = {
   BETA: 'beta',
   XPROMOBANNER: 'banner',
   USE_BRANCH: 'useBranch',
+  BOTTOM_COMMENT_BANNER: 'bottomCommentBanner',
+  MID_COMMENT_BANNER: 'midCommentBanner',
   VARIANT_NEXTCONTENT_BOTTOM: 'experimentNextContentBottom',
   VARIANT_RECOMMENDED_BOTTOM: 'experimentRecommendedBottom',
   VARIANT_RECOMMENDED_TOP: 'experimentRecommendedTop',
