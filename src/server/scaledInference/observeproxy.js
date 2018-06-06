@@ -12,22 +12,25 @@ export default (router) => {
       await amp.session.observe('XPromoContext', context, {});
 
       if (project_id === 0) {
-        ctx.body = amp.session.cookieData;
+        ctx.body = Object.assign({}, amp.session.cookieData);
         return;
       }
 
-      const decision = await new Promise((resolve) => {
+      const { err, decision } = await new Promise((resolve) => {
         amp.session.decide('XPromo', {
           xpromo_listing: ['TA', 'BLB', 'P', 'N'],
           xpromo_post: ['BB', 'BLB', 'P', 'N'],
           xpromo_click: ['D', 'N'],
         }, {}, (err, decision) => {
-          resolve(decision);
+          resolve({
+            err,
+            decision,
+          });
         });
       });
 
       const decisionData = assign(
-        { variants: decision },
+        { variants: decision, err },
         amp.session.cookieData
       );
 

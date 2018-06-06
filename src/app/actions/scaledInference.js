@@ -53,13 +53,25 @@ export const getScaledInferenceProjectId = (state) => {
   }
 };
 
-export const shouldThrottle = (state) => {
+const shouldThrottle = (state) => {
   const userAccount = userAccountSelector(state);
+  let exception = false;
+
+  const platform = state && state.platform;
+  const currentPage = platform && platform.currentPage;
+  const queryParams = currentPage && currentPage.queryParams;
+
+  if (queryParams && queryParams.si_throttle === 'off') {
+    exception = true;
+  }
+
   const loggedOutUserAccount = loggedOutUserAccountSelector(state);
   const id = userAccount ? userAccount.id : loggedOutUserAccount.loid;
   const num = parseInt(id, 36);
   const percentile = num % 100;
-  return percentile !== 42;
+  const pass = exception || percentile === 42;
+
+  return !pass;
 };
 
 export const getContextFromState = (state) => {
