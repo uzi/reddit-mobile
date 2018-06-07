@@ -62,6 +62,7 @@ function CommentsPage(props) {
       />
       { !post.promoted &&
         <BannerAd
+          a9
           id='atf-comments-banner'
           shouldCollapse
           listingName='comments'
