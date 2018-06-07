@@ -79,7 +79,7 @@ spec:
                 configMapKeyRef:
                   name: deployment-config
                   key: google.tagmanager.id
-            - name: HTTPS_PROXY
+            - name: MWEB_HTTPS_PROXY
               valueFrom:
                 configMapKeyRef:
                   name: deployment-config

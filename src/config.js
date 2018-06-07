@@ -41,7 +41,7 @@ const rootReddit = redditDomainParts.length < 2
 
 const config = () => ({
   https: process.env.HTTPS === 'true',
-  httpsProxy: process.env.HTTPS_PROXY === 'true',
+  httpsProxy: process.env.MWEB_HTTPS_PROXY === 'true',
 
   debugLevel: process.env.DEBUG_LEVEL,
   postErrorURL: '/error',
