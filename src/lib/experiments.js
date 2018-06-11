@@ -23,6 +23,14 @@ export function getActiveExperimentVariant(state, experimentName) {
 }
 
 export function getExperimentVariant(state, experimentName) {
+  if (experimentName === 'scaled_inference') {
+    const queryParams = state.platform.currentPage && state.platform.currentPage.queryParams;
+
+    if (queryParams && queryParams.si_experiment) {
+      return queryParams.si_experiment;
+    }
+  }
+
   const data = getExperimentData(state, experimentName);
   return data && data.variant;
 }

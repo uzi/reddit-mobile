@@ -39,7 +39,6 @@ createTest({ reducers: { listingClick } }, ({ getStore, expect }) => {
         store.dispatch(xpromoActions.xpromoListingClickModalActivated({ postId, listingClickType }));
         const { listingClick } = store.getState();
 
-        console.log(JSON.stringify(listingClick, null, 2));
         expect(listingClick.clickInfo).to.eql({
           listingClickType,
           postId,

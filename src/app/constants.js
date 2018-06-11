@@ -197,6 +197,12 @@ export const flags = {
   // Mobile Sharing by Browser Capability
   VARIANT_MOBILE_SHARING_WEB_SHARE_API: 'experimentMobileSharingWebShareAPI',
   VARIANT_MOBILE_SHARING_CLIPBOARD: 'experimentMobileSharingClipboard',
+
+  // Call to action
+  VARIANT_CALL_TO_ACTION: 'showCallToAction',
+
+  // Scaled Inference
+  VARIANT_SCALED_INFERENCE: 'scaledInference',
 };
 
 // Now we have 2 different types of XPromo
@@ -315,3 +321,46 @@ export const VIDEO_WATCHED_SECONDS = [
   VIDEO_WATCHED_SECONDS_5,
   VIDEO_WATCHED_SECONDS_10,
 ];
+
+export const SCALED_INFERENCE = {
+  // experiment name
+  EXPERIMENT: 'scaled_inference',
+
+  // scaled inference projects
+  PROJECT_2: 'treatment_2',
+  PROJECT_1: 'treatment_1',
+
+  // triggers
+  LISTING: 'xpromo_listing',
+  POST: 'xpromo_post',
+  CLICK: 'xpromo_click',
+
+  // components
+  TOPBUTTON: 'topbutton',
+  TRANSPARENT: 'transparent',
+  PILL: 'pill',
+  SNACKBAR: 'snackbar',
+  MODAL_LISTING_CLICK: 'modal_listing_click',
+
+  // variants
+  P: 'P',     // pill
+  D: 'D',     // legacy xpromo (click)
+  BB: 'BB',   // legacy xpromo (post)
+  TA: 'TA',   // legacy xpromo (listing)
+  BLB: 'BLB', // snackbar
+  N: 'N',
+
+  // outcomes
+  VIEW: 'view',
+  DISMISS: 'dismiss',
+  ACCEPT: 'accept',
+};
+
+export const SCALED_INFERENCE_BRANCH_PARAMS = {
+  campaign: SCALED_INFERENCE.EXPERIMENT,
+  utm_name: SCALED_INFERENCE.EXPERIMENT,
+  channel: 'xpromo',
+  utm_source: 'xpromo',
+  feature: 'mweb',
+  utm_medium: 'mweb',
+};

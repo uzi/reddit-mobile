@@ -1,4 +1,5 @@
 import { METHODS } from './router';
+import { handshake } from 'app/actions/scaledInference';
 
 export const INCOGNITO_DETECTED = 'PLATFORM__INCOGNITO_DETECTED';
 export const SET_PAGE = 'PLATFORM__SET_PAGE';
@@ -72,7 +73,11 @@ export const activateClient = () => async (dispatch, getState) => {
   dispatch(reroutePage());
 };
 
-export const setStatus = status => ({
-  type: SET_STATUS,
-  payload: { status },
-});
+export const setStatus = (status) => async (dispatch) => {
+  dispatch(handshake());
+
+  return dispatch({
+    type: SET_STATUS,
+    payload: { status },
+  });
+};

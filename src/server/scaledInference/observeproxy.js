@@ -1,7 +1,24 @@
 import * as si from './util';
 import { logServerError } from 'lib/errorLog';
+import { SCALED_INFERENCE } from 'app/constants';
 
 const { assign } = Object;
+
+const { LISTING, POST, CLICK, P, D, BB, TA, BLB, N } = SCALED_INFERENCE;
+
+const SI_PARAMS = {
+  [LISTING]: [TA, BLB, P, N],
+  [POST]: [BB, BLB, P, N],
+  [CLICK]: [D, N],
+};
+
+// const DEBUG_RESULT = {
+//   [LISTING]: P,
+//   [POST]: BLB,
+//   [CLICK]: D,
+// };
+
+const DEBUG_RESULT = null;
 
 export default (router) => {
   router.post('/si-observe', async (ctx) => {
@@ -17,14 +34,10 @@ export default (router) => {
       }
 
       const { err, decision } = await new Promise((resolve) => {
-        amp.session.decide('XPromo', {
-          xpromo_listing: ['TA', 'BLB', 'P', 'N'],
-          xpromo_post: ['BB', 'BLB', 'P', 'N'],
-          xpromo_click: ['D', 'N'],
-        }, {}, (err, decision) => {
+        amp.session.decide('XPromo', SI_PARAMS, {}, (err, decision) => {
           resolve({
             err,
-            decision,
+            decision: DEBUG_RESULT || decision,
           });
         });
       });

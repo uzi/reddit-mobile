@@ -21,6 +21,7 @@ import { isInterstitialDimissed } from 'lib/xpromoState';
 import { trackXPromoIneligibleEvent } from 'lib/eventUtils';
 import { isCommentsPage } from 'platform/pageUtils';
 import { POST_TYPE } from 'apiClient/models/thingTypes';
+import { isScaledInferenceActive } from '../actions/scaledInference';
 
 const { DAYMODE } = COLOR_SCHEME;
 const { USUAL, MINIMAL, PERSIST } = XPROMO_DISPLAY_THEMES;
@@ -65,6 +66,9 @@ const {
 
   // Porn Pill
   VARIANT_NSFW_XPROMO,
+
+  // Scaled Inference
+  VARIANT_SCALED_INFERENCE,
 } = flagConstants;
 
 const EXPERIMENT_FULL = [
@@ -137,6 +141,7 @@ export const EXPERIMENT_NAMES = {
   [VARIANT_XPROMO_AD_FEED_IOS]: 'mweb_xpromo_ad_feed_ios',
   [VARIANT_XPROMO_AD_FEED_ANDROID]: 'mweb_xpromo_ad_feed_android',
   [VARIANT_NSFW_XPROMO]: 'mweb_nsfw_xpromo',
+  [VARIANT_SCALED_INFERENCE]: 'mweb_scaled_inference',
 };
 
 export function getRouteActionName(state) {
@@ -183,13 +188,7 @@ export function isXPromoFixedBottom(state) {
 
 function xpromoIsConfiguredOnPage(state) {
   const actionName = getRouteActionName(state);
-  if (actionName === 'index' || actionName === 'listing') {
-    return true;
-  } else if (actionName === 'comments') {
-    return commentsInterstitialEnabled(state);
-  }
-
-  return false;
+  return actionName === 'index' || actionName === 'listing' || actionName === 'comments';
 }
 
 export function isXPromoEnabledOnPages(state) {
@@ -250,9 +249,15 @@ export function commentsInterstitialEnabled(state) {
  */
 
 export function listingClickEnabled(state, postId) {
+  if (isScaledInferenceActive(state)) {
+    return state.scaledInference.variants.xpromo_click === 'D' &&
+           !state.xpromo.listingClick.dismissed;
+  }
+
   if (!isEligibleListingPage(state) || !isXPromoEnabledOnDevice(state)) {
     return false;
   }
+
   if (!state.user.loggedOut) {
     const userAccount = state.accounts[state.user.name];
     if (userAccount && (userAccount.isMod || userAccount.isGold)) {
@@ -437,5 +442,5 @@ function isContentLoaded(state) {
   return true;
 }
 export function XPromoIsActive(state) {
-  return isContentLoaded(state) && shouldShowXPromo(state) && xpromoIsConfiguredOnPage(state);
+  return isContentLoaded(state) && xpromoIsConfiguredOnPage(state) && state.xpromo.interstitials.showBanner;
 }

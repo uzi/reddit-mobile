@@ -5,57 +5,109 @@ import { createSelector } from 'reselect';
 import DualPartInterstitial from 'app/components/DualPartInterstitial';
 import EUCookieNotice from 'app/components/EUCookieNotice';
 import TopNav from 'app/components/TopNav';
-import { 
+import {
   XPromoIsActive,
   isXPromoFixedBottom,
-  loginRequiredEnabled as loginRequiredXPromoVariant,
 } from 'app/selectors/xpromo';
 
-const renderXPromoBanner = (children, isDisplay=false, mixin=false) => {
-  return isDisplay ? <DualPartInterstitial mixin={ mixin }>{ children }</DualPartInterstitial> : null;
+import SnackBar from 'app/components/SnackBar';
+import XPromoPill from 'app/components/XPromoPill';
+import { pageTypeSelector } from 'app/selectors/platformSelector';
+import { SCALED_INFERENCE } from '../../constants';
+import { isCurrentContentNSFW } from '../../selectors/platformSelector';
+
+const CLASSIC = 'CLASSIC';
+const SNACKBAR = 'SNACKBAR';
+const PILL = 'PILL';
+const NONE = 'NONE';
+
+const DEFAULT_VARIANTS = {
+  [SCALED_INFERENCE.CLICK]: SCALED_INFERENCE.D,
+  [SCALED_INFERENCE.LISTING]: SCALED_INFERENCE.TA,
+  [SCALED_INFERENCE.POST]: SCALED_INFERENCE.BB,
 };
 
-const NavFrame = props => {
-  const {
-    children,
-    showXPromo,
-    requireLogin,
-    isXPromoFixed,
-  } = props;
+const VARIANT_TO_COMPONENT = {
+  [SCALED_INFERENCE.N]: NONE,
+  [SCALED_INFERENCE.TA]: CLASSIC,
+  [SCALED_INFERENCE.BB]: CLASSIC,
+  [SCALED_INFERENCE.P]: PILL,
+  [SCALED_INFERENCE.BLB]: SNACKBAR,
+};
 
-  // xPromoPadding is an additional hidden DOM element that helps
-  // to avoid the situation when a bottom-fixed (CSS rules) banner
-  // is overlapping the content at the end of the page.
-  const showXPromoPadding = (showXPromo && isXPromoFixed);
-  const xPromoPadding = renderXPromoBanner(children, showXPromoPadding, 'm-invisible');
-  const xPromoBanner = renderXPromoBanner(children, showXPromo);
+function renderXPromo (variant, children, isDisplay=false, mixin=false) {
+  if (!isDisplay) { return null; }
 
-  const otherContent = requireLogin ? null : (
-    <div>
-      <TopNav />
-      <div className='NavFrame__below-top-nav'>
-        <EUCookieNotice />
-        { children }
+  const component = VARIANT_TO_COMPONENT[variant];
+
+  // only the original xpromo banner should render the invisible version
+  if (mixin && component !== CLASSIC) {
+    return null;
+  }
+
+  switch (component) {
+    case NONE:
+      return null;
+    case CLASSIC:
+      return <DualPartInterstitial mixin={ mixin }>{ children }</DualPartInterstitial>;
+    case PILL:
+      return <XPromoPill active={ true } scaledInference={ true }/>;
+    case SNACKBAR:
+      return <SnackBar/>;
+  }
+}
+
+class NavFrame extends React.Component {
+  render() {
+    const {
+      children,
+      showXPromo,
+      isXPromoFixed,
+      variant,
+    } = this.props;
+
+    // xPromoPadding is an additional hidden DOM element that helps
+    // to avoid the situation when a bottom-fixed (CSS rules) banner
+    // is overlapping the content at the end of the page.
+    const showXPromoPadding = (showXPromo && isXPromoFixed);
+    const xPromoPadding = renderXPromo(variant, children, showXPromoPadding, 'm-invisible');
+    const xPromo = renderXPromo(variant, children, showXPromo);
+
+    const otherContent = (
+      <div>
+        <TopNav />
+        <div className='NavFrame__below-top-nav'>
+          <EUCookieNotice />
+          { children }
+        </div>
+        { xPromoPadding }
       </div>
-      { xPromoPadding }
-    </div>
-  );
+    );
 
-  return (
-    <div className='NavFrame'>
-      { xPromoBanner }
-      { otherContent }
-    </div>
-  );
-};
+    return (
+      <div className='NavFrame'>
+        { xPromo }
+        { otherContent }
+      </div>
+    );
+  }
+}
 
 const xPromoSelector = createSelector(
   XPromoIsActive,
   isXPromoFixedBottom,
-  loginRequiredXPromoVariant,
-  (showXPromo, isXPromoFixed, requireLogin) => {
-    return { showXPromo, isXPromoFixed, requireLogin};
+  (showXPromo, isXPromoFixed) => {
+    return { showXPromo, isXPromoFixed};
   },
 );
 
-export default connect(xPromoSelector)(NavFrame);
+function mapStateToProps(state) {
+  const isNSFW = isCurrentContentNSFW(state);
+  const trigger = pageTypeSelector(state);
+  const { variants } = state.scaledInference;
+  const variant = variants ? variants[trigger] : DEFAULT_VARIANTS[trigger];
+  const { showXPromo, isXPromoFixed } = xPromoSelector(state);
+  return { showXPromo: showXPromo && !isNSFW, isXPromoFixed, variant };
+}
+
+export default connect(mapStateToProps)(NavFrame);

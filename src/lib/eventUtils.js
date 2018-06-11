@@ -10,9 +10,7 @@ import { EXPERIMENT_NAMES } from 'app/selectors/xpromo';
 
 import { xpromoAddBucketingEvent } from 'app/actions/xpromo';
 import {
-  isXPromoAdLoadingEnabled,
   getXPromoExperimentPayload,
-  commentsInterstitialEnabled,
   isEligibleListingPage,
   isEligibleCommentsPage,
   isXPromoBannerEnabled,
@@ -35,6 +33,7 @@ import * as gtm from 'lib/gtm';
 import { hasAdblock } from 'lib/adblock';
 import { shouldNotShowBanner } from 'lib/xpromoState';
 import { getExperimentData } from './experiments';
+import { SCALED_INFERENCE } from '../app/constants';
 
 export const XPROMO_VIEW = 'cs.xpromo_view';
 export const XPROMO_INELIGIBLE = 'cs.xpromo_ineligible';
@@ -253,6 +252,30 @@ export function trackSharingEvent(state, eventType, additionalEventData = {}) {
   });
 }
 
+export function trackExposeScaledInference(state, additionalEventData = {}) {
+  const experiment_name = SCALED_INFERENCE.EXPERIMENT;
+  const data = getExperimentData(state, SCALED_INFERENCE.EXPERIMENT);
+
+  if (!data) { return; }
+
+  const { variant, experiment_id } = data;
+
+  const payload = {
+    ...getBasePayload(state),
+    experiment_name,
+    experiment_id,
+    variant,
+    ...additionalEventData,
+  };
+
+  return new Promise((resolve) => {
+    getEventTracker()
+      .replaceToNewSend()
+      .addDoneToNewSend(() => resolve())
+      .track('xpromo_events', 'cs.xpromo_si_expose', payload);
+  });
+}
+
 export function trackExposeSharing(state) {
   trackSharingEvent(state, 'cs.mweb_share_expose');
 }
@@ -433,25 +456,6 @@ export const addToQueueAdLoadingXPromoViewEvent = (interstitialType) => {
   }
 };
 
-function trackAdLoadingXPromoEvents(state, additionalEventData) {
-  if (isXPromoAdLoadingEnabled(state)) {
-    if (process.env.ENV === 'server') {
-      // This event should only be fire on the
-      // server-side if the experiment is enabled
-      trackXPromoView(state, additionalEventData);
-    } else {
-      // If this experiment is enabled, it means that the XpromoView
-      // event is already fired on the server-side, so for the first
-      // time on the client-side (if we have init), we need to skip it.
-      if (!adLoadingXPromoView.has('init') && adLoadingXPromoView.size) {
-        const { value } = adLoadingXPromoView.values().next();
-        trackXPromoView(state, {interstitial_type: value});
-      }
-      adLoadingXPromoView.clear();
-    }
-  }
-}
-
 function trackInterstitialXPromoEvents(state, additionalEventData) {
   // Before triggering any of these xPromo events, we need
   // be sure that the first and main XPROMOBANNER is enabled
@@ -465,15 +469,10 @@ function trackInterstitialXPromoEvents(state, additionalEventData) {
     if (process.env.ENV === 'client') {
       return trackXPromoIneligibleEvent(state, additionalEventData, ineligibilityReason);
     }
-  } else if (isEligibleListingPage(state) || commentsInterstitialEnabled(state)) {
-    // listing pages always track view events because they'll
-    // either see the normal xpromo, or the login required variant
-    return trackXPromoView(state, additionalEventData);
   }
 }
 
 export function trackPagesXPromoEvents(state, additionalEventData) {
-  trackAdLoadingXPromoEvents(state, additionalEventData);
   trackInterstitialXPromoEvents(state, additionalEventData);
 }
 

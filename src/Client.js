@@ -23,14 +23,15 @@ import Session from 'app/models/Session';
 import Preferences from 'apiClient/models/Preferences';
 import * as xpromoActionsClientOnly from 'app/actions/xpromoClientOnly';
 import detectIncognito from 'lib/detectIncognito';
-import { trackXPromoIncognito } from './lib/eventUtils';
-import { handshake } from 'app/actions/scaledInference';
+import {
+  trackExposeSharing,
+  trackXPromoIncognito,
+  trackExposeScaledInference,
+} from 'lib/eventUtils';
 
 // importing these to populate the branch.link property needed for mobile sharing
 import { branchProxy } from 'app/actions/sharing';
 import branch from 'branch-sdk';
-
-import { trackExposeSharing } from 'lib/eventUtils';
 
 // Bits to help in the gathering of client side timings to relay back
 // to the server
@@ -182,14 +183,13 @@ if (isShell) {
 
 client.dispatch(sharingActions.detectWebShareCapability());
 trackExposeSharing(client.getState());
+trackExposeScaledInference(client.getState());
 
 detectIncognito().then(result => {
   if (result) {
     trackXPromoIncognito(client.getState());
     client.dispatch(platformActions.incognitoDetected());
   }
-
-  return client.dispatch(handshake());
 });
 
 // expose mobile sharing

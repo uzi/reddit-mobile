@@ -1,11 +1,19 @@
 import Amp from 'amp-node';
 
-export const PROJECT_KEYS = [
+export const TEST_PROJECT_KEYS = [
   // Scaled Inference test project keys
   '4479164de58f944c',
   '4553532aeeded9b3',
   '21377c707a3198c8',
 ];
+
+export const PRODUCTION_PROJECT_KEYS = [
+  '90cc5238a6c41e71',
+  'dcce7f3addf1e3bf',
+  'dea870750b61382c',
+];
+
+const PROJECT_KEYS = PRODUCTION_PROJECT_KEYS;
 
 export const getConfig = (ctx) => {
   const idx = ctx.request.body.project_id || 0;

@@ -2,8 +2,18 @@ import React from 'react';
 import { connect } from 'react-redux';
 import throttle from 'lodash/throttle';
 import { createStructuredSelector } from 'reselect';
-import * as xpromoActions from 'app/actions/xpromo';
 import * as xpromoPersist from 'lib/xpromoPersistState';
+import {
+  promoScrollPast,
+  promoScrollStart,
+  promoScrollUp,
+  promoPersistActivate,
+  promoPersistDeactivate,
+} from 'app/actions/xpromo';
+import {
+  trackXPromoView,
+  trackXPromoEvent,
+} from 'lib/eventUtils';
 
 import {
   XPROMO_SCROLLPAST,
@@ -13,7 +23,7 @@ import {
   XPROMO_INELIGIBLE,
 } from 'lib/eventUtils';
 
-import { 
+import {
   xpromoThemeIsUsual,
   dismissedState,
   scrollPastState,
@@ -21,6 +31,8 @@ import {
   isXPromoPersistent,
   xpromoAdFeedVariant,
 } from 'app/selectors/xpromo';
+
+import { SCALED_INFERENCE } from 'app/constants';
 
 class XPromoWrapper extends React.Component {
   constructor(props) {
@@ -36,45 +48,45 @@ class XPromoWrapper extends React.Component {
   }
 
   displayPersistBannerByTimer() {
-    const { dispatch, isInterstitialDismissed } = this.props;
+    const { isInterstitialDismissed } = this.props;
 
     xpromoPersist.runStatusCheck((status) => {
       switch (status) {
         case xpromoPersist.statusKey.JUST_DISMISSED: {
-          dispatch(xpromoActions.trackXPromoEvent(
-            XPROMO_VIEW, { process_note: 'just_dismissed_and_show' })
+          this.props.trackXPromoEvent(
+            XPROMO_VIEW, { process_note: 'just_dismissed_and_show' }
           );
           break;
         }
 
         case xpromoPersist.statusKey.SHOW_SAME_SESSION: {
-          dispatch(xpromoActions.promoPersistActivate());
-          dispatch(xpromoActions.trackXPromoEvent(
-            XPROMO_VIEW, { process_note: 'show_same_session' })
+          this.props.promoPersistActivate();
+          this.props.trackXPromoEvent(
+            XPROMO_VIEW, { process_note: 'show_same_session' }
           );
           break;
         }
 
         case xpromoPersist.statusKey.SHOW_NEW_SESSION: {
-          dispatch(xpromoActions.promoPersistActivate());
-          dispatch(xpromoActions.trackXPromoEvent(
-            XPROMO_VIEW, { process_note: 'show_new_session' })
+          this.props.promoPersistActivate();
+          this.props.trackXPromoEvent(
+            XPROMO_VIEW, { process_note: 'show_new_session' }
           );
           break;
         }
 
         case xpromoPersist.statusKey.HIDE: {
-          dispatch(xpromoActions.promoPersistDeactivate());
-          dispatch(xpromoActions.trackXPromoEvent(
-            XPROMO_DISMISS, { ineligibility_reason: 'hide_by_timeout'})
+          this.props.promoPersistDeactivate();
+          this.props.trackXPromoEvent(
+            XPROMO_DISMISS, { ineligibility_reason: 'hide_by_timeout'}
           );
           break;
         }
 
         case xpromoPersist.statusKey.BLOCK_SHOW: {
-          dispatch(xpromoActions.promoPersistDeactivate());
-          dispatch(xpromoActions.trackXPromoEvent(
-            XPROMO_INELIGIBLE, { ineligibility_reason: 'recent_session'})
+          this.props.promoPersistDeactivate();
+          this.props.trackXPromoEvent(
+            XPROMO_INELIGIBLE, { ineligibility_reason: 'recent_session'}
           );
         }
       }
@@ -85,10 +97,9 @@ class XPromoWrapper extends React.Component {
     // For now we will consider scrolling half the
     // viewport "scrolling past" the interstitial.
     // note the referencing of window
-    const { 
-      dispatch, 
-      alreadyScrolledStart, 
-      alreadyScrolledPast, 
+    const {
+      alreadyScrolledStart,
+      alreadyScrolledPast,
       xpromoThemeIsUsual,
       isXPromoPersistent,
       xpromoAdFeedVariant,
@@ -97,31 +108,31 @@ class XPromoWrapper extends React.Component {
     // should appears only once on the start
     // of the scrolled down by the viewport
     if (!xpromoThemeIsUsual && !alreadyScrolledStart) {
-      dispatch(xpromoActions.trackXPromoEvent(XPROMO_SCROLLPAST, { scroll_note: 'scroll_start' }));
-      dispatch(xpromoActions.promoScrollStart());
+      this.props.trackXPromoEvent(XPROMO_SCROLLPAST, { scroll_note: 'scroll_start' });
+      this.props.promoScrollStart();
     }
     // should appears only once on scroll down about the half viewport.
     // "scrollPast" state is also used for
     // toggling xpromo fade-in/fade-out actions
     if (this.isScrollPast() && !alreadyScrolledPast) {
       const additionalData = (xpromoThemeIsUsual ? {} : { scroll_note: 'unit_fade_out' });
-      dispatch(xpromoActions.trackXPromoEvent(XPROMO_SCROLLPAST, additionalData));
-      dispatch(xpromoActions.promoScrollPast());
+      this.props.trackXPromoEvent(XPROMO_SCROLLPAST, additionalData);
+      this.props.promoScrollPast();
     }
     // should appears only once on scroll up about the half viewport.
     // xpromo fade-in action, if user will scroll
     // window up (only for "minimal" xpromo theme)
     if (!this.isScrollPast() && alreadyScrolledPast) {
       const additionalData = (xpromoThemeIsUsual ? {} : { scroll_note: 'unit_fade_in' });
-      dispatch(xpromoActions.trackXPromoEvent(XPROMO_SCROLLUP, additionalData));
-      dispatch(xpromoActions.promoScrollUp());
+      this.props.trackXPromoEvent(XPROMO_SCROLLUP, additionalData);
+      this.props.promoScrollUp();
     }
-    // remove scroll events for usual xpromo theme 
+    // remove scroll events for usual xpromo theme
     // (no needs to listen window up scrolling)
     if (xpromoThemeIsUsual && alreadyScrolledPast && !isXPromoPersistent) {
       if (xpromoAdFeedVariant) {
-        dispatch(xpromoActions.trackXPromoEvent(
-          XPROMO_VIEW, { interstitial_type: xpromoAdFeedVariant})
+        this.props.trackXPromoEvent(
+          XPROMO_VIEW, { interstitial_type: xpromoAdFeedVariant }
         );
       }
       this.toggleOnScroll(false);
@@ -131,15 +142,15 @@ class XPromoWrapper extends React.Component {
   isScrollPast() {
     const { alreadyScrolledPast } = this.props;
     let isPastHalfViewport = (window.pageYOffset > window.innerHeight / 2);
-    // Fixing an issue, when (height of content part + height of the second xpromo 
+    // Fixing an issue, when (height of content part + height of the second xpromo
     // for bottom padding) is the same as window.pageYOffset. In this case:
     // 1. isPastHalfViewport - is false
     // 2. let's scroll a little bit more
     // 3.1. isPastHalfViewport - become true
-    // 3.2. class 'fadeOut' will be deleted 
+    // 3.2. class 'fadeOut' will be deleted
     // 3.3. second xpromo for bottom padding become hidden (after deleting the class 'fadeOut')
     // 4. window.pageYOffset will become lower again (because of removing height of second xpromo)
-    // 5. isPastHalfViewport - will become false 
+    // 5. isPastHalfViewport - will become false
     // 6. and it will goes around forever...
     // Desynchronizing Up/Down heights, to avoid this issue.
     if (!alreadyScrolledPast) {
@@ -164,6 +175,7 @@ class XPromoWrapper extends React.Component {
   }
   componentDidMount() {
     this.toggleOnScroll(true);
+    this.props.trackXPromoView();
   }
   componentWillUnmount() {
     this.toggleOnScroll(false);
@@ -183,4 +195,18 @@ const selector = createStructuredSelector({
   xpromoAdFeedVariant,
 });
 
-export default connect(selector)(XPromoWrapper);
+const mapDispatchToProps = {
+  trackXPromoView: () => async (_, getState) => {
+    return trackXPromoView(getState(), { interstitial_type: SCALED_INFERENCE.TRANSPARENT });
+  },
+  trackXPromoEvent: (...args) => async(_, getState) => {
+    return trackXPromoEvent(getState(), ...args);
+  },
+  promoScrollPast,
+  promoScrollStart,
+  promoScrollUp,
+  promoPersistActivate,
+  promoPersistDeactivate,
+};
+
+export default connect(selector, mapDispatchToProps)(XPromoWrapper);

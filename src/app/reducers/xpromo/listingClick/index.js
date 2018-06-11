@@ -37,6 +37,8 @@ export const DEFAULT = {
   // in order to differentiate being in the listing click experiment vs
   // the frequency experiment
 
+  dismissed: false, // true if the user has dismissed the modal in the current session
+
   showingAppStoreModal: false, // true if the click-through modal should be visible
 
   showingReturnerModal: false, // true if the returner modal should be visible.
@@ -98,6 +100,7 @@ export default function(state=DEFAULT, action={}) {
         target: null,
         showingAppStoreModal: false,
         showingReturnerModal: false,
+        dismissed: true,
       });
     }
 

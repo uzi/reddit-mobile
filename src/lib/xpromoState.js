@@ -1,9 +1,9 @@
 import url from 'url';
 import get from 'lodash/get';
 import cookies from 'js-cookie';
-
 import config from 'config';
 import localStorageAvailable from './localStorageAvailable';
+
 import {
   getBasePayload,
   buildSubredditData,
@@ -11,7 +11,6 @@ import {
 } from 'lib/eventUtils';
 
 import {
-  getXPromoExperimentPayload,
   isEligibleCommentsPage,
   isEligibleListingPage,
   loginRequiredEnabled,
@@ -29,6 +28,8 @@ import {
 } from 'app/constants';
 
 import extractTaglist from 'lib/extractTagList';
+import { getExperimentVariant } from './experiments';
+import { SCALED_INFERENCE_BRANCH_PARAMS, SCALED_INFERENCE } from '../app/constants';
 
 const {
   USUAL,
@@ -66,10 +67,19 @@ export function isXPromoPersistentEnabled(state) {
 }
 
 export function getXPromoLinkforCurrentPage(state, interstitial_type) {
+  const variant = getExperimentVariant(state, SCALED_INFERENCE.EXPERIMENT);
+
+  const params = {
+    interstitial_type,
+    tags: [interstitial_type],
+    ...SCALED_INFERENCE_BRANCH_PARAMS,
+    keyword: variant,
+    utm_term: variant,
+  };
   const path = state.platform.currentPage.url;
   // utm_content (3 arg) and interstitial_type (4 arg) are
   // should be the same inside the url link (as payload also).
-  return getXPromoLink(state, path, interstitial_type, { interstitial_type });
+  return getXPromoLink(state, path, interstitial_type, params);
 }
 
 export function getXPromoListingClickLink(state, postId, listingClickType) {
@@ -80,10 +90,19 @@ export function getXPromoListingClickLink(state, postId, listingClickType) {
 
   const path = getXPromoListingClickPath(state, post, listingClickType);
 
+  const scaledInferenceVariant = getExperimentVariant(state, SCALED_INFERENCE.EXPERIMENT);
+
   return getXPromoLink(state, path, XPROMO_MODAL_LISTING_CLICK_NAME, {
     listing_click_type: listingClickType,
+    keyword: scaledInferenceVariant,
+    utm_term: scaledInferenceVariant,
+    utm_content: SCALED_INFERENCE.MODAL_LISTING_CLICK,
+    tags: [SCALED_INFERENCE.MODAL_LISTING_CLICK],
   });
 }
+
+// https://www.reddit.com/?campaign=scaled_inference&utm_name=scaled_inference&channel=xpromo&utm_source=xpromo&feature=mweb&utm_medium=mweb&%24og_redirect=https%3A%2F%2Fwww.reddit.com%2Fr%2Fnottheonion%2Fcomments%2F8zb638%2Fus_republicans_endorse_arming_toddlers_on_sacha%2F&%24deeplink_path=%2Fr%2Fnottheonion%2Fcomments%2F8zb638%2Fus_republicans_endorse_arming_toddlers_on_sacha%2F&%24android_deeplink_path=reddit%2Fr%2Fnottheonion%2Fcomments%2F8zb638%2Fus_republicans_endorse_arming_toddlers_on_sacha%2F&mweb_loid=00000000001se15pox&mweb_loid_created=1531760367214&mweb_user_id36=&mweb_user_name=&domain=localhost%3A4444&geoip_country=US&user_agent=Mozilla%2F5.0%20%28iPhone%3B%20CPU%20iPhone%20OS%2011_0%20like%20Mac%20OS%20X%29%20AppleWebKit%2F604.1.38%20%28KHTML%2C%20like%20Gecko%29%20Version%2F11.0%20Mobile%2F15A372%20Safari%2F604.1&base_url=%2F&referrer_domain=&referrer_url=&language=&dnt=false&compact_view=true&adblock=false&session_id=ju6YYRHxYIIzV6scSd&loid=00000000001se15pox&loid_created=1531760367214&reddaid=&utm_content=modal_listing_click&interstitial_type=modal_listing_click&listing_click_type=comments_link&keyword=treatment_1&utm_term=treatment_1&tags=modal_listing_click&listing_name=frontpage&target_type=listing&target_sort=hot&target_count=25&_branch_match_id=544983095369148572
+// https://www.reddit.com/?campaign=scaled_inference&utm_name=scaled_inference&channel=xpromo&utm_source=xpromo&feature=mweb&utm_medium=mweb&%24og_redirect=https%3A%2F%2Fwww.reddit.com%2Fr%2Fvideos%2Fcomments%2F8zahhk%2Fthe_theme_to_mib_the_animated_show_had_no_right%2F&%24deeplink_path=%2Fr%2Fvideos%2Fcomments%2F8zahhk%2Fthe_theme_to_mib_the_animated_show_had_no_right%2F&%24android_deeplink_path=reddit%2Fr%2Fvideos%2Fcomments%2F8zahhk%2Fthe_theme_to_mib_the_animated_show_had_no_right%2F&mweb_loid=00000000001se15pox&mweb_loid_created=1531760367214&mweb_user_id36=&mweb_user_name=&domain=localhost%3A4444&geoip_country=US&user_agent=Mozilla%2F5.0%20%28iPhone%3B%20CPU%20iPhone%20OS%2011_0%20like%20Mac%20OS%20X%29%20AppleWebKit%2F604.1.38%20%28KHTML%2C%20like%20Gecko%29%20Version%2F11.0%20Mobile%2F15A372%20Safari%2F604.1&base_url=%2F&referrer_domain=&referrer_url=&language=&dnt=false&compact_view=true&adblock=false&session_id=ju6YYRHxYIIzV6scSd&loid=00000000001se15pox&loid_created=1531760367214&reddaid=&utm_content=modal_listing_click&interstitial_type=modal_listing_click&listing_click_type=comments_link&keyword=treatment_2&utm_term=treatment_2&tags=modal_listing_click&listing_name=frontpage&target_type=listing&target_sort=hot&target_count=25&_branch_match_id=544983095369148572
 
 function getXPromoListingClickPath(state, post, listingClickType) {
   switch (listingClickType) {
@@ -121,21 +140,6 @@ function getXPromoLink(state, path, linkType, additionalData={}) {
     ...interstitialData(state, additionalData),
     ...additionalData,
   };
-
-  const experimentData = getXPromoExperimentPayload(state);
-  if (experimentData && experimentData.experiment_name && experimentData.experiment_variant) {
-    payload = {
-      ...payload,
-      utm_name: experimentData.experiment_name,
-      utm_term: experimentData.experiment_variant,
-      utm_medium: 'experiment',
-    };
-  } else {
-    payload = {
-      ...payload,
-      utm_medium: 'interstitial',
-    };
-  }
 
   payload = {
     ...payload,
@@ -183,9 +187,7 @@ export function getBranchLink(state, path, payload={}) {
   }
 
   const basePayload = {
-    channel: 'mweb_branch',
-    feature: 'xpromo',
-    campaign: 'xpromo',
+    ...SCALED_INFERENCE_BRANCH_PARAMS,
     // We can use this space to fill "tags" which will populate on the
     // branch dashboard and allow you sort/parse data. Optional/not required.
     // tags: [ 'tag1', 'tag2' ],
@@ -212,12 +214,6 @@ export function getBranchLink(state, path, payload={}) {
   The utm_content query parameter overwrites the tags parameter in the long form branch links.
   If you happen to be wondering why it stopped appearing somewhere, look no further.
   */
-
-  if (query.utm_content) {
-    const tag = query.utm_content;
-    query.tags.push(tag);
-    delete query.utm_content;
-  }
 
   const link = url.format({
     protocol: 'https',

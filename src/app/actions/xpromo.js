@@ -1,4 +1,5 @@
 import { XPROMO_MODAL_LISTING_CLICK_NAME } from 'app/constants';
+
 import {
   getXPromoListingClickLink,
   markBannerClosed,
@@ -8,18 +9,21 @@ import {
   listingClickInitialState as getListingClickInitialState,
   isXPromoPersistentEnabled,
 } from 'lib/xpromoState';
+
 import {
   trackPreferenceEvent,
   XPROMO_APP_STORE_VISIT,
   XPROMO_DISMISS,
   XPROMO_VIEW,
 } from 'lib/eventUtils';
+
 import * as scaledInferenceActions from './scaledInference';
+
+import { SCALED_INFERENCE } from 'app/constants';
 
 export const SHOW = 'XPROMO__SHOW';
 export const _show = () => ({ type: SHOW });
 export const show = () => async (dispatch) => {
-  dispatch(scaledInferenceActions.setMetadata({ trigger: null }));
   dispatch(scaledInferenceActions.reportOutcome('view'));
   dispatch(_show());
 };
@@ -50,11 +54,11 @@ export const promoPersistActivate = () => async (dispatch) => {
 };
 
 export const XPROMO_DISMISS_CLICKED = 'XPROMO__DISMISS_CLICKED';
-export const promoDismissed = (dismissType) => async (dispatch, getState) => {
+export const promoDismissed = (interstitialType) => async (dispatch, getState) => {
   dispatch(scaledInferenceActions.reportOutcome('dismiss'));
   dispatch({ type: XPROMO_DISMISS_CLICKED });
-  if (dismissType) {
-    dispatch(trackXPromoEvent(XPROMO_DISMISS, { dismiss_type: dismissType }));
+  if (interstitialType) {
+    dispatch(trackXPromoEvent(XPROMO_DISMISS, { interstitial_type: interstitialType }));
   }
   if (isXPromoPersistentEnabled(getState())) {
     dispatch(promoPersistActivate());
@@ -110,8 +114,7 @@ export const _xpromoListingClickModalActivated = ({ postId='', listingClickType=
 });
 
 export const xpromoListingClickModalActivated = (...args) => async (dispatch) => {
-  dispatch(scaledInferenceActions.setMetadata({ trigger: 'click' }));
-  dispatch(scaledInferenceActions.reportOutcome('view'));
+  dispatch(scaledInferenceActions.reportOutcome('view', false, SCALED_INFERENCE.CLICK));
   dispatch(_xpromoListingClickModalActivated(...args));
 };
 
@@ -123,7 +126,12 @@ export const xpromoListingClickReturnerModalActivated = () => ({
 });
 
 export const LISTING_CLICK_MODAL_HIDDEN = 'XPROMO__LISTING_CLICK_MODAL_HIDDEN';
-export const listingClickModalHidden = () => ({ type: LISTING_CLICK_MODAL_HIDDEN });
+export const _listingClickModalHidden = () => ({ type: LISTING_CLICK_MODAL_HIDDEN });
+
+export const listingClickModalHidden = () => async (dispatch) => {
+  dispatch(scaledInferenceActions.reportOutcome('dismiss', false, SCALED_INFERENCE.CLICK));
+  return dispatch(_listingClickModalHidden());
+};
 
 export const TRACK_XPROMO_EVENT = 'XPROMO__TRACK_EVENT';
 export const trackXPromoEvent = (eventType, data) => ({
@@ -158,8 +166,12 @@ export const close = () => async (dispatch, getState) => {
 };
 
 export const checkAndSet = () => async (dispatch, getState) => {
-  if (!shouldNotShowBanner(getState())) {
-    dispatch(show());
+  const state = getState();
+
+  if (!shouldNotShowBanner(state)) {
+    if (!scaledInferenceActions.isScaledInferenceActive(state)) {
+      dispatch(show());
+    }
   }
 
   if (isXPromoPersistentEnabled(getState())) {
@@ -196,7 +208,9 @@ export const listingClickModalAppStoreClicked = () => async (dispatch, getState)
 
   dispatch(xpromoListingClickReturnerModalActivated());
 
-  navigateToAppStore(getXPromoListingClickLink(state, postId, listingClickType));
+  const link = getXPromoListingClickLink(state, postId, listingClickType);
+
+  navigateToAppStore(link);
 
   await trackingPromise;
 };
