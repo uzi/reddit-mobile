@@ -109,7 +109,7 @@ export const _xpromoListingClickModalActivated = ({ postId='', listingClickType=
   },
 });
 
-export const xpromoListingClickModalActivated = (...args) => (dispatch) => {
+export const xpromoListingClickModalActivated = (...args) => async (dispatch) => {
   dispatch(scaledInferenceActions.setMetadata({ trigger: 'click' }));
   dispatch(scaledInferenceActions.reportOutcome('view'));
   dispatch(_xpromoListingClickModalActivated(...args));

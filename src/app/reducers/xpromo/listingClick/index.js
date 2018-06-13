@@ -42,6 +42,8 @@ export const DEFAULT = {
   showingReturnerModal: false, // true if the returner modal should be visible.
   // Note: when bucketed in the dismiss-able variants, clicking 'dismiss' will
   // close the app store modal without showing a returner modal.
+
+  modalDismissCount: 0, // number of times that the user has dismissed the click-through modal
 };
 
 export default function(state=DEFAULT, action={}) {
