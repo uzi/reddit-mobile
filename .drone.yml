@@ -20,9 +20,9 @@ pipeline:
       event: [ push ]
 
   notify:
-    image: plugins/slack
+    image: 258875347723.dkr.ecr.us-east-1.amazonaws.com/drone-plugin-slack
     channel: mweb-salon
-    secrets: [ SLACK_WEBHOOK ]
+    secrets: [ slack_webhook ]
     when:
       status: [ success, failure ]
       event: [ pull_request ]
@@ -35,9 +35,9 @@ pipeline:
     deploy_env: staging
     auto_merge: false
     secrets:
-      - GITHUB_INTEGRATION_PRIVATE_KEY_PEM
-      - GITHUB_APP_INTEGRATION_ID
-      - GITHUB_INSTALLATION_ID
+      - github_integration_private_key_pem
+      - github_app_integration_id
+      - github_installation_id
     when:
       event: [ push ]
 
@@ -52,8 +52,26 @@ pipeline:
       - You can see all deployed branches [here](https://branches.mobile.dev.snooguts.net)
       - Your branch will be available once the CI build finishes
     secrets:
-      - GITHUB_INTEGRATION_PRIVATE_KEY_PEM
-      - GITHUB_APP_INTEGRATION_ID
-      - GITHUB_INSTALLATION_ID
+      - github_integration_private_key_pem
+      - github_app_integration_id
+      - github_installation_id
     when:
       event: [ pull_request ]
+
+secrets:
+  github_app_integration_id:
+    driver: vault
+    driver_opts:
+      path: secret/drone/common/github_app_integration_id
+  github_installation_id:
+    driver: vault
+    driver_opts:
+      path: secret/drone/common/github_installation_id
+  github_integration_private_key_pem:
+    driver: vault
+    driver_opts:
+      path: secret/drone/common/github_integration_private_key_pem
+  slack_webhook:
+    driver: vault
+    driver_opts:
+      path: secret/drone/common/slack_webhook

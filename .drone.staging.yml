@@ -16,15 +16,17 @@ pipeline:
     timeout: 60
     release: reddit-mobile-${DRONE_BRANCH}
     values: branch_name=${DRONE_BRANCH},commit_sha=${DRONE_COMMIT},deployer_name=$$CI_PREV_COMMIT_AUTHOR_NAME
-    secrets: [ API_SERVER, SERVICE_ACCOUNT ]
+    secrets:
+      - api_server
+      - service_account
     when:
       event: [ deployment ]
       environment: staging
 
   notify-deployment:
-    image: plugins/slack
+    image: 258875347723.dkr.ecr.us-east-1.amazonaws.com/drone-plugin-slack/slack
     channel: mweb-salon
-    secrets: [ SLACK_WEBHOOK ]
+    secrets: [ slack_webhook ]
     template: >
       {{#success build.status}}
         🚀 *Deployed* <{{build.link}}|{{repo.name}}@{{truncate build.commit 8}}> ({{build.branch}}) to *<https://{{build.branch}}.mobile.dev.snooguts.net|staging>*
@@ -34,3 +36,17 @@ pipeline:
     when:
       status: [ failure, success ]
       event: [ deployment ]
+
+secrets:
+  api_server:
+    driver: vault
+    driver_opts:
+      path: secret/drone/common/api_server
+  service_account:
+    driver: vault
+    driver_opts:
+      path: secret/drone/common/service_account
+  slack_webhook:
+    driver: vault
+    driver_opts:
+      path: secret/drone/common/slack_webhook
