@@ -197,5 +197,3 @@ detectIncognito().then(result => {
 
 // populate the branchProxy object with branch.link
 branchProxy.link = (payload, callback) => { return branch.link(payload, callback); };
-
-// nop comment
