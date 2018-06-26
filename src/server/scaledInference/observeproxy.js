@@ -12,7 +12,7 @@ export default (router) => {
       await amp.session.observe('XPromoContext', context, {});
 
       if (project_id === 0) {
-        ctx.body = Object.assign({}, amp.session.cookieData);
+        ctx.body = Object.assign({ session: amp.session.cookieData });
         return;
       }
 

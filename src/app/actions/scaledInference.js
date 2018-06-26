@@ -11,6 +11,9 @@ export const SET_METADATA = 'SCALED_INFERENCE__SET_METADATA';
 export const LOCAL_STORAGE_KEY = 'scaled_inference';
 export const SCALED_INFERENCE_PROJECT_IDS = [0, 1, 2];
 
+const outcomeQueue = [];
+let observeSucceeded = false;
+
 export const getStateFromLocalStorage = () => {
   if (localStorageAvailable()) {
     const serializedState = localStorage.getItem(LOCAL_STORAGE_KEY);
@@ -44,6 +47,12 @@ export const setMetadata = (payload) => {
 };
 
 export const getScaledInferenceProjectId = (state) => {
+  const queryParams = state.platform.currentPage && state.platform.currentPage.queryParams;
+
+  if (queryParams && queryParams.si_project_id) {
+    return parseInt(queryParams.si_project_id);
+  }
+
   const variant = getExperimentVariant(state, LOCAL_STORAGE_KEY);
 
   switch (variant) {
@@ -103,9 +112,19 @@ export const getContextFromState = (state) => {
   };
 };
 
+export const completeHandshake = (data) => async (dispatch) => {
+  observeSucceeded = true;
+
+  outcomeQueue.forEach(closure => {
+    closure(data);
+  });
+
+  dispatch({ type: HANDSHAKE_END, data });
+};
+
 export const handshake = () => async (dispatch, getState) => {
   const storage = getStateFromLocalStorage();
-  const session = (storage && storage.session) || {};
+  const session = extractSession(getStateFromLocalStorage());
   const outcomes = (storage && storage.outcomes) || {};
   const state = getState();
 
@@ -123,12 +142,8 @@ export const handshake = () => async (dispatch, getState) => {
   dispatch({ type: HANDSHAKE_BEGIN });
 
   return sendObserve(payload).then(json => {
-    updateStateInLocalStorage({ session: json });
-
-    return dispatch({
-      type: HANDSHAKE_END,
-      data: json,
-    });
+    updateStateInLocalStorage(json);
+    return dispatch(completeHandshake(json));
   });
 };
 
@@ -143,7 +158,19 @@ export const extractSession = (data) => {
   return { __si_uid, __si_sid, __si_startts, __si_eventts };
 };
 
-export const reportOutcome = (outcome, isHeaderButton = false) => async (dispatch, getState) => {
+export const reportOutcome = (outcome, isHeaderButton = false) => async (dispatch) => {
+  if (observeSucceeded) {
+    return dispatch(_reportOutcome(outcome, isHeaderButton, null));
+  }
+
+  outcomeQueue.push(({ session }) => {
+    return dispatch(_reportOutcome(outcome, isHeaderButton, session));
+  });
+
+  return null;
+};
+
+export const _reportOutcome = (outcome, isHeaderButton = false, _session = null) => async (dispatch, getState) => {
   const state = getState();
 
   if (shouldThrottle(state)) {
@@ -154,7 +181,7 @@ export const reportOutcome = (outcome, isHeaderButton = false) => async (dispatc
   const pageType = pageTypeSelector(state);
   const trigger = _trigger || pageType;
   const xpromoType = _xpromoType || DEFAULT_XPROMO_TYPES[trigger];
-  const session = extractSession(getStateFromLocalStorage());
+  const session = _session || extractSession(getStateFromLocalStorage());
   const projectId = getScaledInferenceProjectId(state);
   const payload = {
     session,
