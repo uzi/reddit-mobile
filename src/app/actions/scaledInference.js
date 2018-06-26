@@ -138,11 +138,6 @@ const DEFAULT_XPROMO_TYPES = {
   listing: 'TA',
 };
 
-export const extractSession = (data) => {
-  const { __si_uid, __si_sid, __si_startts, __si_eventts } = data;
-  return { __si_uid, __si_sid, __si_startts, __si_eventts };
-};
-
 export const reportOutcome = (outcome, isHeaderButton = false) => async (dispatch, getState) => {
   const state = getState();
 
@@ -154,7 +149,7 @@ export const reportOutcome = (outcome, isHeaderButton = false) => async (dispatc
   const pageType = pageTypeSelector(state);
   const trigger = _trigger || pageType;
   const xpromoType = _xpromoType || DEFAULT_XPROMO_TYPES[trigger];
-  const session = extractSession(getStateFromLocalStorage());
+  const { session } = getStateFromLocalStorage();
   const projectId = getScaledInferenceProjectId(state);
   const payload = {
     session,
