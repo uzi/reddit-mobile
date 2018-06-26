@@ -3,8 +3,8 @@ import { DEFAULT_API_TIMEOUT } from 'app/constants';
 import makeRequest from './makeRequest';
 
 // Hivemind is no longer available to external clients
-// so setting this to 0 as a first step
-const CLIENT_PERCENTAGE = 0;
+// so setting this to -1 so no clients pass through.
+const CLIENT_PERCENTAGE = -1;
 
 export function getTimes() {
   const performance = global.performance ||
