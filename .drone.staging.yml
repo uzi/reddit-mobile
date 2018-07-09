@@ -24,7 +24,7 @@ pipeline:
       environment: staging
 
   notify-deployment:
-    image: 258875347723.dkr.ecr.us-east-1.amazonaws.com/drone-plugin-slack/slack
+    image: 258875347723.dkr.ecr.us-east-1.amazonaws.com/drone-plugin-slack
     channel: mweb-salon
     secrets: [ slack_webhook ]
     template: >
