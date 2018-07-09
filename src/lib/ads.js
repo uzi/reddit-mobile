@@ -21,6 +21,10 @@ export const AdEvents = {
   VideoWatched75: 106,
   VideoWatched95: 107,
   VideoWatched100: 108,
+  VideoStarted: 109,
+  VideoWatchedSeconds3: 110,
+  VideoWatchedSeconds5: 111,
+  VideoWatchedSeconds6: 112,
 };
 
 export const firePixel = (pixel) => {

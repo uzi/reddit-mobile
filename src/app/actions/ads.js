@@ -1,5 +1,13 @@
 import { logClientAdblock } from 'lib/eventUtils';
 import { firePixelsOfType, AdEvents } from 'lib/ads';
+import {
+  VIDEO_WATCHED_PERCENT_25,
+  VIDEO_WATCHED_PERCENT_50,
+  VIDEO_WATCHED_PERCENT_75,
+  VIDEO_WATCHED_PERCENT_95,
+  VIDEO_WATCHED_SECONDS_3,
+  VIDEO_WATCHED_SECONDS_5,
+} from 'app/constants';
 
 export const FETCHING = 'FETCHING_AD';
 export const fetching = (adId, postsListId) => ({
@@ -87,6 +95,12 @@ export const trackVideoFullyViewableImpression = id => async (dispatch, getState
   firePixelsOfType(post.events, AdEvents.VideoFullyViewableImpression);
 };
 
+export const trackVideoStarted = id => async (dispatch, getState) => {
+  const state = getState();
+  const post = state.posts[id];
+  firePixelsOfType(post.events, AdEvents.VideoStarted);
+};
+
 export const trackVideoPlayedWithSound = id => async (dispatch, getState) => {
   const state = getState();
   const post = state.posts[id];
@@ -110,11 +124,20 @@ export const trackVideoPlayedExpanded = id => async (dispatch, getState) => {
 export const trackVideoWatchedPercent = (id, percent) => async (dispatch, getState) => {
   const state = getState();
   const post = state.posts[id];
-  const adEvent = percent === 25 ? AdEvents.VideoWatched25 :
-                  percent === 50 ? AdEvents.VideoWatched50 :
-                  percent === 75 ? AdEvents.VideoWatched75 :
-                  percent === 95 ? AdEvents.VideoWatched95 :
+  const adEvent = percent === VIDEO_WATCHED_PERCENT_25 ? AdEvents.VideoWatched25 :
+                  percent === VIDEO_WATCHED_PERCENT_50 ? AdEvents.VideoWatched50 :
+                  percent === VIDEO_WATCHED_PERCENT_75 ? AdEvents.VideoWatched75 :
+                  percent === VIDEO_WATCHED_PERCENT_95 ? AdEvents.VideoWatched95 :
                   AdEvents.VideoWatched100;
+  firePixelsOfType(post.events, adEvent);
+};
+
+export const trackVideoWatchedTime = (id, time) => async (dispatch, getState) => {
+  const state = getState();
+  const post = state.posts[id];
+  const adEvent = time === VIDEO_WATCHED_SECONDS_3 ? AdEvents.VideoWatchedSeconds3 :
+                  time === VIDEO_WATCHED_SECONDS_5 ? AdEvents.VideoWatchedSeconds5 :
+                  AdEvents.VideoWatchedSeconds10;
   firePixelsOfType(post.events, adEvent);
 };
 

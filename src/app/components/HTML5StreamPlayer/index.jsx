@@ -5,9 +5,11 @@ import './styles.less';
 import PostModel from 'apiClient/models/PostModel';
 import { trackVideoEvent } from 'app/actions/posts';
 import {
+  trackVideoStarted,
   trackVideoPlayedWithSound,
   trackVideoPlayedExpanded,
   trackVideoWatchedPercent,
+  trackVideoWatchedTime,
   updateBufferedStatus,
   updateVideoSeekedStatus,
 } from 'app/actions/ads';
@@ -15,6 +17,18 @@ import { connect } from 'react-redux';
 import { VIDEO_EVENT } from 'app/constants';
 import { createSelector } from 'reselect';
 import { isCommentsPage } from 'platform/pageUtils';
+import {
+  VIDEO_WATCHED_PERCENT_25,
+  VIDEO_WATCHED_PERCENT_50,
+  VIDEO_WATCHED_PERCENT_75,
+  VIDEO_WATCHED_PERCENT_95,
+  VIDEO_WATCHED_PERCENT_100,
+  VIDEO_WATCHED_PERCENTAGES,
+  VIDEO_WATCHED_SECONDS_3,
+  VIDEO_WATCHED_SECONDS_5,
+  VIDEO_WATCHED_SECONDS_10,
+  VIDEO_WATCHED_SECONDS,
+} from 'app/constants';
 
 const T = React.PropTypes;
 
@@ -55,11 +69,16 @@ class HTML5StreamPlayer extends React.Component {
     };
     this.percentWatchedInterval = null;
     this.percentagePixelsTriggered = {
-      25: null,
-      50: null,
-      75: null,
-      95: null,
-      100: null,
+      [VIDEO_WATCHED_PERCENT_25]: null,
+      [VIDEO_WATCHED_PERCENT_50]: null,
+      [VIDEO_WATCHED_PERCENT_75]: null,
+      [VIDEO_WATCHED_PERCENT_95]: null,
+      [VIDEO_WATCHED_PERCENT_100]: null,
+    };
+    this.timePixelsTriggered = {
+      [VIDEO_WATCHED_SECONDS_3]: null,
+      [VIDEO_WATCHED_SECONDS_5]: null,
+      [VIDEO_WATCHED_SECONDS_10]: null,
     };
     this.didSeek = false;
     this.latestStartTime = 0;
@@ -125,6 +144,9 @@ class HTML5StreamPlayer extends React.Component {
       && this.state.videoScrollPaused === false) {
       video.play();
       this.sendTrackVideoEvent(VIDEO_EVENT.SCROLL_AUTOPLAY);
+      if (this.state.totalServedTime < 1000) {
+        this.props.dispatch(trackVideoStarted(this.getPostId()));
+      }
     }
 
     if (this.videoIsPaused() === false && videoIsInView === false) {
@@ -355,9 +377,8 @@ class HTML5StreamPlayer extends React.Component {
     if (!this.isPromoted()) {
       return;
     }
-    const pixelPercents = [25, 50, 75, 95, 100]; // percentage benchmarks to fire ad pixels
     const id = this.getPostId();
-    pixelPercents.forEach(pixelPercent => {
+    VIDEO_WATCHED_PERCENTAGES.forEach(pixelPercent => {
       if (percent < pixelPercent || this.didTriggerPercentagePixel(pixelPercent)) {
         return;
       }
@@ -369,6 +390,24 @@ class HTML5StreamPlayer extends React.Component {
         return;
       }
       clearInterval(this.percentWatchedInterval);
+    });
+  }
+
+  trackVideoWatchedTime = (timeWatched, duration) => {
+    if (!this.isPromoted()) {
+      return;
+    }
+    // according to specs, if a user watches 95% of a video's length, we trigger all time events
+    if (timeWatched / duration >= 0.95) {
+      timeWatched = VIDEO_WATCHED_SECONDS_10;
+    }
+    const id = this.getPostId();
+    VIDEO_WATCHED_SECONDS.forEach(timeTrigger => {
+      if (timeWatched < timeTrigger || this.timePixelsTriggered[timeTrigger]) {
+        return;
+      }
+      this.timePixelsTriggered[timeTrigger] = true;
+      this.props.dispatch(trackVideoWatchedTime(id, timeTrigger));
     });
   }
 
@@ -532,7 +571,6 @@ class HTML5StreamPlayer extends React.Component {
       newTime += performance.now() - this.state.lastUpdate;
     }
 
-
     if (video.currentTime && video.duration) {
       this.setState({
         videoPosition: ((video.currentTime/video.duration) * 100),
@@ -543,6 +581,8 @@ class HTML5StreamPlayer extends React.Component {
         wasPlaying: !this.videoIsPaused(),
         scrubPosition: ((video.currentTime/video.duration) * 100),
       });
+
+      this.trackVideoWatchedTime(newTime / 1000, video.duration);
 
       // HACK: most times after seeking, the video doesn't "end"
       // (i.e. it hangs at around 99.6% complete)
