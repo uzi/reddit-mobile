@@ -73,7 +73,7 @@ PostContent.defaultProps = {
 
 export default function PostContent(props) {
   const { post, isDomainExternal, compact, isThumbnail, interceptListingClick,
-          renderMediaFullbleed, showLinksInNewTab, showCallToAction } = props;
+          renderMediaFullbleed, showLinksInNewTab } = props;
   const linkUrl = cleanPostHREF(mobilify(post.cleanUrl));
   const linkDescriptor = new LinkDescriptor(linkUrl, true);
   const mediaContentNode = buildMediaContent(post, linkDescriptor, props);
@@ -95,7 +95,7 @@ export default function PostContent(props) {
       { renderMediaContent(mediaContentNode, isThumbnail, isDomainExternal,
                            cleanPostDomain(post.domain), linkUrl,
                            renderMediaFullbleed, showLinksInNewTab,
-                           post.outboundLink, post.promoted, showCallToAction) }
+                           post.outboundLink, post.promoted) }
       { selftextNode }
     </div>
   );
@@ -103,14 +103,14 @@ export default function PostContent(props) {
 
 function renderMediaContent(mediaContentNode, isThumbnail, isDomainExternal,
                             linkDisplayText, linkUrl, renderMediaFullbleed,
-                            showLinksInNewTab, outboundLink, promoted, showCallToAction) {
+                            showLinksInNewTab, outboundLink, promoted) {
   if (isThumbnail || !isDomainExternal || renderMediaFullbleed) {
     return mediaContentNode;
   }
   return (
     <div className='PostContent__media-wrapper'>
       { mediaContentNode }
-      { !showCallToAction && renderLinkBar(linkDisplayText, linkUrl,
+      { !promoted && renderLinkBar(linkDisplayText, linkUrl,
                       showLinksInNewTab, outboundLink, promoted) }
     </div>
   );

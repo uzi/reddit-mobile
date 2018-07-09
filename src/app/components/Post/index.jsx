@@ -36,7 +36,6 @@ import { setListingClickTarget } from '../../actions/xpromo';
 const {
   VARIANT_TITLE_EXPANDO,
   VARIANT_MIXED_VIEW,
-  SHOW_CALL_TO_ACTION,
 } = flags;
 
 const noExpandoPostTypes = new Set(['link', 'self', '']);
@@ -62,7 +61,6 @@ Post.propTypes = {
   subredditIsNSFW: T.bool,
   subredditShowSpoilers: T.bool,
   showOver18Interstitial: T.bool,
-  showCallToAction: T.bool,
   single: T.bool,
   userActivityPage: T.bool,
   z: T.number,
@@ -123,7 +121,6 @@ export function Post(props, context) {
     single,
     hideSubredditLabel,
     hideWhen,
-    showCallToAction,
     interceptListingClick: unboundInterceptListingClick,
     inTitleExpandoExp,
     inMixedViewExp,
@@ -198,7 +195,6 @@ export function Post(props, context) {
         togglePlaying={ onTogglePlaying }
         width={ winWidth }
         toggleShowNSFW={ toggleShowNSFW }
-        showCallToAction={ showCallToAction }
         showNSFW={ showNSFW }
         showSpoilers={ showSpoilers }
         editing={ false }
@@ -232,7 +228,6 @@ export function Post(props, context) {
         togglePlaying={ onTogglePlaying }
         width={ winWidth }
         showNSFW={ showNSFW }
-        showCallToAction={ showCallToAction }
         showSpoilers={ showSpoilers }
         toggleShowNSFW={ toggleShowNSFW }
         forceHTTPS={ forceHTTPS }
@@ -264,7 +259,6 @@ export function Post(props, context) {
           hideWhen={ hideWhen }
           nextToThumbnail={ !!thumbnailOrNil }
           showingLink={ !!(displayCompact && !hasExpandedCompact && externalDomain) }
-          showCallToAction={ showCallToAction }
           renderMediaFullbleed={ renderMediaFullbleed }
           showLinksInNewTab={ showLinksInNewTab }
           onElementClick={ () => { onPostClick(post); } }
@@ -276,7 +270,7 @@ export function Post(props, context) {
         />
       </div>
       { contentOrNil }
-      { showCallToAction && (
+      { post.promoted && (
         <AdLinkBar
           post={ post }
           renderMediaFullbleed={ renderMediaFullbleed }
@@ -316,7 +310,6 @@ const selector = createSelector(
   (state, props) => state.editingText[props.postId],
   state => features.withContext({ state }).enabled(VARIANT_TITLE_EXPANDO),
   state => features.withContext({ state }).enabled(VARIANT_MIXED_VIEW),
-  state => features.withContext({ state }).enabled(SHOW_CALL_TO_ACTION),
   (state, props) => state.playingPosts[removePrefix(props.postId)],
   state => state.moderatingSubreddits,
   (state, props) => state.reports[props.postId],
@@ -331,7 +324,6 @@ const selector = createSelector(
     editingState,
     inTitleExpandoExp,
     inMixedViewExp,
-    showCallToAction,
     isPlaying,
     moderatingSubreddits,
     reports,
@@ -351,7 +343,6 @@ const selector = createSelector(
       inTitleExpandoExp,
       inMixedViewExp,
       isPlaying,
-      showCallToAction: showCallToAction && post.promoted,
       moderatingSubreddits,
       reports,
     };

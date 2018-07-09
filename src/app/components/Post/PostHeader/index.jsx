@@ -384,9 +384,9 @@ function renderDetailViewSubline(post, hideWhen) {
   );
 }
 
-function renderPostHeaderLink(post, interceptListingClick, showLinksInNewTab, showCallToAction) {
+function renderPostHeaderLink(post, interceptListingClick, showLinksInNewTab) {
   const href = cleanPostHREF(mobilify(post.cleanUrl));
-  if (!href || showCallToAction) {
+  if (!href) {
     return;
   }
 
@@ -481,7 +481,6 @@ export default function PostHeader(props) {
     nextToThumbnail,
     showingLink,
     renderMediaFullbleed,
-    showCallToAction,
     showLinksInNewTab,
     onElementClick,
     titleOpensExpando,
@@ -490,7 +489,7 @@ export default function PostHeader(props) {
     reports,
   } = props;
 
-  const showSourceLink = showingLink && !renderMediaFullbleed;
+  const showSourceLink = showingLink && !renderMediaFullbleed && !post.promoted;
   const sizeClass = `${compact ? 'size-compact' : ''}`;
   const thumbnailClass = `${nextToThumbnail ? 'm-thumbnail-margin' : ''}`;
   const approvalStatus = getApprovalStatus(post.approved,
@@ -527,7 +526,7 @@ export default function PostHeader(props) {
       { renderPostTitleLink(post, interceptListingClick, showLinksInNewTab,
                            onElementClick, titleOpensExpando, onTapExpand) }
       { showSourceLink
-        ? renderPostHeaderLink(post, interceptListingClick, showLinksInNewTab, showCallToAction)
+        ? renderPostHeaderLink(post, interceptListingClick, showLinksInNewTab)
         : null }
       { single && !isPromotedUserPost
         ? renderDetailViewSubline(post, interceptListingClick, hideWhen) : null }

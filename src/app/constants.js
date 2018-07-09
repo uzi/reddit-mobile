@@ -197,9 +197,6 @@ export const flags = {
   // Mobile Sharing by Browser Capability
   VARIANT_MOBILE_SHARING_WEB_SHARE_API: 'experimentMobileSharingWebShareAPI',
   VARIANT_MOBILE_SHARING_CLIPBOARD: 'experimentMobileSharingClipboard',
-
-  // Call to action
-  VARIANT_CALL_TO_ACTION: 'showCallToAction',
 };
 
 // Now we have 2 different types of XPromo
