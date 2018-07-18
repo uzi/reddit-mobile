@@ -94,16 +94,12 @@ Post.contextTypes = {
 };
 
 export function Post(props, context) {
-  const userAgent = global.navigator && global.navigator.userAgent
-    ? global.navigator.userAgent
-    : '';
-
   const compact = _isCompact(props);
   const externalDomain = isPostDomainExternal(props.post);
   const renderMediaFullbleed = postShouldRenderMediaFullbleed(props.post);
   const forceHTTPS = shouldForceHTTPS({ https: true });
-  const isAndroid = userAgent && /android/i.test(userAgent);
-  const showLinksInNewTab = externalDomain && isAndroid;
+
+  const showLinksInNewTab = externalDomain;
   const showNSFW = props.subredditIsNSFW || props.unblurred;
 
   // Spoilers differ from NSFW in that if a subreddit disables spoilers
