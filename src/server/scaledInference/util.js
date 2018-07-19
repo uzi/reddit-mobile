@@ -23,11 +23,12 @@ export const getConfig = (ctx) => {
     key,
     domain: 'https://reddit.agent.amp.ai:8100',
     apiPath: '/api/core/v1/',
+    timeout: 30000,
   };
 };
 
-const SESSIONTTL = 18 * 60 * 60;
-const SESSIONLENGTH = 30 * 60;
+const SESSIONLENGTH = 18 * 60 * 60;
+const SESSIONTTL = 30 * 60;
 
 export function newSession(amp) {
   amp.session = new amp.Session();
@@ -52,15 +53,15 @@ export function createAmp(ctx) {
 
   const { __si_startts, __si_eventts, __si_sid, __si_uid } = getSessionDataFromContext(ctx);
 
-  if (!(__si_sid || __si_uid)) {
-    newSession(amp, ctx);
+  if (!(__si_sid && __si_uid)) {
+    newSession(amp);
   } else {
     const now = Date.now() / 1000;
 
     if (now - __si_eventts > SESSIONTTL || now - __si_startts > SESSIONLENGTH) {
-      newSession(amp, ctx);
+      newSession(amp);
     } else {
-      amp.session = new amp.Session({id: __si_sid, userId: __si_uid});
+      amp.session = new amp.Session({id: __si_sid, userId: __si_uid, timeout: 30000});
       amp.session.cookieData = getSessionDataFromContext(ctx);
     }
   }

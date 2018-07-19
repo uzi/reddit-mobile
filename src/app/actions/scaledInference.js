@@ -124,8 +124,9 @@ export const getContextFromState = (state) => {
 };
 
 export const completeHandshake = (data) => async (dispatch, getState) => {
-  const state = getState();
+  updateStateInLocalStorage(data);
 
+  const state = getState();
   observeSucceeded = true;
 
   outcomeQueue.forEach(closure => {
@@ -178,9 +179,6 @@ export const handshake = () => async (dispatch, getState) => {
   dispatch({ type: HANDSHAKE_BEGIN });
 
   return sendObserve(payload).then(json => {
-    if (projectId === SCALED_INFERENCE_PROJECT_IDS[2]) {
-      updateStateInLocalStorage(json);
-    }
     return dispatch(completeHandshake(json));
   });
 };
