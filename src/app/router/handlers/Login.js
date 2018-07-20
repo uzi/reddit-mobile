@@ -23,7 +23,7 @@ export default class Login extends BaseHandler {
     try {
       const state = getState();
       const loginForm = state.twoFactorAuthentication && state.twoFactorAuthentication.activeForm;
-      const otpInRightForm = loginForm === loginForms.BACKUP_CODE ? 'B_' + otp : otp;
+      const otpInRightForm = loginForm === loginForms.BACKUP_CODE ? `B_${ otp}` : otp;
 
       const data = await Session.fromLogin(username, password, otpInRightForm);
       

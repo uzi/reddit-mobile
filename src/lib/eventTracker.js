@@ -35,7 +35,9 @@ function stubbedPost({ data, done }) {
 
 const trackers = {};
 
-export function getEventTracker() {
+export function getEventTracker(options={}) {
+  const { serverEvent=false } = options;
+
   const {
     trackerKey,
     trackerClientSecret,
@@ -64,7 +66,7 @@ export function getEventTracker() {
       trackerClientAppName,
       calculateHash,
       {
-        appendClientContext: true,
+        appendClientContext: !serverEvent,
         bufferLength: 1,
       }
     );
