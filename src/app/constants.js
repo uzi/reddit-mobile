@@ -386,3 +386,10 @@ export const PAGE_NAMES = {
   SUBMIT: 'submit',
   USER: 'user',
 };
+
+export const FIRST_BIT = {
+  EXPERIMENT_NAME: 'mweb_first_bit_redo',
+  FIRST_BIT_1: 'mweb_first_bit_redo_1',
+  FIRST_BIT_2: 'mweb_first_bit_redo_2',
+  FIRST_BIT_3: 'mweb_first_bit_redo_3',
+};

@@ -64,16 +64,16 @@ export function getEventTracker() {
       trackerClientAppName,
       calculateHash,
       {
-        appendClientContext: true,
+        appendClientContext: process.env.ENV === 'client',
         bufferLength: 1,
       }
     );
     trackers[hash] = tracker;
 
-    /* 
-     * (v.artem.tkachenko@reddit.com) 
-     * Method "Send" (from the external "event-tracker" 
-     * lib. https://github.com/reddit/event-tracker) 
+    /*
+     * (v.artem.tkachenko@reddit.com)
+     * Method "Send" (from the external "event-tracker"
+     * lib. https://github.com/reddit/event-tracker)
      * is executing without "Done" callback in usual mode, and
      * there is no way to fire Resolve/Reject for Promise
      */
@@ -83,12 +83,12 @@ export function getEventTracker() {
 }
 
 /*
- * Patch for EventTracker libery. Add Done callback to 
+ * Patch for EventTracker libery. Add Done callback to
  * current 'Send' method of external "event-tracker" lib
  * (https://github.com/reddit/event-tracker).
- * 
+ *
  * instance: tracer (new instance of EventTracker)
- */ 
+ */
 function patchEventTracker(instance) {
   /*
    * @TODO: we should replace current
@@ -108,7 +108,7 @@ function patchEventTracker(instance) {
           key: this.clientKey,
           mac: hash,
         },
-        done: ((this.done || done) || function() {}), 
+        done: ((this.done || done) || function() {}),
       });
       this.buffer = [];
     }
