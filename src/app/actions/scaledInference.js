@@ -160,7 +160,7 @@ export const handshake = () => async (dispatch, getState) => {
   // the above flag ensures it is only called once
 
   const storage = getStateFromLocalStorage();
-  const session = extractSession({ session: storage });
+  const session = extractSession(storage);
   const outcomes = (storage && storage.outcomes) || {};
   const state = getState();
 
@@ -188,9 +188,9 @@ const DEFAULT_XPROMO_TYPES = {
   [SCALED_INFERENCE.LISTING]: SCALED_INFERENCE.TA,
 };
 
-export const extractSession =
-  ({ session: { __si_uid, __si_sid, __si_startts, __si_eventts } }) =>
-  ({ __si_uid, __si_sid, __si_startts, __si_eventts });
+export const extractSession = (storage = {}) => {
+  return (storage && storage.session) || null;
+};
 
 export const reportOutcome = (outcome, isHeaderButton = false, trigger = null) => async (dispatch, getState) => {
   const state = getState();
