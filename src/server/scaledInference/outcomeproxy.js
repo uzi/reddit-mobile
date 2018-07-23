@@ -16,6 +16,9 @@ export default (router) => {
       xpromoType,
       headerButton,
     });
-    ctx.body='OK';
+
+    ctx.body = {
+      session: amp.session.cookieData,
+    };
   });
 };

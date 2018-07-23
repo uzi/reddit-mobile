@@ -42,8 +42,7 @@ export const clearStateInLocalStorage = () => {
 };
 
 export const setMetadata = (payload) => {
-  const storage = getStateFromLocalStorage();
-  setStateInLocalStorage({ ...storage, ...payload });
+  updateStateInLocalStorage(payload);
   return {
     type: SET_METADATA,
     payload,
@@ -97,7 +96,7 @@ const shouldThrottle = (state) => {
 
 export const getContextFromState = (state) => {
   const account = userAccountSelector(state) || loggedOutUserAccountSelector(state);
-  const lastSessionTimestamp = localStorage.getItem('last_session_timestamp') || null;
+  const lastSessionTimestamp = (localStorageAvailable() && localStorage.getItem('last_session_timestamp')) || null;
   const post = getCurrentPost(state);
   const subreddit = getCurrentSubreddit(state);
 
@@ -124,7 +123,7 @@ export const getContextFromState = (state) => {
 };
 
 export const completeHandshake = (data) => async (dispatch, getState) => {
-  updateStateInLocalStorage(data);
+  dispatch(setMetadata(data));
 
   const state = getState();
   observeSucceeded = true;
@@ -135,17 +134,17 @@ export const completeHandshake = (data) => async (dispatch, getState) => {
 
   const projectId = getScaledInferenceProjectId(state);
 
-  if (projectId === SCALED_INFERENCE_PROJECT_IDS[1]) {
-    dispatch({ type: SET_METADATA, payload: { ...data, variants: DEFAULT_XPROMO_TYPES }});
-
-    if (!shouldNotShowBanner(state)) {
-      dispatch(show());
-    }
-  }
-
   if (projectId === SCALED_INFERENCE_PROJECT_IDS[2]) {
-    dispatch({ type: SET_METADATA, payload: data });
+    dispatch(setMetadata(data));
     dispatch(show());
+  } else {
+    dispatch(setMetadata({ ...data, variants: DEFAULT_XPROMO_TYPES }));
+
+    if (projectId === SCALED_INFERENCE_PROJECT_IDS[1]) {
+      if (!shouldNotShowBanner(state)) {
+        dispatch(show());
+      }
+    }
   }
 };
 
@@ -193,8 +192,11 @@ export const extractSession =
   ({ __si_uid, __si_sid, __si_startts, __si_eventts }) =>
   ({ __si_uid, __si_sid, __si_startts, __si_eventts });
 
-export const reportOutcome = (outcome, isHeaderButton = false, trigger = null) => async (dispatch) => {
-  if (observeSucceeded) {
+export const reportOutcome = (outcome, isHeaderButton = false, trigger = null) => async (dispatch, getState) => {
+  const state = getState();
+  const projectId = getScaledInferenceProjectId(state);
+
+  if (observeSucceeded || !projectId) {
     return dispatch(_reportOutcome(outcome, isHeaderButton, null, trigger));
   }
 
@@ -247,7 +249,7 @@ export const _reportOutcome = (outcome, isHeaderButton = false, _session = null,
       [responseKey]: outcome,
     };
 
-    updateStateInLocalStorage({ ...storage, outcomes: updatedOutcomes });
+    dispatch(setMetadata({ ...storage, outcomes: updatedOutcomes }));
   }
 
   return sendOutcome(payload);

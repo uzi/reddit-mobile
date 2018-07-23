@@ -29,7 +29,7 @@ export default (router) => {
       await amp.session.observe('XPromoContext', context, {});
 
       if (project_id === 0) {
-        ctx.body = Object.assign({ session: amp.session.cookieData });
+        ctx.body = { session: amp.session.cookieData };
         return;
       }
 
@@ -42,12 +42,12 @@ export default (router) => {
         });
       });
 
-      const decisionData = assign(
-        { variants: decision, err },
-        amp.session.cookieData
-      );
+      ctx.body = {
+        variant: decision,
+        err,
+        session: amp.session.cookieData,
+      };
 
-      ctx.body = decisionData;
     } catch (error) {
       ctx.status = 401;
       ctx.body = { error: 'Server Error' };
