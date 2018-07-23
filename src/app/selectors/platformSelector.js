@@ -35,3 +35,9 @@ export const isCurrentContentNSFW = state => {
   if (post && post.over18) { return true; }
   return false;
 };
+
+export const isEmailVerified = state =>
+  state.platform &&
+  state.platform.currentPage &&
+  state.platform.currentPage.queryParams &&
+  state.platform.currentPage.queryParams.verified;

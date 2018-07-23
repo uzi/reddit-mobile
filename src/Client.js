@@ -9,6 +9,9 @@ import localStorageAvailable from 'lib/localStorageAvailable';
 import Client from 'platform/Client';
 import * as platformActions from 'platform/actions';
 import * as sharingActions from 'app/actions/sharing';
+import { toastSuccess } from 'app/actions/toaster';
+import { TOAST_SUCCESS_EMAIL_VALIDATION } from 'app/constants';
+import { isEmailVerified } from 'app/selectors/platformSelector';
 
 import App from 'app';
 import config from 'config';
@@ -184,18 +187,25 @@ if (isShell) {
 
 client.dispatch(sharingActions.detectWebShareCapability());
 client.dispatch(loadStateFromLocalStorage());
-trackExposeSharing(client.getState());
-trackExposeScaledInference(client.getState());
+
+const state = client.getState();
+const emailVerified = isEmailVerified(state);
+
+trackExposeSharing(state);
+trackExposeScaledInference(state);
 
 detectIncognito().then(result => {
   if (result) {
-    trackXPromoIncognito(client.getState());
+    trackXPromoIncognito(state);
     client.dispatch(platformActions.incognitoDetected());
   }
 });
 
-// expose mobile sharing
+if (emailVerified) {
+  client.dispatch(toastSuccess(TOAST_SUCCESS_EMAIL_VALIDATION));
+}
 
+// expose mobile sharing
 
 // populate the branchProxy object with branch.link
 branchProxy.link = (payload, callback) => { return branch.link(payload, callback); };
