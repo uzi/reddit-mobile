@@ -160,7 +160,7 @@ export const handshake = () => async (dispatch, getState) => {
   // the above flag ensures it is only called once
 
   const storage = getStateFromLocalStorage();
-  const session = extractSession(storage);
+  const session = extractSession({ session: storage });
   const outcomes = (storage && storage.outcomes) || {};
   const state = getState();
 
