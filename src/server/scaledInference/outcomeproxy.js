@@ -1,5 +1,4 @@
 import * as si from './util';
-import { resolve } from 'path';
 
 export default (router) => {
   router.post('/si-outcome', async (ctx) => {
