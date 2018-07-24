@@ -188,7 +188,7 @@ const DEFAULT_XPROMO_TYPES = {
   [SCALED_INFERENCE.LISTING]: SCALED_INFERENCE.TA,
 };
 
-export const extractSession = (storage = {}) => {
+export const extractSession = (storage) => {
   return (storage && storage.session) || null;
 };
 
