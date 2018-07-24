@@ -15,6 +15,14 @@ export const PRODUCTION_PROJECT_KEYS = [
 
 const PROJECT_KEYS = PRODUCTION_PROJECT_KEYS;
 
+export const debugClient = (action, sid, uid, fingerprint) => {
+  console.log(`[SI] CLIENT ${action} ${sid} ${uid} ${fingerprint}`);
+};
+
+export const debugServer = (action, sid1, uid1, sid2, uid2, err, fingerprint) => {
+  console.log(`[SI] SERVER ${action} ${sid1} ${uid1} ${sid2} ${uid2} ${err} ${fingerprint}`);
+};
+
 export const getConfig = (ctx) => {
   const idx = ctx.request.body.project_id || 0;
   const key = PROJECT_KEYS[idx];
@@ -46,6 +54,10 @@ export function newSession(amp) {
 
 export function getSessionDataFromContext(ctx) {
   return ctx.request.body.session || {};
+}
+
+export function getFingerprintFromContext(ctx) {
+  return ctx.request.body.fingerprint;
 }
 
 export function createAmp(ctx) {

@@ -160,7 +160,7 @@ export const handshake = () => async (dispatch, getState) => {
   // the above flag ensures it is only called once
 
   const storage = getStateFromLocalStorage();
-  const session = extractSession(getStateFromLocalStorage());
+  const session = extractSession(storage);
   const outcomes = (storage && storage.outcomes) || {};
   const state = getState();
 
@@ -189,7 +189,7 @@ const DEFAULT_XPROMO_TYPES = {
 };
 
 export const extractSession =
-  ({ __si_uid, __si_sid, __si_startts, __si_eventts }) =>
+  ({ session: { __si_uid, __si_sid, __si_startts, __si_eventts } }) =>
   ({ __si_uid, __si_sid, __si_startts, __si_eventts });
 
 export const reportOutcome = (outcome, isHeaderButton = false, trigger = null) => async (dispatch, getState) => {
