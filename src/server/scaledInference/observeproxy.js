@@ -64,14 +64,14 @@ export default (router) => {
         'XPromoContext',
         sid1, uid1,
         sid2, uid2,
-        err || null,
+        observeResult.err,
         fingerprint,
       );
 
       if (observeResult.err) {
         ctx.body = {
           variants: null,
-          session: null,
+          session: amp.session.cookieData,
           err: observeResult.err,
         };
         return;

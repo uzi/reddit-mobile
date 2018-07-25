@@ -126,8 +126,20 @@ export const completeHandshake = (data) => async (dispatch, getState) => {
   dispatch(setMetadata(data));
 
   const state = getState();
-  observeSucceeded = true;
 
+  if (data.err) {
+    dispatch(setMetadata({ ...data, variants: DEFAULT_XPROMO_TYPES }));
+
+    if (projectId === SCALED_INFERENCE_PROJECT_IDS[2]) {
+      if (!shouldNotShowBanner(state)) {
+        dispatch(show());
+      }
+    }
+
+    return;
+  }
+
+  observeSucceeded = true;
   outcomeQueue.forEach(closure => {
     closure(data);
   });
@@ -135,7 +147,7 @@ export const completeHandshake = (data) => async (dispatch, getState) => {
   const projectId = getScaledInferenceProjectId(state);
 
   if (projectId === SCALED_INFERENCE_PROJECT_IDS[2]) {
-    dispatch(setMetadata(data));
+    dispatch(setMetadata({ ...data, variants: data.variants || DEFAULT_XPROMO_TYPES }));
     dispatch(show());
   } else {
     dispatch(setMetadata({ ...data, variants: DEFAULT_XPROMO_TYPES }));
@@ -194,6 +206,7 @@ export const extractSession = (storage) => {
 
 export const reportOutcome = (outcome, isHeaderButton = false, trigger = null) => async (dispatch, getState) => {
   const state = getState();
+
   const projectId = getScaledInferenceProjectId(state);
 
   if (observeSucceeded || !projectId) {
@@ -249,7 +262,7 @@ export const _reportOutcome = (outcome, isHeaderButton = false, _session = null,
       [responseKey]: outcome,
     };
 
-    dispatch(setMetadata({ ...storage, outcomes: updatedOutcomes }));
+    dispatch(setMetadata({ ...storage, session, outcomes: updatedOutcomes }));
   }
 
   return sendOutcome(payload);
