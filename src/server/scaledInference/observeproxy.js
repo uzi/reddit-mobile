@@ -29,6 +29,7 @@ const DEBUG_RESULT = null;
 export default (router) => {
   router.post('/si-observe', async (ctx) => {
 
+    const clientVariants = si.getVariantsFromContext(ctx);
     const clientSession = si.getSessionDataFromContext(ctx);
     const fingerprint = si.getFingerprintFromContext(ctx);
 
@@ -45,6 +46,8 @@ export default (router) => {
 
     sid1 = amp.session.cookieData.__si_sid;
     uid1 = amp.session.cookieData.__si_uid;
+
+    const sessionUnchanged = (sid1 === clientSession.__si_sid && uid1 === clientSession.__si_uid);
 
     try {
       const { context, project_id } = ctx.request.body;
@@ -68,17 +71,14 @@ export default (router) => {
         fingerprint,
       );
 
-      if (observeResult.err) {
+      const variants = project_id === 0 ? null : clientVariants;
+
+      if (project_id === 0 || sessionUnchanged || observeResult.err) {
         ctx.body = {
-          variants: null,
+          variants,
           session: amp.session.cookieData,
           err: observeResult.err,
         };
-        return;
-      }
-
-      if (project_id === 0) {
-        ctx.body = { session: amp.session.cookieData };
         return;
       }
 

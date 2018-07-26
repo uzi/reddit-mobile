@@ -60,6 +60,10 @@ export function getFingerprintFromContext(ctx) {
   return ctx.request.body.fingerprint;
 }
 
+export function getVariantsFromContext(ctx) {
+  return ctx.request.body.variants || null;
+}
+
 export function createAmp(ctx) {
   const amp = new Amp(getConfig(ctx));
 

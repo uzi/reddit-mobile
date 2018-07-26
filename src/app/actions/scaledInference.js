@@ -185,6 +185,7 @@ export const handshake = () => async (dispatch, getState) => {
     context: { ...outcomes, ...getContextFromState(state) },
     session,
     project_id: projectId,
+    variants: storage.variants,
   };
 
   dispatch({ type: HANDSHAKE_BEGIN });
