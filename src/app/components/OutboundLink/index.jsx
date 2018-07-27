@@ -66,11 +66,11 @@ function OutboundLink(props) {
     return <a { ...linkProps } href={ outboundLink.url } />;
   }
 
-  // Note: this component very intentionally doesn't use `setState` to change the 
+  // Note: this component very intentionally doesn't use `setState` to change the
   // the href rendered in the DOM like a traditional React component might.
   // `setState`'s changes are batched and not guaranteed to be invoked immediately.
   // We _need_ to change the href right when the user starts to click or tap
-  // the link to guarantee the browser uses the correct outbound link 
+  // the link to guarantee the browser uses the correct outbound link
   return (
     <a
       { ...linkProps }
@@ -94,7 +94,7 @@ OutboundLink.propTypes = {
   href: T.string.isRequired,
   outboundLink: T.shape({
     url: T.string.isRequired,
-    expiration: T.number.isRequired,
+    expiration: T.number,
   }),
   onClick: T.func,
   promoted: T.bool,

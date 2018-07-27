@@ -68,6 +68,9 @@ const {
   // Porn Pill
   VARIANT_NSFW_XPROMO,
 
+  // iOS link out
+  VARIANT_IOS_LINK_TAB,
+
 } = flagConstants;
 
 const EXPERIMENT_FULL = [
@@ -140,6 +143,7 @@ export const EXPERIMENT_NAMES = {
   [VARIANT_XPROMO_AD_FEED_IOS]: 'mweb_xpromo_ad_feed_ios',
   [VARIANT_XPROMO_AD_FEED_ANDROID]: 'mweb_xpromo_ad_feed_android',
   [VARIANT_NSFW_XPROMO]: 'mweb_nsfw_xpromo',
+  [VARIANT_IOS_LINK_TAB]: 'mweb_link_tab',
 };
 
 export function getRouteActionName(state) {

@@ -200,6 +200,9 @@ export const flags = {
 
   // Call to action
   VARIANT_CALL_TO_ACTION: 'showCallToAction',
+
+  // link out
+  VARIANT_IOS_LINK_TAB: 'mwebLinkTab',
 };
 
 // Now we have 2 different types of XPromo

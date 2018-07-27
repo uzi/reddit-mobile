@@ -347,6 +347,23 @@ export function trackExperimentClickEvent(state, experimentName, experimentId, t
   getEventTracker().track('internal_click_events', 'cs.experiment_click', payload);
 }
 
+export function trackLinkTabExperiment(state) {
+  const data = getExperimentData(state, flags.VARIANT_IOS_LINK_TAB);
+
+  if (!data) { return; }
+
+  const { variant, experiment_id } = data;
+
+  if (variant) {
+    getEventTracker().track('outbound_click_events', 'cs.link_out_expose', {
+      ...getBasePayload(state),
+      experiment_name: EXPERIMENT_NAMES[flags.VARIANT_IOS_LINK_TAB],
+      experiment_id,
+      variant,
+    });
+  }
+}
+
 function trackCrawlEvent(state, additionalEventData) {
   const { protocol, method, crawler, userAgent, domain } = state.meta;
 
