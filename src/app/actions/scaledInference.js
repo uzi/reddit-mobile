@@ -85,11 +85,13 @@ const shouldThrottle = (state) => {
     return false;
   }
 
+  const THROTTLE_PERCENTAGE = 25;
+
   const loggedOutUserAccount = loggedOutUserAccountSelector(state);
   const id = userAccount ? userAccount.id : loggedOutUserAccount.loid;
   const num = parseInt(id, 36);
   const mod = (num % 100) | 0;
-  const pass = mod === 42;
+  const pass = mod < THROTTLE_PERCENTAGE;
 
   return !pass;
 };
