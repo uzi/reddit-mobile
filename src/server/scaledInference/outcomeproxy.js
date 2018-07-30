@@ -2,15 +2,7 @@ import * as si from './util';
 
 export default (router) => {
   router.post('/si-outcome', async (ctx) => {
-    const clientSession = si.getSessionDataFromContext(ctx);
     const fingerprint = si.getFingerprintFromContext(ctx);
-
-    si.debugClient(
-      'outcome',
-      clientSession.__si_sid,
-      clientSession.__si_uid,
-      fingerprint,
-    );
 
     const amp = si.createAmp(ctx);
 
@@ -42,13 +34,15 @@ export default (router) => {
     const sid2 = amp.session.cookieData.__si_sid;
     const uid2 = amp.session.cookieData.__si_uid;
 
-    si.debugServer(
-      eventNames[outcome],
-      sid1, uid1,
-      sid2, uid2,
-      response.err || null,
-      fingerprint,
-    );
+    if (response.err) {
+      si.debugServer(
+        eventNames[outcome],
+        sid1, uid1,
+        sid2, uid2,
+        response.err || null,
+        fingerprint,
+      );
+    }
 
     ctx.body = {
       session: amp.session.cookieData,

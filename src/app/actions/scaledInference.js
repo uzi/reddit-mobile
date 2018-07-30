@@ -49,6 +49,10 @@ export const setMetadata = (payload) => {
   };
 };
 
+export const getMetadata = (state) => {
+  return getStateFromLocalStorage() || state.scaledInference;
+};
+
 export const getScaledInferenceProjectId = (state) => {
   const queryParams = state.platform.currentPage && state.platform.currentPage.queryParams;
 
@@ -66,6 +70,7 @@ export const getScaledInferenceProjectId = (state) => {
 };
 
 export const isScaledInferenceActive = (state) => {
+  if (shouldThrottle(state)) { return false; }
   const id = getScaledInferenceProjectId(state);
   return id === SCALED_INFERENCE_PROJECT_IDS[1] || id === SCALED_INFERENCE_PROJECT_IDS[2];
 };
@@ -173,10 +178,10 @@ export const handshake = () => async (dispatch, getState) => {
   // action creator in order to prevent a context data race condition
   // the above flag ensures it is only called once
 
-  const storage = getStateFromLocalStorage();
+  const state = getState();
+  const storage = getMetadata(state);
   const session = extractSession(storage);
   const outcomes = (storage && storage.outcomes) || {};
-  const state = getState();
 
   if (shouldThrottle(state)) {
     return;
@@ -230,11 +235,10 @@ export const _reportOutcome = (outcome, isHeaderButton = false, _session = null,
     return;
   }
 
-  const { xpromoType: _xpromoType } = state.scaledInference;
   const pageType = pageTypeSelector(state);
   const trigger = _trigger || pageType;
-  const xpromoType = _xpromoType || DEFAULT_XPROMO_TYPES[trigger];
-  const session = _session || extractSession(getStateFromLocalStorage());
+  const xpromoType = (state.scaledInference.variants || DEFAULT_XPROMO_TYPES)[trigger];
+  const session = _session || extractSession(getMetadata(state));
   const projectId = getScaledInferenceProjectId(state);
   const payload = {
     session,
@@ -251,7 +255,7 @@ export const _reportOutcome = (outcome, isHeaderButton = false, _session = null,
   });
 
   if (outcome === SCALED_INFERENCE.ACCEPT || outcome === SCALED_INFERENCE.DISMISS) {
-    const storage = getStateFromLocalStorage();
+    const storage = getMetadata(state);
     const outcomes = storage && storage.outcomes;
 
     const prefix = `${trigger}_${xpromoType}`;

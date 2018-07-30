@@ -32,14 +32,6 @@ export default (router) => {
     const clientVariants = si.getVariantsFromContext(ctx);
     const clientSession = si.getSessionDataFromContext(ctx);
     const fingerprint = si.getFingerprintFromContext(ctx);
-
-    si.debugClient(
-      'observe',
-      clientSession.__si_sid,
-      clientSession.__si_uid,
-      fingerprint,
-    );
-
     const amp = si.createAmp(ctx);
 
     let sid1, uid1, sid2, uid2;
@@ -63,13 +55,15 @@ export default (router) => {
       sid2 = amp.session.cookieData.__si_sid;
       uid2 = amp.session.cookieData.__si_uid;
 
-      si.debugServer(
-        'XPromoContext',
-        sid1, uid1,
-        sid2, uid2,
-        observeResult.err,
-        fingerprint,
-      );
+      if (observeResult.err) {
+        si.debugServer(
+          'XPromoContext',
+          sid1, uid1,
+          sid2, uid2,
+          observeResult.err,
+          fingerprint,
+        );
+      }
 
       const variants = project_id === 0 ? null : clientVariants;
 
@@ -97,13 +91,15 @@ export default (router) => {
       sid2 = amp.session.cookieData.__si_sid;
       uid2 = amp.session.cookieData.__si_uid;
 
-      si.debugServer(
-        'XPromo',
-        sid1, uid1,
-        sid2, uid2,
-        err,
-        fingerprint,
-      );
+      if (err) {
+        si.debugServer(
+          'XPromo',
+          sid1, uid1,
+          sid2, uid2,
+          err,
+          fingerprint,
+        );
+      }
 
       ctx.body = {
         variants: decision,
