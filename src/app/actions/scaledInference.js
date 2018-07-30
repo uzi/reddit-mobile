@@ -82,7 +82,8 @@ const shouldThrottle = (state) => {
   const currentPage = platform && platform.currentPage;
   const queryParams = currentPage && currentPage.queryParams;
 
-  if (queryParams && queryParams.si_throttle === 'off') {
+  if (queryParams && queryParams.si_throttle === 'off' ||
+      queryParams && queryParams.si_experiment) {
     return false;
   }
 
@@ -235,10 +236,12 @@ export const _reportOutcome = (outcome, isHeaderButton = false, _session = null,
     return;
   }
 
+  const storage = getMetadata(state);
+
   const pageType = pageTypeSelector(state);
   const trigger = _trigger || pageType;
-  const xpromoType = (state.scaledInference.variants || DEFAULT_XPROMO_TYPES)[trigger];
-  const session = _session || extractSession(getMetadata(state));
+  const xpromoType = (storage.variants || DEFAULT_XPROMO_TYPES)[trigger];
+  const session = _session || extractSession(storage);
   const projectId = getScaledInferenceProjectId(state);
   const payload = {
     session,
