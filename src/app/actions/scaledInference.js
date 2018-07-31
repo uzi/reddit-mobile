@@ -6,7 +6,11 @@ import { sendOutcome, sendObserve } from '../../apiClient/apis/ScaledInferenceEn
 import { show } from 'app/actions/xpromo';
 import { shouldNotShowBanner } from 'lib/xpromoState';
 import { getCurrentPost, getCurrentSubreddit } from 'app/selectors/platformSelector';
-import { SCALED_INFERENCE } from 'app/constants';
+import {
+  SCALED_INFERENCE,
+  OPT_OUT_XPROMO_INTERSTITIAL_MENU,
+  OPT_OUT_XPROMO_INTERSTITIAL,
+} from 'app/constants';
 
 export const HANDSHAKE_BEGIN = 'SCALED_INFERENCE__HANDSHAKE_BEGIN';
 export const HANDSHAKE_END = 'SCALED_INFERENCE__HANDSHAKE_END';
@@ -69,14 +73,21 @@ export const getScaledInferenceProjectId = (state) => {
   }
 };
 
+export const isOptOut = (state) => {
+  return state.optOuts[OPT_OUT_XPROMO_INTERSTITIAL_MENU] ||
+         state.optOuts[OPT_OUT_XPROMO_INTERSTITIAL];
+};
+
 export const isScaledInferenceActive = (state) => {
   if (shouldThrottle(state)) { return false; }
+  if (isOptOut(state)) { return false; }
   const id = getScaledInferenceProjectId(state);
   return id === SCALED_INFERENCE_PROJECT_IDS[2];
 };
 
 export const isScaledInferenceLatencyActive = (state) => {
   if (shouldThrottle(state)) { return false; }
+  if (isOptOut(state)) { return false; }
   const id = getScaledInferenceProjectId(state);
   return id === SCALED_INFERENCE_PROJECT_IDS[1];
 };
@@ -133,6 +144,7 @@ export const getContextFromState = (state) => {
     is_card_view: !state.compact,
     karma: account.karma,
     current_post: post && post.id,
+    is_opted_out: isOptOut(state),
   };
 };
 
