@@ -72,7 +72,13 @@ export const getScaledInferenceProjectId = (state) => {
 export const isScaledInferenceActive = (state) => {
   if (shouldThrottle(state)) { return false; }
   const id = getScaledInferenceProjectId(state);
-  return id === SCALED_INFERENCE_PROJECT_IDS[1] || id === SCALED_INFERENCE_PROJECT_IDS[2];
+  return id === SCALED_INFERENCE_PROJECT_IDS[2];
+};
+
+export const isScaledInferenceLatencyActive = (state) => {
+  if (shouldThrottle(state)) { return false; }
+  const id = getScaledInferenceProjectId(state);
+  return id === SCALED_INFERENCE_PROJECT_IDS[1];
 };
 
 const shouldThrottle = (state) => {

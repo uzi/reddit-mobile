@@ -169,7 +169,8 @@ export const checkAndSet = () => async (dispatch, getState) => {
   const state = getState();
 
   if (!shouldNotShowBanner(state)) {
-    if (!scaledInferenceActions.isScaledInferenceActive(state)) {
+    if (!scaledInferenceActions.isScaledInferenceActive(state) &&
+        !scaledInferenceActions.isScaledInferenceLatencyActive(state)) {
       dispatch(show());
     }
   }
