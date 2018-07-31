@@ -74,8 +74,8 @@ export const getScaledInferenceProjectId = (state) => {
 };
 
 export const isOptOut = (state) => {
-  return state.optOuts[OPT_OUT_XPROMO_INTERSTITIAL_MENU] ||
-         state.optOuts[OPT_OUT_XPROMO_INTERSTITIAL];
+  return state.optOuts[OPT_OUT_XPROMO_INTERSTITIAL_MENU.STORE_KEY] ||
+         state.optOuts[OPT_OUT_XPROMO_INTERSTITIAL.STORE_KEY];
 };
 
 export const isScaledInferenceActive = (state) => {
