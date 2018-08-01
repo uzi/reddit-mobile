@@ -12,6 +12,8 @@ const DEFAULT = {
     xpromo_listing: TA,
   },
   xpromoType: null,
+  bannerDismissed: false,
+  listingClickDismissed: false,
 };
 
 export default function scaledInferenceReducer(state=DEFAULT, action) {

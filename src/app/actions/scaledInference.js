@@ -174,7 +174,9 @@ export const completeHandshake = (data) => async (dispatch, getState) => {
 
   if (projectId === SCALED_INFERENCE_PROJECT_IDS[2]) {
     dispatch(setMetadata({ ...data, variants: data.variants || DEFAULT_XPROMO_TYPES }));
-    dispatch(show());
+    if (!isOptOut(state)) {
+      dispatch(show());
+    }
   } else {
     dispatch(setMetadata({ ...data, variants: DEFAULT_XPROMO_TYPES }));
 
