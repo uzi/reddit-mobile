@@ -22,6 +22,10 @@ export const SCALED_INFERENCE_PROJECT_IDS = [0, 1, 2];
 const outcomeQueue = [];
 let observeSucceeded = false;
 
+export const loadStateFromLocalStorage = () => async (dispatch) => {
+  dispatch(setMetadata(getStateFromLocalStorage()));
+};
+
 export const getStateFromLocalStorage = () => {
   if (localStorageAvailable()) {
     const serializedState = localStorage.getItem(LOCAL_STORAGE_KEY);
@@ -45,12 +49,19 @@ export const clearStateInLocalStorage = () => {
   setStateInLocalStorage(null);
 };
 
-export const setMetadata = (payload) => {
+export const setMetadata = (_payload) => async (dispatch, getState) => {
+  const state = getState();
+  const { session } = getMetadata(state);
+  const sessionChanged = (session && _payload.session && session.__si_sid !== _payload.session.__si_sid);
+  const payload = sessionChanged ?
+    { ..._payload, listingClickDismissed: false, bannerDismissed: false } :
+    _payload;
+
   updateStateInLocalStorage(payload);
-  return {
+  dispatch({
     type: SET_METADATA,
     payload,
-  };
+  });
 };
 
 export const getMetadata = (state) => {
@@ -92,7 +103,7 @@ export const isScaledInferenceLatencyActive = (state) => {
   return id === SCALED_INFERENCE_PROJECT_IDS[1];
 };
 
-const shouldThrottle = (state) => {
+export const shouldThrottle = (state) => {
   const userAccount = userAccountSelector(state);
 
   const platform = state && state.platform;
@@ -149,9 +160,8 @@ export const getContextFromState = (state) => {
 };
 
 export const completeHandshake = (data) => async (dispatch, getState) => {
-  dispatch(setMetadata(data));
-
   const state = getState();
+  dispatch(setMetadata(data));
 
   if (data.err) {
     dispatch(setMetadata({ ...data, variants: DEFAULT_XPROMO_TYPES }));

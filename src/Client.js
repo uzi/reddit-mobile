@@ -32,6 +32,7 @@ import {
 // importing these to populate the branch.link property needed for mobile sharing
 import { branchProxy } from 'app/actions/sharing';
 import branch from 'branch-sdk';
+import { loadStateFromLocalStorage } from './app/actions/scaledInference';
 
 // Bits to help in the gathering of client side timings to relay back
 // to the server
@@ -182,6 +183,7 @@ if (isShell) {
 }
 
 client.dispatch(sharingActions.detectWebShareCapability());
+client.dispatch(loadStateFromLocalStorage());
 trackExposeSharing(client.getState());
 trackExposeScaledInference(client.getState());
 

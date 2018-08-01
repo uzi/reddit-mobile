@@ -21,7 +21,7 @@ import { isInterstitialDimissed } from 'lib/xpromoState';
 import { trackXPromoIneligibleEvent } from 'lib/eventUtils';
 import { isCommentsPage } from 'platform/pageUtils';
 import { POST_TYPE } from 'apiClient/models/thingTypes';
-import { isScaledInferenceActive } from '../actions/scaledInference';
+import { isScaledInferenceActive, getMetadata } from '../actions/scaledInference';
 
 const { DAYMODE } = COLOR_SCHEME;
 const { USUAL, MINIMAL, PERSIST } = XPROMO_DISPLAY_THEMES;
@@ -250,8 +250,9 @@ export function commentsInterstitialEnabled(state) {
 
 export function listingClickEnabled(state, postId) {
   if (isScaledInferenceActive(state)) {
-    return state.scaledInference.variants.xpromo_click === 'D' &&
-           !state.xpromo.listingClick.dismissed;
+    const si = getMetadata(state);
+    return si.variants.xpromo_click === 'D' &&
+           !si.listingClickDismissed;
   }
 
   if (!isEligibleListingPage(state) || !isXPromoEnabledOnDevice(state)) {

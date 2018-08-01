@@ -23,7 +23,16 @@ import { SCALED_INFERENCE } from 'app/constants';
 
 export const SHOW = 'XPROMO__SHOW';
 export const _show = () => ({ type: SHOW });
-export const show = () => async (dispatch) => {
+export const show = () => async (dispatch, getState) => {
+  const state = getState();
+
+  if (scaledInferenceActions.isScaledInferenceActive(state)) {
+
+    if (scaledInferenceActions.getMetadata(state).bannerDismissed) {
+      return;
+    }
+  }
+
   dispatch(scaledInferenceActions.reportOutcome('view'));
   dispatch(_show());
 };
@@ -55,6 +64,7 @@ export const promoPersistActivate = () => async (dispatch) => {
 
 export const XPROMO_DISMISS_CLICKED = 'XPROMO__DISMISS_CLICKED';
 export const promoDismissed = (interstitialType) => async (dispatch, getState) => {
+  dispatch(scaledInferenceActions.setMetadata({ bannerDismissed: true }));
   dispatch(scaledInferenceActions.reportOutcome('dismiss'));
   dispatch({ type: XPROMO_DISMISS_CLICKED });
   if (interstitialType) {
@@ -129,6 +139,7 @@ export const LISTING_CLICK_MODAL_HIDDEN = 'XPROMO__LISTING_CLICK_MODAL_HIDDEN';
 export const _listingClickModalHidden = () => ({ type: LISTING_CLICK_MODAL_HIDDEN });
 
 export const listingClickModalHidden = () => async (dispatch) => {
+  dispatch(scaledInferenceActions.setMetadata({ listingClickDismissed: true }));
   dispatch(scaledInferenceActions.reportOutcome('dismiss', false, SCALED_INFERENCE.CLICK));
   return dispatch(_listingClickModalHidden());
 };

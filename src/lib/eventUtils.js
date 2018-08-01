@@ -34,6 +34,7 @@ import { hasAdblock } from 'lib/adblock';
 import { shouldNotShowBanner } from 'lib/xpromoState';
 import { getExperimentData } from './experiments';
 import { SCALED_INFERENCE } from '../app/constants';
+import { shouldThrottle } from 'app/actions/scaledInference';
 
 export const XPROMO_VIEW = 'cs.xpromo_view';
 export const XPROMO_INELIGIBLE = 'cs.xpromo_ineligible';
@@ -253,6 +254,10 @@ export function trackSharingEvent(state, eventType, additionalEventData = {}) {
 }
 
 export function trackExposeScaledInference(state, additionalEventData = {}) {
+  if (shouldThrottle(state)) {
+    return;
+  }
+
   const experiment_name = SCALED_INFERENCE.EXPERIMENT;
   const data = getExperimentData(state, SCALED_INFERENCE.EXPERIMENT);
 
