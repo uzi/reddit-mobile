@@ -10,21 +10,13 @@ const SI_PARAMS = {
   [CLICK]: [D, N],
 };
 
-// const DEBUG_RESULT = {
+// const DEBUG_VARIANTS = {
 //   [LISTING]: P,
 //   [POST]: BLB,
 //   [CLICK]: D,
 // };
 
-/*
-__si_startts: now,
-__si_eventts: now,
-__si_sid: amp.session.id,
-__si_uid: amp.session.userId,
-*/
-
-
-const DEBUG_RESULT = null;
+const DEBUG_VARIANTS = null;
 
 export default (router) => {
   router.post('/si-observe', async (ctx) => {
@@ -65,7 +57,7 @@ export default (router) => {
         );
       }
 
-      const variants = project_id === 0 ? null : clientVariants;
+      const variants = DEBUG_VARIANTS || (project_id === 0 ? null : clientVariants);
 
       if (project_id === 0 || sessionUnchanged || observeResult.err) {
         ctx.body = {
@@ -83,7 +75,7 @@ export default (router) => {
         amp.session.decide('XPromo', SI_PARAMS, {}, (err, decision) => {
           resolve({
             err,
-            decision: DEBUG_RESULT || decision,
+            decision: DEBUG_VARIANTS || decision,
           });
         });
       });

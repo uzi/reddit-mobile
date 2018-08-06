@@ -213,23 +213,29 @@ export const listingClickModalAppStoreClicked = () => async (dispatch, getState)
     return;
   }
 
+  dispatch(scaledInferenceActions.setMetadata({ listingClickDismissed: true }));
+
   const { listingClickType, postId } = state.xpromo.listingClick.clickInfo;
 
   // Start tracking before navigating to the app store
   const trackingPromise = dispatch(trackAppStoreVisit(XPROMO_MODAL_LISTING_CLICK_NAME));
+  const outcomePromise = dispatch(scaledInferenceActions.reportOutcome('accept'));
+
+  await trackingPromise;
+  await outcomePromise;
 
   dispatch(xpromoListingClickReturnerModalActivated());
 
   const link = getXPromoListingClickLink(state, postId, listingClickType);
 
   navigateToAppStore(link);
-
-  await trackingPromise;
 };
 
 export const listingClickModalDismissClicked = () => async (dispatch, getState) => {
   // guard against duplicate clicks
   const state = getState();
+
+  dispatch(scaledInferenceActions.setMetadata({ listingClickDismissed: true }));
 
   if (!state.xpromo.listingClick.active) {
     return;

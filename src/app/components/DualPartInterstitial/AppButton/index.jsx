@@ -14,6 +14,7 @@ import {
   navigateToAppStore,
   promoClicked,
 } from 'app/actions/xpromo';
+import { reportOutcome } from '../../../actions/scaledInference';
 
 class AppButton extends React.Component {
   // Because of the rendering of this component on both sides (client
@@ -79,12 +80,17 @@ const mapDispatchToProps = dispatch => {
         const extraData = interstitial_type ? { interstitial_type } : undefined;
         const logAppStoreAction = logAppStoreNavigation(visit_trigger, extraData);
         const trackingPromise = dispatch(logAppStoreAction);
+        const outcomePromise = dispatch(reportOutcome('accept'));
 
         dispatch(promoClicked()); // Hide interstitial XPromo banner
+
+        await trackingPromise;
+        await outcomePromise;
+
         navigateToAppStore(url);  // window.loction redirect to AppStore link.
         // We should not call `await` until the app-store navigation
         // is in progress, see actions/xpromo.navigateToAppStore for more info.
-        await trackingPromise;
+
         preventExtraClick = false;
       }
     }),

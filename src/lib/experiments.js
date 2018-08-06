@@ -1,3 +1,5 @@
+import { SCALED_INFERENCE } from 'app/constants';
+
 export function extractUser(state) {
   if (!state || !state.user || !state.accounts) {
     return;
@@ -23,7 +25,7 @@ export function getActiveExperimentVariant(state, experimentName) {
 }
 
 export function getExperimentVariant(state, experimentName) {
-  if (experimentName === 'scaled_inference') {
+  if (experimentName === SCALED_INFERENCE.EXPERIMENT) {
     const queryParams = state.platform.currentPage && state.platform.currentPage.queryParams;
 
     if (queryParams && queryParams.si_experiment) {

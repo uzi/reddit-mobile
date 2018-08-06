@@ -5,6 +5,7 @@ import { getBranchLink } from 'lib/xpromoState';
 import { reportOutcome } from 'app/actions/scaledInference';
 import { getExperimentVariant } from 'lib/experiments';
 import { SCALED_INFERENCE } from 'app/constants';
+import { navigateToAppStore } from '../../actions/xpromo';
 
 const mapStateToProps = state => {
   const variant = getExperimentVariant(state, SCALED_INFERENCE.EXPERIMENT);
@@ -24,7 +25,13 @@ const mapDispatchToProps = {
 };
 
 const DisconnectedTopButton = props => {
-  const onClick = () => props.reportOutcome('accept', true);
+  const { link, reportOutcome } = props;
+  const onClick = async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    await reportOutcome('accept', true);
+    navigateToAppStore(link);
+  };
   return (
     <a href={ props.link } onClick={ onClick } className="TopButton">USE APP</a>
   );

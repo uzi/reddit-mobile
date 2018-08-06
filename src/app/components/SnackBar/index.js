@@ -4,10 +4,16 @@ import { connect } from 'react-redux';
 import cx from 'lib/classNames';
 import SnooIcon from 'app/components/SnooIcon';
 import { getBranchLink } from 'lib/xpromoState';
-import { promoClicked, promoDismissed } from 'app/actions/xpromo';
+import {
+  logAppStoreNavigation,
+  navigateToAppStore,
+  promoClicked,
+  promoDismissed,
+} from 'app/actions/xpromo';
 import { getExperimentVariant } from 'lib/experiments';
 import { trackXPromoView } from 'lib/eventUtils';
 import { SCALED_INFERENCE, SCALED_INFERENCE_BRANCH_PARAMS } from 'app/constants';
+import { setMetadata } from 'app/actions/scaledInference';
 
 class SnackBar extends React.Component {
   constructor() {
@@ -22,6 +28,8 @@ class SnackBar extends React.Component {
   }
 
   render() {
+    const { href, reportOutcome, logAppStoreNavigation } = this.props;
+
     const dismiss = () => {
       this.props.promoDismissed('snackbar');
       this.setState({
@@ -29,8 +37,17 @@ class SnackBar extends React.Component {
       });
     };
 
-    const accept = () => {
+    const accept = async (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      setMetadata({ bannerDismissed: true });
       this.props.promoClicked('snackbar');
+      const extraData = { interstitial_type: 'snackbar' };
+      const outcomePromise = reportOutcome('accept');
+      const logAppStorePromise = logAppStoreNavigation(null, extraData);
+      await outcomePromise;
+      await logAppStorePromise;
+      navigateToAppStore(href);
     };
 
     const {
@@ -74,6 +91,8 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = {
   promoClicked,
   promoDismissed,
+  logAppStoreNavigation,
+  setMetadata,
   trackXPromoView: () => async (_, getState) => {
     return trackXPromoView(getState(), { interstitial_type: SCALED_INFERENCE.SNACKBAR });
   },

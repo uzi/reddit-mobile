@@ -19,6 +19,41 @@ export const SET_METADATA = 'SCALED_INFERENCE__SET_METADATA';
 export const LOCAL_STORAGE_KEY = SCALED_INFERENCE.EXPERIMENT;
 export const SCALED_INFERENCE_PROJECT_IDS = [0, 1, 2];
 
+/*
+// variants
+  P: 'P',     // pill
+  D: 'D',     // legacy xpromo (click)
+  BB: 'BB',   // legacy xpromo (post)
+  TA: 'TA',   // legacy xpromo (listing)
+  BLB: 'BLB', // snackbar
+  N: 'N',
+*/
+
+const { P, D, BB, TA, BLB } = SCALED_INFERENCE;
+
+/*
+These percentages represent current actual install metrics after a user has accepted an xpromo
+These are used to help scaled inference more accurately optimize for actual installations instead
+of only xpromo accept clicks.
+This is likely to change in the future, or remain untouched for years.
+*/
+
+const DUPE = {
+  [TA]: 1.96,
+  [BLB]: 5.31,
+  [P]: 1.40,
+  [BB]: 1.25,
+  [D]: 7.57,
+};
+
+const DEDUPE = {
+  [TA]: 2.89,
+  [BLB]: 6.61,
+  [P]: 2.09,
+  [BB]: 1.54,
+  [D]: 8.75,
+};
+
 const outcomeQueue = [];
 let observeSucceeded = false;
 
@@ -267,7 +302,6 @@ export const _reportOutcome = (outcome, isHeaderButton = false, _session = null,
   }
 
   const storage = getMetadata(state);
-
   const pageType = pageTypeSelector(state);
   const trigger = _trigger || pageType;
   const xpromoType = (storage.variants || DEFAULT_XPROMO_TYPES)[trigger];
@@ -280,6 +314,8 @@ export const _reportOutcome = (outcome, isHeaderButton = false, _session = null,
     xpromoType,
     headerButton: isHeaderButton,
     project_id: projectId,
+    dupe: DUPE[xpromoType],
+    dedupe: DEDUPE[xpromoType],
   };
 
   dispatch({

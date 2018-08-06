@@ -68,8 +68,6 @@ const {
   // Porn Pill
   VARIANT_NSFW_XPROMO,
 
-  // Scaled Inference
-  VARIANT_SCALED_INFERENCE,
 } = flagConstants;
 
 const EXPERIMENT_FULL = [
@@ -142,7 +140,6 @@ export const EXPERIMENT_NAMES = {
   [VARIANT_XPROMO_AD_FEED_IOS]: 'mweb_xpromo_ad_feed_ios',
   [VARIANT_XPROMO_AD_FEED_ANDROID]: 'mweb_xpromo_ad_feed_android',
   [VARIANT_NSFW_XPROMO]: 'mweb_nsfw_xpromo',
-  [VARIANT_SCALED_INFERENCE]: 'mweb_scaled_inference',
 };
 
 export function getRouteActionName(state) {

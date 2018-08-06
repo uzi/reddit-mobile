@@ -200,9 +200,6 @@ export const flags = {
 
   // Call to action
   VARIANT_CALL_TO_ACTION: 'showCallToAction',
-
-  // Scaled Inference
-  VARIANT_SCALED_INFERENCE: 'scaledInference',
 };
 
 // Now we have 2 different types of XPromo
@@ -324,7 +321,7 @@ export const VIDEO_WATCHED_SECONDS = [
 
 export const SCALED_INFERENCE = {
   // experiment name
-  EXPERIMENT: 'scaled_inference',
+  EXPERIMENT: 'scaled_inference_2',
 
   // scaled inference projects
   PROJECT_2: 'treatment_2',
