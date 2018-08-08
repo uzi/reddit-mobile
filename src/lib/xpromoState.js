@@ -175,7 +175,8 @@ export function getBranchLink(state, path, payload={}) {
     const pageType = pageTypeSelector(state);
     const tagIndex = tags.indexOf(utm_content);
     const updateIndex = tagIndex >= 0 ? tagIndex : tags.length;
-    payload.utm_content = payload.tags[updateIndex] = `${utm_content}_${pageType}`;
+    payload.utm_content = `${utm_content}_${pageType}`;
+    payload.tags[updateIndex] = payload.utm_content;
   }
 
   const { user, accounts } = state;
