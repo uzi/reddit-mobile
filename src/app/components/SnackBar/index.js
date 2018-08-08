@@ -13,7 +13,7 @@ import {
 import { getExperimentVariant } from 'lib/experiments';
 import { trackXPromoView } from 'lib/eventUtils';
 import { SCALED_INFERENCE, SCALED_INFERENCE_BRANCH_PARAMS } from 'app/constants';
-import { setMetadata } from 'app/actions/scaledInference';
+import { setMetadata, reportOutcome } from 'app/actions/scaledInference';
 
 class SnackBar extends React.Component {
   constructor() {
@@ -93,6 +93,7 @@ const mapDispatchToProps = {
   promoDismissed,
   logAppStoreNavigation,
   setMetadata,
+  reportOutcome,
   trackXPromoView: () => async (_, getState) => {
     return trackXPromoView(getState(), { interstitial_type: SCALED_INFERENCE.SNACKBAR });
   },
