@@ -169,14 +169,13 @@ export function isInterstitialDimissed(state) {
 }
 
 export function getBranchLink(state, path, payload={}) {
+  const { utm_content, tags } = payload;
 
-  if (payload.utm_content) {
-    const creative = payload.utm_content;
+  if (utm_content && tags) {
     const pageType = pageTypeSelector(state);
-    const tagIndex = payload.tags.indexOf(creative);
-    const creative2 = `${creative}_${pageType}`;
-    payload.utm_content = creative2;
-    payload.tags[tagIndex >= 0 ? tagIndex : payload.tags.length] = creative2;
+    const tagIndex = tags.indexOf(utm_content);
+    const updateIndex = tagIndex >= 0 ? tagIndex : tags.length;
+    payload.utm_content = payload.tags[updateIndex] = `${utm_content}_${pageType}`;
   }
 
   const { user, accounts } = state;
@@ -217,8 +216,6 @@ export function getBranchLink(state, path, payload={}) {
   const basePayloadTags = basePayload.tags || [];
   const finalTags = [...extractedXPromoTags, ...payloadTags, ...basePayloadTags];
   const query = { ...basePayload, ...payload, tags: finalTags };
-
-  console.log(query);
 
   /*
   The utm_content query parameter overwrites the tags parameter in the long form branch links.
