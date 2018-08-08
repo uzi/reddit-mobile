@@ -174,7 +174,7 @@ export function getBranchLink(state, path, payload={}) {
     const creative = payload.utm_content;
     const pageType = pageTypeSelector(state);
     const tagIndex = payload.tags.indexOf(creative);
-    const creative2 = `${creative}-${pageType}`;
+    const creative2 = `${creative}_${pageType}`;
     payload.utm_content = creative2;
     payload.tags[tagIndex >= 0 ? tagIndex : payload.tags.length] = creative2;
   }
