@@ -30,6 +30,7 @@ import {
 import extractTaglist from 'lib/extractTagList';
 import { getExperimentVariant } from './experiments';
 import { SCALED_INFERENCE_BRANCH_PARAMS, SCALED_INFERENCE } from '../app/constants';
+import { pageTypeSelector } from 'app/selectors/platformSelector';
 
 const {
   USUAL,
@@ -168,6 +169,16 @@ export function isInterstitialDimissed(state) {
 }
 
 export function getBranchLink(state, path, payload={}) {
+
+  if (payload.utm_content) {
+    const creative = payload.utm_content;
+    const pageType = pageTypeSelector(state);
+    const tagIndex = payload.tags.indexOf(creative);
+    const creative2 = `${creative}-${pageType}`;
+    payload.utm_content = creative2;
+    payload.tags[tagIndex >= 0 ? tagIndex : payload.tags.length] = creative2;
+  }
+
   const { user, accounts } = state;
 
   const extractedXPromoTags = extractTaglist(state);
@@ -206,6 +217,8 @@ export function getBranchLink(state, path, payload={}) {
   const basePayloadTags = basePayload.tags || [];
   const finalTags = [...extractedXPromoTags, ...payloadTags, ...basePayloadTags];
   const query = { ...basePayload, ...payload, tags: finalTags };
+
+  console.log(query);
 
   /*
   The utm_content query parameter overwrites the tags parameter in the long form branch links.
