@@ -278,12 +278,8 @@ export const extractSession = (storage) => {
   return (storage && storage.session) || null;
 };
 
-export const reportOutcome = (outcome, isHeaderButton = false, trigger = null) => async (dispatch, getState) => {
-  const state = getState();
-
-  const projectId = getScaledInferenceProjectId(state);
-
-  if (observeSucceeded || !projectId) {
+export const reportOutcome = (outcome, isHeaderButton = false, trigger = null) => async (dispatch) => {
+  if (observeSucceeded) {
     return dispatch(_reportOutcome(outcome, isHeaderButton, null, trigger));
   }
 

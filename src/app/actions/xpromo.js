@@ -40,7 +40,6 @@ export const show = () => async (dispatch, getState) => {
 export const HIDE = 'XPROMO__HIDE';
 export const _hide = () => ({ type: HIDE });
 export const hide = () => async (dispatch) => {
-  dispatch(scaledInferenceActions.reportOutcome('dismiss'));
   dispatch(_hide());
 };
 
