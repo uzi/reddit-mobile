@@ -22,7 +22,6 @@ import { trackXPromoIneligibleEvent } from 'lib/eventUtils';
 import { isCommentsPage } from 'platform/pageUtils';
 import { POST_TYPE } from 'apiClient/models/thingTypes';
 import { isScaledInferenceActive, getMetadata } from '../actions/scaledInference';
-import { FIRST_BIT } from '../constants';
 
 const { DAYMODE } = COLOR_SCHEME;
 const { USUAL, MINIMAL, PERSIST } = XPROMO_DISPLAY_THEMES;
@@ -205,7 +204,7 @@ export function isEligibleListingPage(state) {
 
 function isVideoCommentsPage(state) {
   const currentPage = state.platform.currentPage;
-  const currentPostId = `${POST_TYPE }_${ currentPage.urlParams.postId}`;
+  const currentPostId = POST_TYPE + '_' + currentPage.urlParams.postId;
   const currentPost = state.posts[currentPostId];
 
   if (isCommentsPage(currentPage) && currentPost && currentPost.media && currentPost.media.reddit_video) {
@@ -428,10 +427,7 @@ export function isXPromoBannerEnabled(state) {
   return anyFlagEnabled(state, [XPROMOBANNER]);
 }
 export function isXPromoAdLoadingEnabled(state) {
-  // don't show loading xpromo if slowdown feature is enabled
-  const firstBitFeatureData = getExperimentData(state, FIRST_BIT.EXPERIMENT_NAME);
-
-  return !firstBitFeatureData && anyFlagEnabled(state, XPROMO_AD_LOADING_FLAGS);
+  return anyFlagEnabled(state, XPROMO_AD_LOADING_FLAGS);
 }
 
 function shouldShowXPromo(state) {

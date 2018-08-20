@@ -365,11 +365,4 @@ export const SCALED_INFERENCE_BRANCH_PARAMS = {
   utm_medium: 'mweb',
 };
 
-export const FIRST_BIT = {
-  EXPERIMENT_NAME: 'mweb_first_bit',
-  FIRST_BIT_1: 'mweb_first_bit_1',
-  FIRST_BIT_2: 'mweb_first_bit_2',
-  FIRST_BIT_3: 'mweb_first_bit_3',
-};
-
 export const TOAST_SUCCESS_EMAIL_VALIDATION = 'Email validation complete';

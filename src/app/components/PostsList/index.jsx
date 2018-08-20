@@ -78,7 +78,7 @@ const renderPostsList = props => {
       const videoAdsStatus = isVideo ?
                             { ...videoAds, length: post.media.reddit_video.duration * 1000 } :
                             videoAds;
-      return (<Ad
+      return <Ad
         postId={ postId }
         placementIndex={ i }
         isVideo={ isVideo }
@@ -87,8 +87,7 @@ const renderPostsList = props => {
           ...postProps,
           key: 'native-ad',
         } }
-        key={ `post-id-${postId}` }
-              />);
+        key={ `post-id-${postId}` } />;
     }
     return <Post { ...postProps } postId={ postId } key={ `post-id-${postId}` }/>;
   });

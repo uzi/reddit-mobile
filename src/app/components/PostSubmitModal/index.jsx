@@ -93,9 +93,9 @@ class PostSubmitModal extends React.Component {
 
         { showCaptcha
           ? <ReCaptchaBox
-            onCloseCaptcha={ onCloseCaptcha }
-            onRecaptchaLoaded={ onRecaptchaLoaded }
-            onSubmit={ onSubmit }
+              onCloseCaptcha={ onCloseCaptcha }
+              onRecaptchaLoaded={ onRecaptchaLoaded }
+              onSubmit={ onSubmit }
             />
           : null }
         { showSafeHarborText
