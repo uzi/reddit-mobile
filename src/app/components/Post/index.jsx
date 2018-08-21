@@ -115,6 +115,10 @@ export function Post(props, context) {
   const showLinksInNewTab = externalDomain && (isAndroid || props.linkTabExperiment === 'treatment_1');
   const showNSFW = props.subredditIsNSFW || props.unblurred;
 
+  if (!isAndroid) {
+    props.trackLinkTabExperiment();
+  }
+
   // Spoilers differ from NSFW in that if a subreddit disables spoilers
   // we should not render the spoiler treatment. If the preference is
   // enabled we should show the spoiler treatment. We will also only show
@@ -169,10 +173,6 @@ export function Post(props, context) {
   const isSubredditModerator = includes(moderatingSubreddits.names, post.subreddit.toLowerCase());
   // Bind a new copy of interceptListingClick that uses `redux.getState` to check eligilibility
   const interceptListingClick = (e, listingClickType) => {
-    if (!isAndroid) {
-      props.trackLinkTabExperiment();
-    }
-
     const checkEligibility = postId => {
       if (single) {
         return false; // don't listing click on comments pages

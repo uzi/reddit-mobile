@@ -348,7 +348,7 @@ export function trackExperimentClickEvent(state, experimentName, experimentId, t
 }
 
 export function trackLinkTabExperiment(state) {
-  const data = getExperimentData(state, EXPERIMENT_NAMES[flags.VARIANT_IOS_LINK_TAB]);
+  const data = getExperimentData(state, flags.VARIANT_IOS_LINK_TAB);
 
   if (!data) { return; }
 
