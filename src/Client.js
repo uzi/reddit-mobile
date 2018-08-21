@@ -191,6 +191,12 @@ client.dispatch(loadStateFromLocalStorage());
 const state = client.getState();
 const emailVerified = isEmailVerified(state);
 
+console.log('YO WTF');
+console.log({
+  mweb_sharing_clipboard: state.accounts.me.features.mweb_sharing_clipboard,
+  mweb_link_tab: state.accounts.me.features.mweb_link_tab,
+});
+
 trackExposeSharing(state);
 trackExposeScaledInference(state);
 
