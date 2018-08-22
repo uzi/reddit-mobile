@@ -33,6 +33,7 @@ const preserveInconsistentProperties = (state, post) => {
     promoted: currentPost.promoted,
     selfTextMD: currentPost.selfTextMD,
     selfTextHTML: currentPost.selfTextHTML,
+    outboundLink: currentPost.outboundLink,
   });
 };
 
