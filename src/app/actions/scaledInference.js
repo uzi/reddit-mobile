@@ -38,20 +38,40 @@ of only xpromo accept clicks.
 This is likely to change in the future, or remain untouched for years.
 */
 
+const { LISTING, POST, CLICK } = SCALED_INFERENCE;
+
 const DUPE = {
-  [TA]: 1.96,
-  [BLB]: 5.31,
-  [P]: 1.40,
-  [BB]: 1.25,
-  [D]: 7.57,
+  [LISTING]: {
+    [BB]: 1.53,
+    [P]: 10.36,
+    [BLB]: 6.50,
+    [TA]: 2.23,
+  },
+  [POST]: {
+    [BB]: 1.31,
+    [P]: 7.93,
+    [BLB]: 5.03,
+  },
+  [CLICK]: {
+    [D]: 11.20,
+  },
 };
 
 const DEDUPE = {
-  [TA]: 2.89,
-  [BLB]: 6.61,
-  [P]: 2.09,
-  [BB]: 1.54,
-  [D]: 8.75,
+  [LISTING]: {
+    [BB]: 1.70,
+    [P]: 10.47,
+    [BLB]: 7.28,
+    [TA]: 3.49,
+  },
+  [POST]: {
+    [BB]: 1.63,
+    [P]: 8.16,
+    [BLB]: 5.66,
+  },
+  [CLICK]: {
+    [D]: 12.63,
+  },
 };
 
 const outcomeQueue = [];
@@ -303,6 +323,10 @@ export const _reportOutcome = (outcome, isHeaderButton = false, _session = null,
   const xpromoType = (storage.variants || DEFAULT_XPROMO_TYPES)[trigger];
   const session = _session || extractSession(storage);
   const projectId = getScaledInferenceProjectId(state);
+
+  const dupe = DUPE[trigger] && DUPE[trigger][xpromoType];
+  const dedupe = DEDUPE[trigger] && DEDUPE[trigger][xpromoType];
+
   const payload = {
     session,
     outcome,
@@ -310,8 +334,8 @@ export const _reportOutcome = (outcome, isHeaderButton = false, _session = null,
     xpromoType,
     headerButton: isHeaderButton,
     project_id: projectId,
-    dupe: DUPE[xpromoType],
-    dedupe: DEDUPE[xpromoType],
+    dupe,
+    dedupe,
   };
 
   dispatch({
