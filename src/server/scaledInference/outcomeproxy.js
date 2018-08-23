@@ -9,7 +9,7 @@ export default (router) => {
     const sid1 = amp.session.cookieData.__si_sid;
     const uid1 = amp.session.cookieData.__si_uid;
 
-    const { outcome, trigger, xpromoType, headerButton } = ctx.request.body;
+    const { outcome, trigger, xpromoType, headerButton, dupe, dedupe } = ctx.request.body;
 
     const eventNames = {
       accept: 'XPromoOutcomeAccept',
@@ -23,6 +23,8 @@ export default (router) => {
           trigger,
           xpromoType,
           headerButton,
+          dupe,
+          dedupe,
         },
         {},
         (err, res) => {
