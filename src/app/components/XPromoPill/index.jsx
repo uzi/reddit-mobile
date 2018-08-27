@@ -12,7 +12,7 @@ import {
   promoDismissed,
   hide,
 } from 'app/actions/xpromo';
-import { getExperimentVariant } from 'lib/experiments';
+
 import { trackXPromoView } from 'lib/eventUtils';
 import { SCALED_INFERENCE, SCALED_INFERENCE_BRANCH_PARAMS } from 'app/constants';
 import { setMetadata, reportOutcome } from '../../actions/scaledInference';
@@ -81,11 +81,7 @@ const PORN_PARAMS = {
 const mapStateToProps = (state, ownProps) => {
   const params = ownProps.scaledInference ? SCALED_INFERENCE_PARAMS : PORN_PARAMS;
 
-  const variant = getExperimentVariant(state, SCALED_INFERENCE.EXPERIMENT);
-
-  const href = getBranchLink(
-    state,
-    state.platform.currentPage.url, params, SCALED_INFERENCE.PILL);
+  const href = getBranchLink(state, state.platform.currentPage.url, params, SCALED_INFERENCE.PILL);
   return { href };
 };
 
@@ -93,7 +89,7 @@ const mapDispatchToProps = {
   reportOutcome,
   setMetadata,
   promoClicked,
-  promoDismissed: () => async (dispatch, getState) => {
+  promoDismissed: () => async (dispatch) => {
     dispatch(hide());
     dispatch(promoDismissed());
   },
