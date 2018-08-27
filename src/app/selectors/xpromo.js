@@ -22,6 +22,7 @@ import { trackXPromoIneligibleEvent } from 'lib/eventUtils';
 import { isCommentsPage } from 'platform/pageUtils';
 import { POST_TYPE } from 'apiClient/models/thingTypes';
 import { isScaledInferenceActive, getMetadata } from '../actions/scaledInference';
+import { SCALED_INFERENCE } from 'app/constants';
 
 const { DAYMODE } = COLOR_SCHEME;
 const { USUAL, MINIMAL, PERSIST } = XPROMO_DISPLAY_THEMES;
@@ -69,6 +70,9 @@ const {
 
   // iOS link out
   VARIANT_IOS_LINK_TAB,
+
+  // xpromo revamp
+  VARIANT_XPROMO_REVAMP,
 
 } = flagConstants;
 
@@ -143,6 +147,7 @@ export const EXPERIMENT_NAMES = {
   [VARIANT_XPROMO_AD_FEED_ANDROID]: 'mweb_xpromo_ad_feed_android',
   [VARIANT_NSFW_XPROMO]: 'mweb_nsfw_xpromo',
   [VARIANT_IOS_LINK_TAB]: 'mweb_link_tab',
+  [VARIANT_XPROMO_REVAMP]: 'mweb_xpromo_revamp',
 };
 
 export function getRouteActionName(state) {
@@ -254,6 +259,12 @@ export function listingClickEnabled(state, postId) {
     const si = getMetadata(state);
     return si.variants.xpromo_click === 'D' &&
            !si.listingClickDismissed;
+  }
+
+  const variants = getXPromoVariants(state);
+
+  if (!variants[SCALED_INFERENCE.CLICK]) {
+    return false;
   }
 
   if (!isEligibleListingPage(state) || !isXPromoEnabledOnDevice(state)) {
@@ -445,4 +456,59 @@ function isContentLoaded(state) {
 }
 export function XPromoIsActive(state) {
   return isContentLoaded(state) && xpromoIsConfiguredOnPage(state) && state.xpromo.interstitials.showBanner;
+}
+
+const { CLICK, LISTING, POST } = SCALED_INFERENCE;
+const { D, TA, BB, BLB, P } = SCALED_INFERENCE;
+
+const REVAMP_VARIANTS = {
+  DEFAULT: {
+    [CLICK]: D,
+    [LISTING]: TA,
+    [POST]: BB,
+  },
+
+  treatment_1: {
+    [CLICK]: null,
+    [LISTING]: P,
+    [POST]: P,
+  },
+
+  treatment_2: {
+    [CLICK]: null,
+    [LISTING]: BLB,
+    [POST]: BLB,
+  },
+
+  treatment_3: {
+    [CLICK]: null,
+    [LISTING]: P,
+    [POST]: BB,
+  },
+
+  treatment_4: {
+    [CLICK]: null,
+    [LISTING]: BLB,
+    [POST]: BB,
+  },
+};
+
+export function getScaledInferenceVariant(state) {
+  return getExperimentVariant(state, SCALED_INFERENCE.EXPERIMENT);
+}
+
+export function getRevampVariant(state) {
+  return getExperimentVariant(state, EXPERIMENT_NAMES[VARIANT_XPROMO_REVAMP]);
+}
+
+export function getXPromoVariants(state) {
+  const scaledInferenceVariant = getScaledInferenceVariant(state);
+
+  if (scaledInferenceVariant) {
+    return scaledInferenceVariant;
+  }
+
+  const revampVariant = getRevampVariant(state);
+
+  return REVAMP_VARIANTS[revampVariant] || REVAMP_VARIANTS.DEFAULT;
 }

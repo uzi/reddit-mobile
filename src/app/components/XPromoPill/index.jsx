@@ -10,6 +10,7 @@ import {
   navigateToAppStore,
   promoClicked,
   promoDismissed,
+  hide,
 } from 'app/actions/xpromo';
 import { getExperimentVariant } from 'lib/experiments';
 import { trackXPromoView } from 'lib/eventUtils';
@@ -66,13 +67,11 @@ class XPromoPill extends React.Component {
 }
 
 const SCALED_INFERENCE_PARAMS = {
-  ...SCALED_INFERENCE_BRANCH_PARAMS,
   tags: [SCALED_INFERENCE.PILL],
   utm_content: SCALED_INFERENCE.PILL,
 };
 
 const PORN_PARAMS = {
-  ...SCALED_INFERENCE_BRANCH_PARAMS,
   campaign: 'nsfw_xpromo',
   utm_source: 'nsfw_xpromo',
   tags: [SCALED_INFERENCE.PILL],
@@ -83,10 +82,10 @@ const mapStateToProps = (state, ownProps) => {
   const params = ownProps.scaledInference ? SCALED_INFERENCE_PARAMS : PORN_PARAMS;
 
   const variant = getExperimentVariant(state, SCALED_INFERENCE.EXPERIMENT);
-  params.keyword = variant;
-  params.utm_term = variant;
 
-  const href = getBranchLink(state, state.platform.currentPage.url, params, SCALED_INFERENCE.PILL);
+  const href = getBranchLink(
+    state,
+    state.platform.currentPage.url, params, SCALED_INFERENCE.PILL);
   return { href };
 };
 
@@ -94,7 +93,10 @@ const mapDispatchToProps = {
   reportOutcome,
   setMetadata,
   promoClicked,
-  promoDismissed,
+  promoDismissed: () => async (dispatch, getState) => {
+    dispatch(hide());
+    dispatch(promoDismissed());
+  },
   logAppStoreNavigation,
   trackXPromoView: () => async (_, getState) => {
     return trackXPromoView(getState(), { interstitial_type: SCALED_INFERENCE.PILL });

@@ -8,14 +8,30 @@ export function extractUser(state) {
 }
 
 export function getExperimentData(state, experimentName) {
+  const queryParams = state.platform.currentPage && state.platform.currentPage.queryParams;
+  const hasOverride = queryParams && experimentName in queryParams;
+  const override = queryParams && queryParams[experimentName];
   const user = extractUser(state);
-  if (!user || !user.features[experimentName]) {
+
+  // ?my_experiment=
+  if (hasOverride && !override) {
     return null;
   }
-  return {
+
+  if (!user || !user.features[experimentName]) {
+    return override ? { experiment_name: experimentName, variant: override } : null;
+  }
+
+  const result = {
     ...user.features[experimentName],
     experiment_name: experimentName,
   };
+
+  if (override) {
+    result.variant = override;
+  }
+
+  return result;
 }
 
 export function getActiveExperimentVariant(state, experimentName) {
@@ -46,5 +62,5 @@ export function featureEnabled(state, featureName) {
     return false;
   }
 
-  return !!user.features[featureName];
+  return !!getExperimentData(state, featureName);
 }

@@ -16,6 +16,8 @@ import {
   loginRequiredEnabled,
   getExperimentRange,
   isXPromoPersistent,
+  getScaledInferenceVariant,
+  getRevampVariant,
 } from 'app/selectors/xpromo';
 
 import {
@@ -28,8 +30,11 @@ import {
 } from 'app/constants';
 
 import extractTaglist from 'lib/extractTagList';
-import { getExperimentVariant } from './experiments';
-import { SCALED_INFERENCE_BRANCH_PARAMS, SCALED_INFERENCE } from '../app/constants';
+import {
+  SCALED_INFERENCE,
+  SCALED_INFERENCE_BRANCH_PARAMS,
+  REVAMP_BRANCH_PARAMS,
+} from '../app/constants';
 import { pageTypeSelector } from 'app/selectors/platformSelector';
 
 const {
@@ -68,14 +73,10 @@ export function isXPromoPersistentEnabled(state) {
 }
 
 export function getXPromoLinkforCurrentPage(state, interstitial_type) {
-  const variant = getExperimentVariant(state, SCALED_INFERENCE.EXPERIMENT);
-
   const params = {
     interstitial_type,
     tags: [interstitial_type],
     ...SCALED_INFERENCE_BRANCH_PARAMS,
-    keyword: variant,
-    utm_term: variant,
   };
   const path = state.platform.currentPage.url;
   // utm_content (3 arg) and interstitial_type (4 arg) are
@@ -91,12 +92,8 @@ export function getXPromoListingClickLink(state, postId, listingClickType) {
 
   const path = getXPromoListingClickPath(state, post, listingClickType);
 
-  const scaledInferenceVariant = getExperimentVariant(state, SCALED_INFERENCE.EXPERIMENT);
-
   return getXPromoLink(state, path, XPROMO_MODAL_LISTING_CLICK_NAME, {
     listing_click_type: listingClickType,
-    keyword: scaledInferenceVariant,
-    utm_term: scaledInferenceVariant,
     utm_content: SCALED_INFERENCE.MODAL_LISTING_CLICK,
     tags: [SCALED_INFERENCE.MODAL_LISTING_CLICK],
   });
@@ -194,8 +191,14 @@ export function getBranchLink(state, path, payload={}) {
     userId = userAccount.id;
   }
 
+  const scaledInferenceVariant = getScaledInferenceVariant(state);
+  const isRevamp = !scaledInferenceVariant;
+  const variant = isRevamp ? getRevampVariant(state) : scaledInferenceVariant;
+  const baseParams = isRevamp ? REVAMP_BRANCH_PARAMS : SCALED_INFERENCE_BRANCH_PARAMS;
+
+
   const basePayload = {
-    ...SCALED_INFERENCE_BRANCH_PARAMS,
+    ...baseParams,
     // We can use this space to fill "tags" which will populate on the
     // branch dashboard and allow you sort/parse data. Optional/not required.
     // tags: [ 'tag1', 'tag2' ],
@@ -211,6 +214,8 @@ export function getBranchLink(state, path, payload={}) {
     mweb_user_name: userName,
     ...getBasePayload(state),
     ...buildSubredditData(state),
+    keyword: variant,
+    utm_term: variant,
   };
 
   const payloadTags = payload.tags || [];
@@ -239,6 +244,17 @@ export function getBranchLink(state, path, payload={}) {
  * - shouldNotListingClick
  */
 export function shouldNotShowBanner(state) {
+  const scaledInferenceVariant = getScaledInferenceVariant(state);
+  const xpromoRevampVariant = getRevampVariant(state);
+
+  if (!scaledInferenceVariant) {
+    switch (xpromoRevampVariant) {
+      case 'treatment_1':
+      case 'treatment_3':
+        return false;
+    }
+  }
+
   // Do not show the banner:
   // If localStorage is not available
   if (!localStorageAvailable()) {
@@ -246,6 +262,10 @@ export function shouldNotShowBanner(state) {
   }
   // Do not show the banner:
   // If closing date is in limit range still
+
+  console.log('yowtf');
+  console.log(getXpromoClosingLimit(state));
+
   if (getXpromoClosingLimit(state) > Date.now()) {
     return 'dismissed_previously';
   }

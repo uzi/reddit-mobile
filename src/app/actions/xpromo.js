@@ -40,6 +40,7 @@ export const show = () => async (dispatch, getState) => {
 export const HIDE = 'XPROMO__HIDE';
 export const _hide = () => ({ type: HIDE });
 export const hide = () => async (dispatch) => {
+  dispatch(markBannerClosed());
   dispatch(_hide());
 };
 
@@ -162,7 +163,6 @@ export const xpromoAddBucketingEvent = (bucketEventName='') => async (dispatch) 
 // the user dismissed the crosspromo experience.
 const EXTERNAL_PREF_NAME = 'hide_mweb_xpromo_banner';
 export const close = () => async (dispatch, getState) => {
-  markBannerClosed();
   dispatch(hide());
   // We use a separate externally-visible name/value
   // for the preference for clarity when analyzing

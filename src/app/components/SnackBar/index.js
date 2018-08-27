@@ -9,6 +9,7 @@ import {
   navigateToAppStore,
   promoClicked,
   promoDismissed,
+  hide,
 } from 'app/actions/xpromo';
 import { getExperimentVariant } from 'lib/experiments';
 import { trackXPromoView } from 'lib/eventUtils';
@@ -73,12 +74,7 @@ class SnackBar extends React.Component {
 }
 
 const mapStateToProps = (state) => {
-  const variant = getExperimentVariant(state, SCALED_INFERENCE.EXPERIMENT);
-
   const href = getBranchLink(state, state.platform.currentPage.url, {
-    ...SCALED_INFERENCE_BRANCH_PARAMS,
-    keyword: variant,
-    utm_term: variant,
     tags: [SCALED_INFERENCE.SNACKBAR],
     utm_content: [SCALED_INFERENCE.SNACKBAR],
   }, SCALED_INFERENCE.SNACKBAR);
@@ -90,7 +86,10 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = {
   promoClicked,
-  promoDismissed,
+  promoDismissed: () => async (dispatch) => {
+    dispatch(hide());
+    dispatch(promoDismissed());
+  },
   logAppStoreNavigation,
   setMetadata,
   reportOutcome,

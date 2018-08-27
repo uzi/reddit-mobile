@@ -15,6 +15,7 @@ import XPromoPill from 'app/components/XPromoPill';
 import { pageTypeSelector } from 'app/selectors/platformSelector';
 import { SCALED_INFERENCE } from '../../constants';
 import { isCurrentContentNSFW } from '../../selectors/platformSelector';
+import { getXPromoVariants } from '../../selectors/xpromo';
 
 const CLASSIC = 'CLASSIC';
 const SNACKBAR = 'SNACKBAR';
@@ -104,7 +105,7 @@ const xPromoSelector = createSelector(
 function mapStateToProps(state) {
   const isNSFW = isCurrentContentNSFW(state);
   const trigger = pageTypeSelector(state);
-  const { variants } = state.scaledInference;
+  const variants = getXPromoVariants(state);
   const variant = variants ? variants[trigger] : DEFAULT_VARIANTS[trigger];
   const { showXPromo, isXPromoFixed } = xPromoSelector(state);
   return { showXPromo: showXPromo && !isNSFW, isXPromoFixed, variant };

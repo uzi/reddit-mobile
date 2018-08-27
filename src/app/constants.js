@@ -203,6 +203,9 @@ export const flags = {
 
   // link out
   VARIANT_IOS_LINK_TAB: 'mwebLinkTab',
+
+  // xpromo revamp
+  VARIANT_XPROMO_REVAMP: 'mwebXpromoRevamp',
 };
 
 // Now we have 2 different types of XPromo
@@ -359,6 +362,15 @@ export const SCALED_INFERENCE = {
 export const SCALED_INFERENCE_BRANCH_PARAMS = {
   campaign: SCALED_INFERENCE.EXPERIMENT,
   utm_name: SCALED_INFERENCE.EXPERIMENT,
+  channel: 'xpromo',
+  utm_source: 'xpromo',
+  feature: 'mweb',
+  utm_medium: 'mweb',
+};
+
+export const REVAMP_BRANCH_PARAMS = {
+  campaign: 'mweb_xpromo_revamp',
+  utm_name: 'mweb_xpromo_revamp',
   channel: 'xpromo',
   utm_source: 'xpromo',
   feature: 'mweb',
