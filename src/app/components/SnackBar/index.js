@@ -11,9 +11,8 @@ import {
   promoDismissed,
   hide,
 } from 'app/actions/xpromo';
-import { getExperimentVariant } from 'lib/experiments';
 import { trackXPromoView } from 'lib/eventUtils';
-import { SCALED_INFERENCE, SCALED_INFERENCE_BRANCH_PARAMS } from 'app/constants';
+import { SCALED_INFERENCE } from 'app/constants';
 import { setMetadata, reportOutcome } from 'app/actions/scaledInference';
 
 class SnackBar extends React.Component {
