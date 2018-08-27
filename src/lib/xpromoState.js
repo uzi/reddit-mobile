@@ -263,9 +263,6 @@ export function shouldNotShowBanner(state) {
   // Do not show the banner:
   // If closing date is in limit range still
 
-  console.log('yowtf');
-  console.log(getXpromoClosingLimit(state));
-
   if (getXpromoClosingLimit(state) > Date.now()) {
     return 'dismissed_previously';
   }
