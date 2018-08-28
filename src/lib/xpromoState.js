@@ -165,15 +165,25 @@ export function isInterstitialDimissed(state) {
   return (defaultRange > Date.now());
 }
 
-export function getBranchLink(state, path, payload={}) {
-  const { utm_content, tags } = payload;
+export function getBranchLink(state, path, _payload={}, creative) {
+  const { utm_content, tags: _tags } = _payload;
+
+  let tags = _tags;
+  let payload = _payload;
 
   if (utm_content && tags) {
+    tags = _tags.slice();
     const pageType = pageTypeSelector(state);
     const tagIndex = tags.indexOf(utm_content);
     const updateIndex = tagIndex >= 0 ? tagIndex : tags.length;
-    payload.utm_content = `${utm_content}_${pageType}`;
-    payload.tags[updateIndex] = payload.utm_content;
+    const updatedContent = `${utm_content}_${pageType}`;
+    tags[updateIndex] = updatedContent;
+
+    payload = {
+      ..._payload,
+      tags,
+      utm_content: updatedContent,
+    };
   }
 
   const { user, accounts } = state;
@@ -234,6 +244,9 @@ export function getBranchLink(state, path, payload={}) {
     pathname: '/',
     query,
   });
+
+  console.log(link);
+  console.log(query);
 
   return link;
 }

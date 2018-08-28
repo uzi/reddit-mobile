@@ -14,7 +14,7 @@ import {
 } from 'app/actions/xpromo';
 
 import { trackXPromoView } from 'lib/eventUtils';
-import { SCALED_INFERENCE, SCALED_INFERENCE_BRANCH_PARAMS } from 'app/constants';
+import { SCALED_INFERENCE } from 'app/constants';
 import { setMetadata, reportOutcome } from '../../actions/scaledInference';
 
 class XPromoPill extends React.Component {
@@ -81,7 +81,7 @@ const PORN_PARAMS = {
 const mapStateToProps = (state, ownProps) => {
   const params = ownProps.scaledInference ? SCALED_INFERENCE_PARAMS : PORN_PARAMS;
 
-  const href = getBranchLink(state, state.platform.currentPage.url, params, SCALED_INFERENCE.PILL);
+  const href = getBranchLink(state, state.platform.currentPage.url, params);
   return { href };
 };
 
