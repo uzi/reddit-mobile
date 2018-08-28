@@ -257,6 +257,10 @@ export function shouldNotShowBanner(state) {
   const scaledInferenceVariant = getScaledInferenceVariant(state);
   const xpromoRevampVariant = getRevampVariant(state);
 
+  // when the xpromoRevampVariant is active we want to show
+  // the xpromo (the blue pill at the time of writing) once per
+  // session, so we ignore 2 week interval for those cases
+
   if (!scaledInferenceVariant) {
     switch (xpromoRevampVariant) {
       case 'treatment_1':
