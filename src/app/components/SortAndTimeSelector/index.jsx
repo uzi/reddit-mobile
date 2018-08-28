@@ -4,9 +4,12 @@ import { createSelector } from 'reselect';
 
 import * as navigationActions from 'platform/actions';
 import { METHODS } from 'platform/router';
+import isFakeSubreddit from 'lib/isFakeSubreddit';
 import { listingTime } from 'lib/listingTime';
 
 import SortSelector from 'app/components/SortSelector';
+import { PAGE_NAMES } from 'app/constants';
+import { isHomePage } from 'app/selectors/platformSelector';
 import { SORTS } from 'app/sortValues';
 
 const T = React.PropTypes;
@@ -77,7 +80,8 @@ SortAndTimeSelector.defaultProps = {
 
 const mapStateToProps = createSelector(
   state => state.platform.currentPage,
-  currentPage => ({ currentPage }),
+  state => state.user,
+  (currentPage, user) => ({ currentPage, user }),
 );
 
 const mapDispatchToProps = dispatch => ({
@@ -87,9 +91,20 @@ const mapDispatchToProps = dispatch => ({
 });
 
 const mergeProps = (stateProps, dispatchProps, ownProps) => {
-  const { currentPage: { url, urlParams, queryParams } } = stateProps;
+  const {
+    currentPage: { url, urlParams, queryParams },
+    user,
+  } = stateProps;
 
-  const sort = urlParams.sort || queryParams.sort || SORTS.HOT;
+  const isLoggedIn = user && !user.loggedOut;
+  // HOT is the default sort for subreddit pages;
+  // BEST is the default sort for logged in users on the home page;
+  const useBestSort = isHomePage(urlParams.subredditName, urlParams.pageName) && isLoggedIn;
+  const sort = urlParams.sort || queryParams.sort || (
+    useBestSort
+      ? SORTS.BEST
+      : SORTS.HOT
+    );
   const time = ownProps.time || listingTime(queryParams, sort);
   const { navigateToUrl } = dispatchProps;
   const { userName, commentsOrSubmitted } = urlParams;
@@ -106,8 +121,20 @@ const mergeProps = (stateProps, dispatchProps, ownProps) => {
   } else {
     onSortChange = sort => {
       const { subredditName } = urlParams;
-      const baseUrl = subredditName ? `/r/${subredditName}` : '';
-      navigateToUrl(`${baseUrl}/${sort}`);
+      if (
+        (subredditName || isFakeSubreddit(subredditName))
+        && urlParams.pageName !== PAGE_NAMES.SEARCH
+      ) {
+        const baseUrl = subredditName ? `/r/${subredditName}` : '';
+        // for SR  & FakeSR listing pages, sort is in path
+        navigateToUrl(`${baseUrl}/${sort}`);
+      } else {
+        // for all other pages (like search), sort is in the querystring
+        navigateToUrl(`${url}`, {
+          queryParams: { ...queryParams, sort },
+        });
+      }
+
     };
   }
 

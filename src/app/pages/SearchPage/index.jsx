@@ -14,10 +14,17 @@ import PaginationButtons from 'app/components/PaginationButtons';
 import Loading from 'app/components/Loading';
 import { PostsList } from 'app/components/PostsList';
 import SortAndTimeSelector from 'app/components/SortAndTimeSelector';
+import { SORTS } from 'app/sortValues';
+
+const SORT_OPTIONS = [
+  SORTS.RELEVANCE,
+  SORTS.TOP,
+  SORTS.NEW,
+  SORTS.CONTROVERSIAL,
+];
 
 // This is intentionally the non-connected version because search requests aren't loaded in the same
 // way as subreddit listings
-
 const searchLoading = () => (
   <div className='SearchPage__loading'>
     <Loading />
@@ -132,11 +139,14 @@ const renderCommunities = (pageData, subredditRecords, renderingPosts) => (
   </div>
 );
 
-const linksHeader = (/*sort, time*/) => (
+const linksHeader = (sort) => (
   <div className='SearchPage__linksHeader clearfix'>
   <div className='SearchPage__linksHeaderTitle'>Posts</div>
   <div className='SearchPage__linksHeaderTools'>
-    <SortAndTimeSelector />
+    <SortAndTimeSelector
+      sort={ sort }
+      sortOptions={ SORT_OPTIONS }
+    />
   </div>
 </div>
 );
@@ -148,9 +158,11 @@ const postResults = (pageData, postRecords) => {
     type: 'link', pageSize: 22,
   });
 
+  const sort = pageData && pageData.queryParams && pageData.queryParams.sort || SORTS.RELEVANCE;
+
   return (
     <div className='SearchPage__links'>
-      { linksHeader() }
+      { linksHeader(sort) }
       <div className='SearchPage__linksResults'>
         <PostsList
           loading={ false }

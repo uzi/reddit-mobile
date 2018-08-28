@@ -1,4 +1,5 @@
 export const SORTS = {
+  BEST: 'best',
   CONFIDENCE: 'confidence',
   HOT: 'hot',
   NEW: 'new',
@@ -19,6 +20,7 @@ export const SORTS = {
 };
 
 export const SUPPORTED_SORTS = [
+  SORTS.BEST,
   SORTS.HOT,
   SORTS.TOP,
   SORTS.NEW,
@@ -26,9 +28,14 @@ export const SUPPORTED_SORTS = [
 ];
 
 export const SORT_VALUES_MAP = {
+  [SORTS.BEST]: {
+    text: 'Best',
+    icon: 'best',
+  },
+
   [SORTS.CONFIDENCE]: {
     text: 'Best',
-    icon: 'hot',
+    icon: 'best',
   },
 
   [SORTS.HOT]: {

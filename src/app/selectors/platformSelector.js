@@ -1,4 +1,7 @@
-import { SCALED_INFERENCE } from 'app/constants';
+import {
+  PAGE_NAMES,
+  SCALED_INFERENCE,
+} from 'app/constants';
 
 export const pageTypeSelector = state => {
   const currentPageURL = (state.platform.currentPage && state.platform.currentPage.url) || '';
@@ -41,3 +44,7 @@ export const isEmailVerified = state =>
   state.platform.currentPage &&
   state.platform.currentPage.queryParams &&
   state.platform.currentPage.queryParams.verified;
+
+export function isHomePage(subredditName, pageName) {
+  return !subredditName && pageName !== PAGE_NAMES.SEARCH; // the frontpage
+}

@@ -20,14 +20,14 @@ const SORT = 'sort';
 const TIME = 't';
 const TYPE = 'type';
 
-const DEFUALT_PARAMS = {
+const DEFAULT_PARAMS = {
   [SORT]: SORTS.RELEVANCE,
   [TIME]: SORTS.ALL_TIME,
   [TYPE]: DEFAULT_SEARCH_TYPE,
 };
 
 const getDefaultable = (name, queryParams) => {
-  return queryParams[name] || DEFUALT_PARAMS[name];
+  return queryParams[name] || DEFAULT_PARAMS[name];
 };
 
 const removeDefaultables = (params) => {
@@ -35,7 +35,7 @@ const removeDefaultables = (params) => {
   const keys = Object.keys(params);
   keys.forEach(key => {
     const value = params[key];
-    if (value && value === DEFUALT_PARAMS[key]) {
+    if (value && value === DEFAULT_PARAMS[key]) {
       return;
     }
 

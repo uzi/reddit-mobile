@@ -378,3 +378,11 @@ export const REVAMP_BRANCH_PARAMS = {
 };
 
 export const TOAST_SUCCESS_EMAIL_VALIDATION = 'Email validation complete';
+
+export const PAGE_NAMES = {
+  COMMENTS: 'comments',
+  LISTING: 'listing',
+  SEARCH: 'search',
+  SUBMIT: 'submit',
+  USER: 'user',
+};

@@ -12,10 +12,19 @@ import SubNav from 'app/components/SubNav';
 import Tutorial from 'app/components/Tutorial';
 import XPromoListingClickModal from 'app/components/XPromoListingClickModal';
 import XPromoPill from 'app/components/XPromoPill';
+import { SORTS } from 'app/sortValues';
 
 import PostsFromSubredditHandler from 'app/router/handlers/PostsFromSubreddit';
 import { paramsToPostsListsId } from 'app/models/PostsList';
+import { isHomePage } from 'app/selectors/platformSelector';
 import isFakeSubreddit from 'lib/isFakeSubreddit';
+
+const DEFAULT_SORT_OPTIONS = [
+  SORTS.HOT,
+  SORTS.TOP,
+  SORTS.NEW,
+  SORTS.CONTROVERSIAL,
+];
 
 const mapStateToProps = createSelector(
   (_, props) => props, // props is the page props splatted.
@@ -23,6 +32,7 @@ const mapStateToProps = createSelector(
   state => state.subreddits,
   state => state.preferences,
   state => state.modal.id,
+  state => state.platform.currentPage,
   (state, pageProps) => {
     const { loading, loggedout, name } = state.user;
     if (loading || loggedout || state.accounts[name] === undefined) {
@@ -43,6 +53,7 @@ const mapStateToProps = createSelector(
     subreddits,
     preferences,
     modalId,
+    currentPage,
     shouldShowTutorial,
     accounts,
     user,
@@ -52,6 +63,7 @@ const mapStateToProps = createSelector(
     const { subredditName } = postsListParams;
 
     return {
+      currentPage,
       postsListId,
       preferences,
       subredditName,
@@ -68,6 +80,7 @@ const mapStateToProps = createSelector(
 // props is pageData
 export const PostsFromSubredditPage = connect(mapStateToProps)(props => {
   const {
+    currentPage,
     postsListId,
     postsList,
     subredditName,
@@ -116,7 +129,7 @@ export const PostsFromSubredditPage = connect(mapStateToProps)(props => {
   return (
     <div className={ className }>
       { !forFakeSubreddit ? <CommunityHeader subredditName={ subredditName } /> : null }
-      { showSubnav ? renderSubNav(subnavLink) : null }
+      { showSubnav ? renderSubNav(subnavLink, currentPage) : null }
       { accountSuspended ? <SuspensionBanner /> : null }
       { shouldShowTutorial
         ? <Tutorial />
@@ -133,10 +146,16 @@ export const PostsFromSubredditPage = connect(mapStateToProps)(props => {
   );
 });
 
-function renderSubNav(subnavLink) {
+function renderSubNav(subnavLink, currentPage) {
   return (
     <SubNav rightLink={ subnavLink } showWithoutUser={ true }>
-      <SortAndTimeSelector />
+      <SortAndTimeSelector
+        sortOptions={
+          isHomePage(currentPage.urlParams.subredditName, currentPage.urlParams.pageName)
+            ? [SORTS.BEST].concat(DEFAULT_SORT_OPTIONS)
+            : DEFAULT_SORT_OPTIONS
+        }
+      />
     </SubNav>
   );
 }
