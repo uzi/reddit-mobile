@@ -11,7 +11,6 @@ import {
 } from 'lib/xpromoState';
 
 import {
-  trackPreferenceEvent,
   XPROMO_APP_STORE_VISIT,
   XPROMO_DISMISS,
   XPROMO_VIEW,
