@@ -24,7 +24,7 @@ class DismissLink extends React.Component {
     if (requireLogin) {
       dispatch(redirect(this.loginLink()));
     } else {
-      dispatch(xpromoActions.close());
+      dispatch(xpromoActions.hide());
       dispatch(xpromoActions.promoDismissed('link'));
     }
   }

@@ -159,22 +159,6 @@ export const xpromoAddBucketingEvent = (bucketEventName='') => async (dispatch) 
   dispatch({type: XPROMO_ADD_BUCKET_EVENT, payload: { bucketEventName }});
 };
 
-// element is the interface element through which
-// the user dismissed the crosspromo experience.
-const EXTERNAL_PREF_NAME = 'hide_mweb_xpromo_banner';
-export const close = () => async (dispatch, getState) => {
-  dispatch(hide());
-  // We use a separate externally-visible name/value
-  // for the preference for clarity when analyzing
-  // these events in our data pipeline.
-  trackPreferenceEvent(getState(), {
-    modified_preferences: [EXTERNAL_PREF_NAME],
-    user_preferences: {
-      [EXTERNAL_PREF_NAME]: true,
-    },
-  });
-};
-
 export const checkAndSet = () => async (dispatch, getState) => {
   const state = getState();
 
