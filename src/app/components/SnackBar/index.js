@@ -5,11 +5,11 @@ import cx from 'lib/classNames';
 import SnooIcon from 'app/components/SnooIcon';
 import { getBranchLink } from 'lib/xpromoState';
 import {
+  hide,
   logAppStoreNavigation,
   navigateToAppStore,
   promoClicked,
   promoDismissed,
-  hide,
 } from 'app/actions/xpromo';
 import { trackXPromoView } from 'lib/eventUtils';
 import { SCALED_INFERENCE } from 'app/constants';

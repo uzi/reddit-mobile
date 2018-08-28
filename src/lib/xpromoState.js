@@ -165,7 +165,7 @@ export function isInterstitialDimissed(state) {
   return (defaultRange > Date.now());
 }
 
-export function getBranchLink(state, path, _payload={}, creative) {
+export function getBranchLink(state, path, _payload={}) {
   const { utm_content, tags: _tags } = _payload;
 
   let tags = _tags;
