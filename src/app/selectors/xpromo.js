@@ -461,6 +461,11 @@ export function XPromoIsActive(state) {
 const { CLICK, LISTING, POST } = SCALED_INFERENCE;
 const { D, TA, BB, BLB, P } = SCALED_INFERENCE;
 
+// D is the listing click modal
+// TA, BB are the original xpromo banners
+// BLB is the you tube style "snackbar"
+// P is the persistent blue pill
+
 const REVAMP_VARIANTS = {
   DEFAULT: {
     [CLICK]: D,
