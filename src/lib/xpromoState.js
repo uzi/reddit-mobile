@@ -244,9 +244,6 @@ export function getBranchLink(state, path, _payload={}) {
     query,
   });
 
-  console.log(link);
-  console.log(query);
-
   return link;
 }
 
