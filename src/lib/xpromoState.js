@@ -76,7 +76,6 @@ export function getXPromoLinkforCurrentPage(state, interstitial_type) {
   const params = {
     interstitial_type,
     tags: [interstitial_type],
-    ...SCALED_INFERENCE_BRANCH_PARAMS,
   };
   const path = state.platform.currentPage.url;
   // utm_content (3 arg) and interstitial_type (4 arg) are
@@ -244,6 +243,9 @@ export function getBranchLink(state, path, _payload={}) {
     pathname: '/',
     query,
   });
+
+  console.log(link);
+  console.log(query);
 
   return link;
 }
