@@ -12,6 +12,7 @@ import {
   OPT_OUT_XPROMO_INTERSTITIAL,
 } from 'app/constants';
 
+export const SCALED_INFERENCE_DISABLED = true;
 export const HANDSHAKE_BEGIN = 'SCALED_INFERENCE__HANDSHAKE_BEGIN';
 export const HANDSHAKE_END = 'SCALED_INFERENCE__HANDSHAKE_END';
 export const REPORT_OUTCOME = 'SCALED_INFERENCE__REPORT_OUTCOME';
@@ -256,6 +257,10 @@ export const completeHandshake = (data) => async (dispatch, getState) => {
 let handshakeCalled = false;
 
 export const handshake = () => async (dispatch, getState) => {
+  // TODO remove this circuit breaker, delete this function, and fix all call sites
+  // short circuiting exit to disable prior to proper code clean up
+  if (SCALED_INFERENCE_DISABLED) { return; }
+
   if (handshakeCalled) { return; }
 
   handshakeCalled = true;
@@ -299,6 +304,13 @@ export const extractSession = (storage) => {
 };
 
 export const reportOutcome = (outcome, isHeaderButton = false, trigger = null) => async (dispatch) => {
+  // TODO remove this circuit breaker, delete this, and fix all call sites
+  // short circuiting exit to disable prior to proper code clean up
+
+  if (SCALED_INFERENCE_DISABLED) {
+    return;
+  }
+
   if (observeSucceeded) {
     return dispatch(_reportOutcome(outcome, isHeaderButton, null, trigger));
   }
