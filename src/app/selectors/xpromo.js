@@ -361,7 +361,7 @@ function eligibleTimeForModalListingClick(state) {
 
   let interval = EVERY_DAY;
 
-  const variant = getExperimentVariant(EXPERIMENT_NAMES[XPROMO_MODAL_LISTING_CLICK_DAILY_DISMISSIBLE_THROTTLE]);
+  const variant = getExperimentVariant(state, EXPERIMENT_NAMES[XPROMO_MODAL_LISTING_CLICK_DAILY_DISMISSIBLE_THROTTLE]);
 
   if (variant === 'treatment') {
     interval = modalDismissCount >= 3 ? EVERY_TWELVE_WEEKS : EVERY_TWO_WEEKS;
