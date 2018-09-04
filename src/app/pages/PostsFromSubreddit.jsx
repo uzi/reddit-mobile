@@ -72,7 +72,7 @@ const mapStateToProps = createSelector(
       subreddit: subreddits[subredditName],
       shouldShowTutorial,
       accounts: accounts,
-      username: user.name,
+      user: user,
     };
   },
 );
@@ -88,9 +88,10 @@ export const PostsFromSubredditPage = connect(mapStateToProps)(props => {
     preferences,
     shouldShowTutorial,
     accounts,
-    username,
+    user,
   } = props;
 
+  const username = user.name;
   const showSubnav = !!postsList && !postsList.loading;
   const forFakeSubreddit = isFakeSubreddit(subredditName);
   const subnavLink = forFakeSubreddit ? null : {
@@ -98,7 +99,10 @@ export const PostsFromSubredditPage = connect(mapStateToProps)(props => {
     text: 'About this community',
   };
   const accountSuspended = accounts[username] && accounts[username].isSuspended;
-
+  const isLoggedIn = user && !user.loggedOut;
+  const showBestSort = (isLoggedIn
+    && isHomePage(currentPage.urlParams.subredditName, currentPage.urlParams.pageName)
+  );
   const className = 'PostsFromSubredditPage';
 
   // If this subreddit is over18, then we need to show the NSFWInterstitial
@@ -129,7 +133,7 @@ export const PostsFromSubredditPage = connect(mapStateToProps)(props => {
   return (
     <div className={ className }>
       { !forFakeSubreddit ? <CommunityHeader subredditName={ subredditName } /> : null }
-      { showSubnav ? renderSubNav(subnavLink, currentPage) : null }
+      { showSubnav ? renderSubNav(subnavLink, showBestSort) : null }
       { accountSuspended ? <SuspensionBanner /> : null }
       { shouldShowTutorial
         ? <Tutorial />
@@ -146,12 +150,12 @@ export const PostsFromSubredditPage = connect(mapStateToProps)(props => {
   );
 });
 
-function renderSubNav(subnavLink, currentPage) {
+function renderSubNav(subnavLink, showBestSort) {
   return (
     <SubNav rightLink={ subnavLink } showWithoutUser={ true }>
       <SortAndTimeSelector
         sortOptions={
-          isHomePage(currentPage.urlParams.subredditName, currentPage.urlParams.pageName)
+          showBestSort
             ? [SORTS.BEST].concat(DEFAULT_SORT_OPTIONS)
             : DEFAULT_SORT_OPTIONS
         }
