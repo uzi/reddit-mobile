@@ -23,11 +23,11 @@ export default class Login extends BaseHandler {
     try {
       const state = getState();
       const loginForm = state.twoFactorAuthentication && state.twoFactorAuthentication.activeForm;
-      const otpInRightForm = loginForm === loginForms.BACKUP_CODE ? 'B_' + otp : otp;
+      const otpInRightForm = loginForm === loginForms.BACKUP_CODE ? `B_${ otp }` : otp;
 
       const data = await Session.fromLogin(username, password, otpInRightForm);
-      
-      // if 2fa required and we did not create Session 
+
+      // if 2fa required and we did not create Session
       if (data && data.details === loginInfo.TWO_FA_REQUIRED) {
         dispatch(tfaActions.openAppCodeForm());
         return;

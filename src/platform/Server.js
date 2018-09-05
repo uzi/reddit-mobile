@@ -12,6 +12,19 @@ import platform from './reducer';
 import * as actions from './actions';
 import { createQuery } from './pageUtils';
 import { METHODS } from './router';
+import { getSleepAmount } from 'lib/firstBitUtils';
+import { trackServerBucketingEvent } from 'lib/eventUtils';
+import { getExperimentData } from 'lib/experiments';
+import { FIRST_BIT } from 'app/constants';
+
+function sleep(delay) {
+  const p = new Promise((resolve) => {
+    setTimeout(() => {
+      resolve();
+    }, delay);
+  });
+  return p;
+}
 
 export default config => {
   const {
@@ -48,6 +61,15 @@ export default config => {
     await store.dispatch(async (dispatch, getState, utils) => {
       await dispatchBeforeNavigation(ctx, dispatch, getState, utils);
     });
+
+    let state = store.getState();
+    const firstBitFeatureData = getExperimentData(state, FIRST_BIT.EXPERIMENT_NAME);
+
+    if (firstBitFeatureData) {
+      // fire slowdown bucketing event before routing occurs
+      trackServerBucketingEvent(store.getState(), firstBitFeatureData);
+    }
+
     store.dispatch(actions.navigateToUrl(
       ctx.request.method.toLowerCase(),
       ctx.path,
@@ -57,12 +79,13 @@ export default config => {
         referrer: ctx.headers.referer,
       }
     ));
+
     await store.dispatch(async (dispatch, getState, utils) => {
       await dispatchAfterNavigation(ctx, dispatch, getState, utils);
     });
 
     await well.onComplete();
-    const state = store.getState();
+    state = store.getState();
 
     // check for redirects
     const currentUrl = state.platform.currentPage.url;
@@ -82,7 +105,11 @@ export default config => {
       // HEAD requests are converted into GETS by navigation middleware
       // if there isn't an explicit HEAD method on our handler.
       if (ctx.request.method.toLowerCase() !== METHODS.HEAD) {
-        ctx.body = template(state, store);
+        // sleep server response to simulate increase in time to first bit
+        await sleep(getSleepAmount(firstBitFeatureData))
+          .then(() => {
+            ctx.body = template(state, store);
+          });
       }
 
       ctx.status = state.platform.currentPage.status;

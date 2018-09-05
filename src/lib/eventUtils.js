@@ -511,6 +511,7 @@ export function trackPagesXPromoEvents(state, additionalEventData) {
  * @param {Fucntion} dispatch     - Redux Store Dispatch. If it exists, then the name of the bucket
  * event will be stored in the Redux Store to notify the client that it has already occurred.
  */
+
 const firstBuckets = new Set(); // Will only work on the client side
 
 export const trackBucketingEvents = (state, experimentData, dispatch) => {
@@ -553,4 +554,17 @@ export const trackBucketingEvents = (state, experimentData, dispatch) => {
       getEventTracker().track('bucketing_events', 'cs.bucket', omitBy(payload, isNull));
     }
   }
+};
+
+export const trackServerBucketingEvent = (state, experimentData) => {
+  const { variant, experiment_id, owner, experiment_name } = experimentData;
+  const payload = {
+    ...getBasePayload(state),
+    experiment_id,
+    experiment_name,
+    variant,
+    owner: owner || null,
+  };
+
+  getEventTracker().track('bucketing_events', 'cs.bucket', omitBy(payload, isNull));
 };
