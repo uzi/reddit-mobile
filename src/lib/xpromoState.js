@@ -36,6 +36,7 @@ import {
   REVAMP_BRANCH_PARAMS,
 } from '../app/constants';
 import { pageTypeSelector } from 'app/selectors/platformSelector';
+import { isOptOut } from '../app/selectors/xpromo';
 
 const {
   USUAL,
@@ -253,6 +254,10 @@ export function getBranchLink(state, path, _payload={}) {
  * - shouldNotListingClick
  */
 export function shouldNotShowBanner(state) {
+  if (isOptOut(state)) {
+    return true;
+  }
+
   const scaledInferenceVariant = getScaledInferenceVariant(state);
   const xpromoRevampVariant = getRevampVariant(state);
 

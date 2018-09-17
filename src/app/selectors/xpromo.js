@@ -11,6 +11,7 @@ import {
   XPROMO_DISPLAY_THEMES,
   XPROMO_MODAL_LISTING_CLICK_NAME,
   OPT_OUT_XPROMO_INTERSTITIAL_MENU,
+  OPT_OUT_XPROMO_INTERSTITIAL,
 } from 'app/constants';
 
 import features, { isNSFWPage } from 'app/featureFlags';
@@ -150,6 +151,11 @@ export const EXPERIMENT_NAMES = {
   [VARIANT_IOS_LINK_TAB]: 'mweb_link_tab',
   [VARIANT_XPROMO_REVAMP]: 'mweb_xpromo_revamp',
 };
+
+export function isOptOut(state) {
+  return state.optOuts[OPT_OUT_XPROMO_INTERSTITIAL_MENU.STORE_KEY] ||
+         state.optOuts[OPT_OUT_XPROMO_INTERSTITIAL.STORE_KEY];
+}
 
 export function getRouteActionName(state) {
   const routeMeta = getRouteMetaFromState(state);

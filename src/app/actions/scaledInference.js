@@ -4,12 +4,11 @@ import localStorageAvailable from 'lib/localStorageAvailable';
 import { pageTypeSelector } from 'app/selectors/platformSelector';
 import { sendOutcome, sendObserve } from '../../apiClient/apis/ScaledInferenceEndpoint';
 import { show } from 'app/actions/xpromo';
+import { isOptOut } from 'app/selectors/xpromo';
 import { shouldNotShowBanner } from 'lib/xpromoState';
 import { getCurrentPost, getCurrentSubreddit } from 'app/selectors/platformSelector';
 import {
   SCALED_INFERENCE,
-  OPT_OUT_XPROMO_INTERSTITIAL_MENU,
-  OPT_OUT_XPROMO_INTERSTITIAL,
 } from 'app/constants';
 
 export const SCALED_INFERENCE_DISABLED = true;
@@ -138,11 +137,6 @@ export const getScaledInferenceProjectId = (state) => {
     case SCALED_INFERENCE.PROJECT_2: return SCALED_INFERENCE_PROJECT_IDS[2];
     default: return SCALED_INFERENCE_PROJECT_IDS[0];
   }
-};
-
-export const isOptOut = (state) => {
-  return state.optOuts[OPT_OUT_XPROMO_INTERSTITIAL_MENU.STORE_KEY] ||
-         state.optOuts[OPT_OUT_XPROMO_INTERSTITIAL.STORE_KEY];
 };
 
 export const isScaledInferenceActive = (state) => {
