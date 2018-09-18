@@ -19,6 +19,7 @@ import meta from './meta';
 import messages from './messages';
 import modal from './modal';
 import moderatingSubreddits from './moderatingSubreddits';
+import notification from './notification';
 import optOuts from './optOuts';
 import overlay from './overlay';
 import pageMetadata from './pageMetadata';
@@ -56,6 +57,7 @@ import toaster from './toaster';
 import tracking from './tracking';
 import unblurredPosts from './unblurredPosts';
 import user from './user';
+import verification from './verification';
 import videoAds from './videoAds';
 import visitedPosts from './visitedPosts';
 import wikiRequests from './wikiRequests';
@@ -82,6 +84,7 @@ export default {
   messages,
   modal,
   moderatingSubreddits,
+  notification,
   optOuts,
   overlay,
   pageMetadata,
@@ -119,6 +122,7 @@ export default {
   tracking,
   unblurredPosts,
   user,
+  verification,
   videoAds,
   visitedPosts,
   widgets,

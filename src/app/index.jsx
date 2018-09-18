@@ -12,6 +12,7 @@ import LocalStorageSync from './side-effect-components/LocalStorageSync';
 import SessionRefresher from './side-effect-components/SessionRefresher';
 import ScrollPositionSync from './side-effect-components/ScrollPositionSync';
 import TrackingPixel from 'app/side-effect-components/TrackingPixel';
+import Notification from 'app/components/Notification';
 
 export default class App extends React.Component {
   render() {
@@ -28,6 +29,7 @@ export default class App extends React.Component {
         <TooltipShutter />
         <AdblockTester />
         <TrackingPixel />
+        <Notification />
       </div>
     );
   }

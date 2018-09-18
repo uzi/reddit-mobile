@@ -19,6 +19,8 @@ import { paramsToPostsListsId } from 'app/models/PostsList';
 import { isHomePage } from 'app/selectors/platformSelector';
 import isFakeSubreddit from 'lib/isFakeSubreddit';
 
+import { redirect } from 'platform/actions';
+
 const DEFAULT_SORT_OPTIONS = [
   SORTS.HOT,
   SORTS.TOP,
@@ -77,8 +79,10 @@ const mapStateToProps = createSelector(
   },
 );
 
+const mapDispatchToProps = { redirect };
+
 // props is pageData
-export const PostsFromSubredditPage = connect(mapStateToProps)(props => {
+export const PostsFromSubredditPage = connect(mapStateToProps, mapDispatchToProps)(props => {
   const {
     currentPage,
     postsListId,

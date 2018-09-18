@@ -1,4 +1,4 @@
-import config from 'config';
+// import config from 'config';
 import { permanentCookieOptions } from './permanentCookieOptions';
 
 export const permanentRootCookieOptions = ctx => {
@@ -6,8 +6,9 @@ export const permanentRootCookieOptions = ctx => {
   const options = permanentCookieOptions();
 
   if (host && host.indexOf('localhost') === -1) {
-    options.domain = config.rootReddit;
+    // options.domain = config.rootReddit;
+    options.domain = ctx.host;
   }
-  
+
   return options;
 };

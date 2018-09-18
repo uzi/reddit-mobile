@@ -17,6 +17,7 @@ import ToggleSubredditSubscriptionHandler from './handlers/ToggleSubredditSubscr
 import UserActivityHandler from './handlers/UserActivity';
 import UserActivityRerouteHandler from './handlers/UserActivityReroute';
 import UserProfilerHandler from './handlers/UserProfile';
+import VerificationHandler from './handlers/VerificationReroute';
 import DirectMessage from './handlers/DirectMessage';
 import Messages from './handlers/Messages';
 import WikiPageHandler from './handlers/WikiPage';
@@ -66,6 +67,7 @@ export default [
   ['/r/:subredditName/submit', PostSubmitHandler, { name: PAGE_NAMES.SUBMIT }],
   ['/submit', PostSubmitHandler],
   ['/submit/to_community', PostSubmitCommunityHandler],
+  ['/verification/:token', VerificationHandler],
 
   // actions
   ['/actions/community-goto', CommunityGotoActionHandler],

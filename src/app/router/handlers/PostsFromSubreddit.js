@@ -10,6 +10,7 @@ import { fetchUserBasedData } from './handlerCommon';
 import { convertId, trackPageEvents } from 'lib/eventUtils';
 
 import { setTitle } from 'app/actions/pageMetadata';
+import { beginVerification } from 'app/actions/verification';
 
 // NOTE: we're deprecating the query param `sort` in favor of its url param.
 // You'll find a couple places in this file that fallback to the query param
@@ -46,7 +47,9 @@ export default class PostsFromSubreddit extends BaseHandler {
   async [METHODS.GET](dispatch, getState) {
     const state = getState();
 
-    if (state.platform.shell) { return; }
+    if (state.platform.shell) {
+      return;
+    }
 
     const subredditPostsParams = PostsFromSubreddit.pageParamsToSubredditPostsParams(this);
     const postsListId = paramsToPostsListsId(subredditPostsParams);
@@ -83,6 +86,7 @@ export default class PostsFromSubreddit extends BaseHandler {
 
     dispatch(setStatus(statusCode));
     dispatch(setTitle(this.buildTitle(getState(), subredditName)));
+    dispatch(beginVerification());
 
     const latestState = getState();
     trackPageEvents(latestState, buildAdditionalEventData(latestState));

@@ -1,5 +1,6 @@
 import { BaseHandler, METHODS } from 'platform/router';
-import * as platformActions from 'platform/actions';import ValidationError from 'apiClient/errors/ValidationError';
+import * as platformActions from 'platform/actions';
+import ValidationError from 'apiClient/errors/ValidationError';
 import Session from 'app/models/Session';
 import * as sessionActions from 'app/actions/session';
 import * as loginActions from 'app/actions/login';
@@ -7,8 +8,7 @@ import * as tfaActions from 'app/actions/twoFactorAuthentication';
 import { loginInfo, loginForms } from 'app/constants';
 import { getEventTracker } from 'lib/eventTracker';
 import { getBasePayload, trackPageEvents } from 'lib/eventUtils';
-
-
+import { beginVerification, getVerificationTokenFromState } from 'app/actions/verification';
 
 export default class Login extends BaseHandler {
   async [METHODS.GET](dispatch, getState) {
@@ -22,6 +22,7 @@ export default class Login extends BaseHandler {
 
     try {
       const state = getState();
+      const verificationToken = getVerificationTokenFromState(state);
       const loginForm = state.twoFactorAuthentication && state.twoFactorAuthentication.activeForm;
       const otpInRightForm = loginForm === loginForms.BACKUP_CODE ? `B_${ otp }` : otp;
 
@@ -38,6 +39,9 @@ export default class Login extends BaseHandler {
 
       // This is awaited to guarantee the user is loaded for event logging
       await dispatch(platformActions.redirect(redirectTo));
+      if (verificationToken) {
+        dispatch(beginVerification(verificationToken));
+      }
     } catch (e) {
       successful = false;
       if (e instanceof ValidationError && e.errors && e.errors[0]) {

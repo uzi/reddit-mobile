@@ -19,7 +19,7 @@ import { markBannerClosed } from 'lib/xpromoState';
 import SnooIcon from 'app/components/SnooIcon';
 import LoginInput from 'app/components/LoginRegistrationForm/Input';
 import SquareButton from 'app/components/LoginRegistrationForm/SquareButton';
-
+import { getVerificationTokenFromState } from 'app/actions/verification';
 
 class Login extends React.Component {
   constructor (props) {
@@ -137,9 +137,18 @@ class Login extends React.Component {
   }
 
   renderTitle() {
-    const { activeForm } = this.props;
+    const { activeForm, verificationToken } = this.props;
 
-    if (activeForm === loginForms.AUTH) {
+    if (verificationToken) {
+      return (
+        <div>
+          <SnooIcon />
+          <div className='Login__register-link'>
+            Login to complete verification.
+          </div>
+        </div>
+      );
+    } else if (activeForm === loginForms.AUTH) {
       return (
         <div>
           <SnooIcon />
@@ -181,7 +190,7 @@ class Login extends React.Component {
 
   renderCodeTypeSwitcher() {
     const { activeForm } = this.props;
-    
+
     if (activeForm === loginForms.APP_CODE) {
       return (
         <div className='Login__switch-code-type'>
@@ -323,11 +332,19 @@ const mapStateToProps = createSelector(
   state => state.session,
   state => state.platform,
   state => state.twoFactorAuthentication,
-  (session, platform, twoFactorAuthentication) => {
+  getVerificationTokenFromState,
+  (session, platform, twoFactorAuthentication, verificationToken) => {
     const displayAppPromo = !!platform.currentPage.queryParams['native_app_promo'];
     const nativeAppLink = platform.currentPage.queryParams['native_app_link'];
     const activeForm = twoFactorAuthentication.activeForm;
-    return { session, platform, nativeAppLink, displayAppPromo, activeForm };
+    return {
+      session,
+      platform,
+      nativeAppLink,
+      displayAppPromo,
+      activeForm,
+      verificationToken,
+    };
   },
 );
 

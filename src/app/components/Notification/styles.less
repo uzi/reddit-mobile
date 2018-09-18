@@ -1,0 +1,52 @@
+.Notification.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.Notification {
+  transition: opacity 300ms;
+  opacity: 1;
+  width: 98%;
+  position: fixed;
+  left: 1%;
+  top: 2%;
+  z-index: 99;
+  background-color: white;
+  border: 1px solid black;
+  border-radius: 5px;
+
+  &__close.icon {
+    position: absolute;
+    left: 2%;
+    top: 2%;
+    font-size: 16px;
+    color: black;
+  }
+
+  &__title {
+    font-size: 20px;
+    font-weight: bold;
+    text-align: center;
+    margin-top: 8px;
+    color: rgb(72, 76, 79);
+  }
+
+  &__content {
+    margin-top: 16px;
+    text-align: center;
+    color: rgb(72, 76, 79);
+  }
+
+  &__button {
+    width: 98%;
+    margin-left: 1%;
+    margin-top: 16px;
+    margin-bottom: 1%;
+    font-weight: bold;
+    background-color: #0079D3;
+    color: white;
+    padding: 4px;
+    border-radius: 5px;
+    text-align: center;
+  }
+}
