@@ -24,7 +24,6 @@ import { isCommentsPage } from 'platform/pageUtils';
 import { POST_TYPE } from 'apiClient/models/thingTypes';
 import { isScaledInferenceActive, getMetadata } from '../actions/scaledInference';
 import { SCALED_INFERENCE } from 'app/constants';
-import { FIRST_BIT } from '../constants';
 
 const { DAYMODE } = COLOR_SCHEME;
 const { USUAL, MINIMAL, PERSIST } = XPROMO_DISPLAY_THEMES;
@@ -445,10 +444,7 @@ export function isXPromoBannerEnabled(state) {
   return anyFlagEnabled(state, [XPROMOBANNER]);
 }
 export function isXPromoAdLoadingEnabled(state) {
-  // don't show loading xpromo if slowdown feature is enabled
-  const firstBitFeatureData = getExperimentData(state, FIRST_BIT.EXPERIMENT_NAME);
-
-  return !firstBitFeatureData && anyFlagEnabled(state, XPROMO_AD_LOADING_FLAGS);
+  return anyFlagEnabled(state, XPROMO_AD_LOADING_FLAGS);
 }
 
 function shouldShowXPromo(state) {
