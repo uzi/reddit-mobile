@@ -112,6 +112,7 @@ export class CommentTree extends React.Component {
           }) }
         </div>
         { !post.promoted && this.props.features.enabled(flags.BOTTOM_COMMENT_BANNER) &&
+          post.whitelistStatus === 'all_ads' && post.wls === 6 && !post.over18 &&
           <BannerAd
             id='btf-comments-banner'
             shouldCollapse
@@ -170,6 +171,8 @@ const renderNode = (props, depth, data, isHidden, innerRef, withAd) => {
       ref={ innerRef }
     >
       { withAd && !post.promoted &&
+        post.whitelistStatus === 'all_ads' && post.wls === 6 &&
+        !post.over18 &&
           <BannerAd
             id='mid-comments-banner'
             shouldCollapse

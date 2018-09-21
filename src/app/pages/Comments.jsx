@@ -60,7 +60,8 @@ function CommentsPage(props) {
         subredditShowSpoilers={ spoilersEnabled }
         key='post'
       />
-      { !post.promoted &&
+      { !post.promoted && post.whitelistStatus === 'all_ads' && post.wls === 6 &&
+        !post.over18 &&
         <BannerAd
           a9
           id='atf-comments-banner'
