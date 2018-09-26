@@ -26,6 +26,10 @@ export default (state=DEFAULT, action={}) => {
       return { ...state, history, currentPage: pageData};
     }
 
+    case actions.REWRITE_HISTORY: {
+      return { ...state, history: action.payload.history };
+    }
+
     case actions.SET_PAGE: {
       const historyLen = state.history.length;
       const referrerFromHistory = !isEmpty(state.currentPage) && historyLen > 1

@@ -9,6 +9,7 @@ export const NAVIGATE_TO_URL = 'PLATFORM__NAVIGATE_TO_URL';
 export const SET_SHELL = 'PLATFORM__SET_SHELL';
 export const REDIRECT = 'PLATFORM__REDIRECT';
 export const REROUTE_PAGE = 'PLATFORM__REROUTE_PAGE'; // re-run the handlers for the page
+export const REWRITE_HISTORY = 'PLATFORM__REWRITE_HISTORY';
 
 export const incognitoDetected = () => (
   { type: INCOGNITO_DETECTED }
@@ -18,6 +19,14 @@ export const setPage = (url, { urlParams={}, queryParams={}, hashParams={}, refe
   type: SET_PAGE,
   payload: { url, urlParams, queryParams, hashParams, referrer },
 });
+
+export const filterHistory = (pred) => async (dispatch, getState) => {
+  const history = getState().platform.history.filter(pred);
+  return dispatch({
+    type: REWRITE_HISTORY,
+    payload: { history },
+  });
+};
 
 export const gotoPageIndex = (
   pageIndex,

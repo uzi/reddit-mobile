@@ -19,7 +19,6 @@ import { markBannerClosed } from 'lib/xpromoState';
 import SnooIcon from 'app/components/SnooIcon';
 import LoginInput from 'app/components/LoginRegistrationForm/Input';
 import SquareButton from 'app/components/LoginRegistrationForm/SquareButton';
-import { getVerificationTokenFromState } from 'app/actions/verification';
 
 class Login extends React.Component {
   constructor (props) {
@@ -332,8 +331,8 @@ const mapStateToProps = createSelector(
   state => state.session,
   state => state.platform,
   state => state.twoFactorAuthentication,
-  getVerificationTokenFromState,
-  (session, platform, twoFactorAuthentication, verificationToken) => {
+  (session, platform, twoFactorAuthentication) => {
+    const verificationToken = platform.currentPage.queryParams['verification_token'];
     const displayAppPromo = !!platform.currentPage.queryParams['native_app_promo'];
     const nativeAppLink = platform.currentPage.queryParams['native_app_link'];
     const activeForm = twoFactorAuthentication.activeForm;
