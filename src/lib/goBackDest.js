@@ -2,13 +2,18 @@ import { urlFromPage } from 'platform/pageUtils';
 
 // Returns the url of the last page the user was on that's not in the
 // excludedUrls. For example, when a user closes a modal while jumping between
-// /login and /register should go to neither but back to the original page 
+// /login and /register should go to neither but back to the original page
 // they were on.
+
 export default function goBackDest(platform, excludedUrls) {
   if (platform.currentPageIndex === 0) {
-    return urlFromPage(platform.history[0]) || '/';
+    const current = platform.history[0];
+    const { url } = current;
+    return (excludedUrls && excludedUrls.indexOf(url)) > -1 ? '/' : urlFromPage(current);
   }
+
   let i = platform.currentPageIndex - 1;
+
   if (!excludedUrls || excludedUrls.length === 0) {
     return urlFromPage(platform.history[i]);
   }

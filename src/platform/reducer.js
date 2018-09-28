@@ -27,7 +27,11 @@ export default (state=DEFAULT, action={}) => {
     }
 
     case actions.REWRITE_HISTORY: {
-      return { ...state, history: action.payload.history };
+      const { history } = action.payload;
+      const maxIndex = history.length - 1;
+      const currentPageIndex = Math.min(maxIndex, state.currentPageIndex);
+
+      return { ...state, history: action.payload.history, currentPageIndex };
     }
 
     case actions.SET_PAGE: {
