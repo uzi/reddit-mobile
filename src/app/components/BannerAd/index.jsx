@@ -74,9 +74,7 @@ class BannerAd extends React.Component {
 
   render() {
     const { id, slot, hideAds, withBottomSpacing } = this.props;
-    // Remove this once DFP is back on
-
-    if (true || !slot || hideAds) { // eslint-disable-line
+    if (!slot || hideAds) {
       return null;
     }
 
