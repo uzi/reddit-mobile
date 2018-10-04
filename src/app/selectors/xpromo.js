@@ -2,9 +2,9 @@ import { find, some } from 'lodash';
 import isEmpty from 'lodash/isEmpty';
 
 import {
-  EVERY_DAY,
+  EXPERIMENT_FREQUENCY_VARIANTS,
+  EVERY_WEEK,
   EVERY_TWO_WEEKS,
-  EVERY_TWELVE_WEEKS,
   flags as flagConstants,
   COLOR_SCHEME,
   XPROMO_AD_FEED_TYPES,
@@ -22,8 +22,9 @@ import { isInterstitialDimissed } from 'lib/xpromoState';
 import { trackXPromoIneligibleEvent } from 'lib/eventUtils';
 import { isCommentsPage } from 'platform/pageUtils';
 import { POST_TYPE } from 'apiClient/models/thingTypes';
-import { isScaledInferenceActive, getMetadata } from '../actions/scaledInference';
 import { SCALED_INFERENCE } from 'app/constants';
+import { getXpromoClosingTime } from '../../lib/xpromoState';
+import { userAccountSelector } from 'app/selectors/userAccount';
 
 const { DAYMODE } = COLOR_SCHEME;
 const { USUAL, MINIMAL, PERSIST } = XPROMO_DISPLAY_THEMES;
@@ -74,6 +75,7 @@ const {
 
   // xpromo revamp
   VARIANT_XPROMO_REVAMP,
+  VARIANT_XPROMO_REVAMP_2,
 
 } = flagConstants;
 
@@ -149,6 +151,7 @@ export const EXPERIMENT_NAMES = {
   [VARIANT_NSFW_XPROMO]: 'mweb_nsfw_xpromo',
   [VARIANT_IOS_LINK_TAB]: 'mweb_link_tab',
   [VARIANT_XPROMO_REVAMP]: 'mweb_xpromo_revamp',
+  [VARIANT_XPROMO_REVAMP_2]: 'mweb_xpromo_revamp_v2',
 };
 
 export function isOptOut(state) {
@@ -261,12 +264,6 @@ export function commentsInterstitialEnabled(state) {
  */
 
 export function listingClickEnabled(state, postId) {
-  if (isScaledInferenceActive(state)) {
-    const si = getMetadata(state);
-    return si.variants.xpromo_click === 'D' &&
-           !si.listingClickDismissed;
-  }
-
   const variants = getXPromoVariants(state);
 
   if (!variants[SCALED_INFERENCE.CLICK]) {
@@ -274,6 +271,7 @@ export function listingClickEnabled(state, postId) {
   }
 
   if (!isEligibleListingPage(state) || !isXPromoEnabledOnDevice(state)) {
+    console.log('ineligible');
     return false;
   }
 
@@ -359,19 +357,13 @@ export function isXPromoInFeedEnabled(state) {
  *   current user into one of the xpromo modal listing click experiments
  */
 function eligibleTimeForModalListingClick(state) {
-  const { lastModalClick, modalDismissCount } = state.xpromo.listingClick;
+  const { lastModalClick } = state.xpromo.listingClick;
 
   if (lastModalClick === 0) {
     return true;
   }
 
-  let interval = EVERY_DAY;
-
-  const variant = getExperimentVariant(state, EXPERIMENT_NAMES[XPROMO_MODAL_LISTING_CLICK_DAILY_DISMISSIBLE_THROTTLE]);
-
-  if (variant === 'treatment') {
-    interval = modalDismissCount >= 3 ? EVERY_TWELVE_WEEKS : EVERY_TWO_WEEKS;
-  }
+  const interval = EXPERIMENT_FREQUENCY_VARIANTS[EVERY_TWO_WEEKS];
 
   /*
   GROW-1397 modal_listing_click_daily_dismissible_throttling
@@ -464,62 +456,86 @@ export function XPromoIsActive(state) {
   return isContentLoaded(state) && xpromoIsConfiguredOnPage(state) && state.xpromo.interstitials.showBanner;
 }
 
-const { CLICK, LISTING, POST } = SCALED_INFERENCE;
-const { D, TA, BB, BLB, P } = SCALED_INFERENCE;
+const { CLICK, LISTING, POST, TOPBUTTON } = SCALED_INFERENCE;
+const { SNACKBAR, PILL, CLASSIC } = SCALED_INFERENCE;
 
-// D is the listing click modal
-// TA, BB are the original xpromo banners
-// BLB is the you tube style "snackbar"
-// P is the persistent blue pill
-
-const REVAMP_VARIANTS = {
-  DEFAULT: {
-    [CLICK]: D,
-    [LISTING]: TA,
-    [POST]: BB,
-  },
-
-  treatment_1: {
-    [CLICK]: null,
-    [LISTING]: P,
-    [POST]: P,
-  },
-
-  treatment_2: {
-    [CLICK]: null,
-    [LISTING]: BLB,
-    [POST]: BLB,
-  },
-
-  treatment_3: {
-    [CLICK]: null,
-    [LISTING]: P,
-    [POST]: BB,
-  },
-
-  treatment_4: {
-    [CLICK]: null,
-    [LISTING]: BLB,
-    [POST]: BB,
-  },
-};
-
-export function getScaledInferenceVariant(state) {
-  return getExperimentVariant(state, SCALED_INFERENCE.EXPERIMENT);
-}
+const SPARKLE = 'pulse';
 
 export function getRevampVariant(state) {
-  return getExperimentVariant(state, EXPERIMENT_NAMES[VARIANT_XPROMO_REVAMP]);
+  return getExperimentVariant(state, EXPERIMENT_NAMES[VARIANT_XPROMO_REVAMP_2]);
+}
+
+export function getTopButtonStyle(state) {
+  return getXPromoVariants(state)[TOPBUTTON];
 }
 
 export function getXPromoVariants(state) {
-  const scaledInferenceVariant = getScaledInferenceVariant(state);
-
-  if (scaledInferenceVariant) {
-    return scaledInferenceVariant;
-  }
-
   const revampVariant = getRevampVariant(state);
+  const user = userAccountSelector(state);
+  const isLoggedIn = user && !user.loggedOut;
+  const closingTime = getXpromoClosingTime();
+  const currentTime = Date.now();
 
-  return REVAMP_VARIANTS[revampVariant] || REVAMP_VARIANTS.DEFAULT;
+  const everyWeek = EXPERIMENT_FREQUENCY_VARIANTS[EVERY_WEEK];
+  const isTimeToShowSnackbar = (currentTime - closingTime > everyWeek);
+  const listing_t1 = (isTimeToShowSnackbar && !isLoggedIn) ? SNACKBAR : PILL;
+  const listing_t2 = (isTimeToShowSnackbar) ? SNACKBAR : PILL;
+
+  switch (revampVariant) {
+    case 'treatment_1':
+      return {
+        [CLICK]: null,
+        [LISTING]: listing_t1,
+        [POST]: CLASSIC,
+        [TOPBUTTON]: null,
+      };
+
+    case 'treatment_2':
+      return {
+        [CLICK]: null,
+        [LISTING]: listing_t2,
+        [POST]: CLASSIC,
+        [TOPBUTTON]: null,
+      };
+
+    case 'treatment_3':
+      return {
+        [CLICK]: null,
+        [LISTING]: listing_t1,
+        [POST]: CLASSIC,
+        [TOPBUTTON]: null,
+      };
+
+    case 'treatment_4':
+      return {
+        [CLICK]: true,
+        [LISTING]: listing_t1,
+        [POST]: CLASSIC,
+        [TOPBUTTON]: null,
+      };
+
+    case 'treatment_5':
+      return {
+        [CLICK]: null,
+        [LISTING]: PILL,
+        [POST]: CLASSIC,
+        [TOPBUTTON]: SPARKLE,
+      };
+
+    case 'treatment_6':
+      return {
+        [CLICK]: true,
+        [LISTING]: listing_t1,
+        [POST]: CLASSIC,
+        [TOPBUTTON]: SPARKLE,
+      };
+
+    default:
+      return {
+        [CLICK]: null,
+        [LISTING]: listing_t1,
+        [POST]: CLASSIC,
+        [TOPBUTTON]: null,
+      };
+  }
 }

@@ -17,37 +17,18 @@ import { SCALED_INFERENCE } from '../../constants';
 import { isCurrentContentNSFW } from '../../selectors/platformSelector';
 import { getXPromoVariants } from '../../selectors/xpromo';
 
-const CLASSIC = 'CLASSIC';
-const SNACKBAR = 'SNACKBAR';
-const PILL = 'PILL';
-const NONE = 'NONE';
+const { CLASSIC, SNACKBAR, PILL } = SCALED_INFERENCE;
 
-const DEFAULT_VARIANTS = {
-  [SCALED_INFERENCE.CLICK]: SCALED_INFERENCE.D,
-  [SCALED_INFERENCE.LISTING]: SCALED_INFERENCE.TA,
-  [SCALED_INFERENCE.POST]: SCALED_INFERENCE.BB,
-};
-
-const VARIANT_TO_COMPONENT = {
-  [SCALED_INFERENCE.N]: NONE,
-  [SCALED_INFERENCE.TA]: CLASSIC,
-  [SCALED_INFERENCE.BB]: CLASSIC,
-  [SCALED_INFERENCE.P]: PILL,
-  [SCALED_INFERENCE.BLB]: SNACKBAR,
-};
-
-function renderXPromo (variant, children, isDisplay=false, mixin=false) {
+function renderXPromo (componentName, children, isDisplay=false, mixin=false) {
   if (!isDisplay) { return null; }
 
-  const component = VARIANT_TO_COMPONENT[variant];
-
   // only the original xpromo banner should render the invisible version
-  if (mixin && component !== CLASSIC) {
+  if (mixin && componentName !== CLASSIC) {
     return null;
   }
 
-  switch (component) {
-    case NONE:
+  switch (componentName) {
+    case null:
       return null;
     case CLASSIC:
       return <DualPartInterstitial mixin={ mixin }>{ children }</DualPartInterstitial>;
@@ -64,15 +45,15 @@ class NavFrame extends React.Component {
       children,
       showXPromo,
       isXPromoFixed,
-      variant,
+      xpromoComponentName,
     } = this.props;
 
     // xPromoPadding is an additional hidden DOM element that helps
     // to avoid the situation when a bottom-fixed (CSS rules) banner
     // is overlapping the content at the end of the page.
     const showXPromoPadding = (showXPromo && isXPromoFixed);
-    const xPromoPadding = renderXPromo(variant, children, showXPromoPadding, 'm-invisible');
-    const xPromo = renderXPromo(variant, children, showXPromo);
+    const xPromoPadding = renderXPromo(xpromoComponentName, children, showXPromoPadding, 'm-invisible');
+    const xPromo = renderXPromo(xpromoComponentName, children, showXPromo);
 
     const otherContent = (
       <div>
@@ -106,9 +87,10 @@ function mapStateToProps(state) {
   const isNSFW = isCurrentContentNSFW(state);
   const trigger = pageTypeSelector(state);
   const variants = getXPromoVariants(state);
-  const variant = variants ? variants[trigger] : DEFAULT_VARIANTS[trigger];
+  const xpromoComponentName = variants[trigger];
   const { showXPromo, isXPromoFixed } = xPromoSelector(state);
-  return { showXPromo: showXPromo && !isNSFW, isXPromoFixed, variant };
+
+  return { showXPromo: showXPromo && !isNSFW, isXPromoFixed, xpromoComponentName };
 }
 
 export default connect(mapStateToProps)(NavFrame);

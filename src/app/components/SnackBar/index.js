@@ -12,8 +12,13 @@ import {
   promoDismissed,
 } from 'app/actions/xpromo';
 import { trackXPromoView } from 'lib/eventUtils';
-import { SCALED_INFERENCE } from 'app/constants';
+import { XPROMO_NAMES, SCALED_INFERENCE } from 'app/constants';
 import { setMetadata, reportOutcome } from 'app/actions/scaledInference';
+
+const HEADER_COPY = 'Open in the official Reddit app';
+const BODY_COPY = 'Fastest way to browse and packed with exclusive features like Chat and News.';
+const NO_COPY = 'NO';
+const YES_COPY = 'CONTINUE';
 
 class SnackBar extends React.Component {
   constructor() {
@@ -28,7 +33,12 @@ class SnackBar extends React.Component {
   }
 
   render() {
-    const { href, reportOutcome, logAppStoreNavigation } = this.props;
+    const {
+      href,
+      reportOutcome,
+      logAppStoreNavigation,
+      listingClickModalIsActive,
+    } = this.props;
 
     const dismiss = () => {
       this.props.promoDismissed('snackbar');
@@ -50,22 +60,32 @@ class SnackBar extends React.Component {
       navigateToAppStore(href);
     };
 
-    const {
-      dismissed,
-    } = this.state;
+    const dismissed = this.state.dismissed || listingClickModalIsActive;
 
     // inverted snack bar styles for contrast
     const nightmode = !this.props.nightmode;
 
     return (
-      <div className={ cx('SnackBar', { dismissed }, { nightmode }) }>
+      <div className={ cx('SnackBar', 'amp', { dismissed }, { nightmode }) }>
         <div className={ 'SnackBar__header' }>
           <SnooIcon />
-          <span className="SnackBar__text">Get the Reddit app!</span>
+          <span className="SnackBar__text">{ HEADER_COPY }</span>
+        </div>
+        <div className={ 'SnackBar__body' }>
+          { BODY_COPY }
         </div>
         <div className="SnackBar__buttons">
-          <a className="SnackBar__yes SnackBar__button" href={ this.props.href } onClick={ accept }>LET'S GO</a>
-          <div className="SnackBar__no SnackBar__button" onClick={ dismiss }>NO THANKS</div>
+          <div
+            className="SnackBar__no SnackBar__button"
+            onClick={ dismiss }>
+            { NO_COPY }
+          </div>
+          <a
+            className="SnackBar__yes SnackBar__button"
+            href={ this.props.href }
+            onClick={ accept }>
+            { YES_COPY }
+          </a>
         </div>
       </div>
     );
@@ -74,12 +94,16 @@ class SnackBar extends React.Component {
 
 const mapStateToProps = (state) => {
   const href = getBranchLink(state, state.platform.currentPage.url, {
-    tags: [SCALED_INFERENCE.SNACKBAR],
-    utm_content: [SCALED_INFERENCE.SNACKBAR],
-  }, SCALED_INFERENCE.SNACKBAR);
+    tags: [XPROMO_NAMES[SCALED_INFERENCE.SNACKBAR]],
+    utm_content: XPROMO_NAMES[SCALED_INFERENCE.SNACKBAR],
+  }, XPROMO_NAMES[SCALED_INFERENCE.SNACKBAR]);
+
+  const listingClickModalIsActive = state.xpromo.listingClick.active;
+
   return {
     href,
     nightmode: state.theme === 'nightmode',
+    listingClickModalIsActive,
   };
 };
 

@@ -14,7 +14,7 @@ import {
 } from 'app/actions/xpromo';
 
 import { trackXPromoView } from 'lib/eventUtils';
-import { SCALED_INFERENCE } from 'app/constants';
+import { SCALED_INFERENCE, XPROMO_NAMES } from 'app/constants';
 import { setMetadata, reportOutcome } from '../../actions/scaledInference';
 
 class XPromoPill extends React.Component {
@@ -67,15 +67,15 @@ class XPromoPill extends React.Component {
 }
 
 const SCALED_INFERENCE_PARAMS = {
-  tags: [SCALED_INFERENCE.PILL],
-  utm_content: SCALED_INFERENCE.PILL,
+  tags: [XPROMO_NAMES[SCALED_INFERENCE.PILL]],
+  utm_content: XPROMO_NAMES[SCALED_INFERENCE.PILL],
 };
 
 const PORN_PARAMS = {
   campaign: 'nsfw_xpromo',
   utm_source: 'nsfw_xpromo',
-  tags: [SCALED_INFERENCE.PILL],
-  utm_content: SCALED_INFERENCE.PILL,
+  tags: [XPROMO_NAMES[SCALED_INFERENCE.PILL]],
+  utm_content: XPROMO_NAMES[SCALED_INFERENCE.PILL],
 };
 
 const mapStateToProps = (state, ownProps) => {

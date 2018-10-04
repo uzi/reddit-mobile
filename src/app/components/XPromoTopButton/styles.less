@@ -15,3 +15,16 @@
 .TopButton:link, .Topbutton:visited, .TopButton:hover, .TopButton:active {
   text-decoration: none;
 }
+
+.TopButton.pulse {
+  animation: pulse 150s infinite ease-in-out;
+}
+
+// the animation doesn't run 99% of the time so that pulse effect only plays every three minutes
+@keyframes pulse {
+  0% { transform: scale(1); }
+  0.3% { transform: scale(0.9); }
+  0.5% { transform: scale(1.1); }
+  0.7% { transform: scale(0.9); }
+  1% { transform: scale(1); }
+}

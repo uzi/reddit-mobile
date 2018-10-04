@@ -1,0 +1,98 @@
+.XPromoPopup {
+  &__overlay {
+    top: 0;
+    left: 0;
+    background-color: black;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    opacity: 0;
+    transition: opacity 500ms;
+    pointer-events: none;
+  }
+
+  &__content {
+    background-color: white;
+    position: fixed;
+    z-index: 0;
+    height: 152px;
+    width: 100%;
+    left: 0;
+    bottom: -200px;
+    transition: bottom 500ms;
+    pointer-events: none;
+  }
+
+  &__header {
+    font-size: 18px;
+    font-weight: 600;
+    color: #121213;
+    text-align: center;
+    padding-top: 12px;
+    padding-bottom: 12px;
+    border-bottom: solid 1px #ddd;
+  }
+
+  &__actions {
+    padding: 16px;
+    vertical-align: top;
+  }
+
+  &__action {
+    display: block;
+    position: relative;
+    height: 42px;
+  }
+
+  &__actionTitle {
+    position: absolute;
+    left: 42px;
+    color: #787C7E;
+    font-size: 16px;
+    line-height: 32px;
+  }
+
+  &__actionButton {
+    position: absolute;
+    font-weight: 600;
+    top: 0;
+    right: 0;
+    line-height: 32px;
+    text-align: center;
+    color: #0079D3;
+    height: 32px;
+    width: 102px;
+    border-radius: 5px;
+    border: 1px solid #0079D3;
+  }
+}
+
+.active {
+  .XPromoPopup__overlay {
+    z-index: 30;
+    opacity: 0.5;
+    pointer-events: all;
+  }
+
+  .XPromoPopup__content {
+    z-index: 31;
+    bottom: 0;
+    pointer-events: all;
+  }
+
+  .SnooIcon {
+    width: 32px;
+    height: 32px;
+  }
+}
+
+.XPromoPopup__safari {
+  width: 32px;
+  height: 32px;
+}
+
+.XPromoPopup__chrome {
+  width: 32px;
+  height: 32px;
+}

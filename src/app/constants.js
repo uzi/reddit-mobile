@@ -206,6 +206,7 @@ export const flags = {
 
   // xpromo revamp
   VARIANT_XPROMO_REVAMP: 'mwebXpromoRevamp',
+  VARIANT_XPROMO_REVAMP_2: 'mwebXpromoRevamp2',
 };
 
 // Now we have 2 different types of XPromo
@@ -339,24 +340,23 @@ export const SCALED_INFERENCE = {
   CLICK: 'xpromo_click',
 
   // components
-  TOPBUTTON: 'topbutton',
-  TRANSPARENT: 'transparent',
-  PILL: 'pill',
-  SNACKBAR: 'snackbar',
-  MODAL_LISTING_CLICK: 'modal_listing_click',
-
-  // variants
-  P: 'P',     // pill
-  D: 'D',     // legacy xpromo (click)
-  BB: 'BB',   // legacy xpromo (post)
-  TA: 'TA',   // legacy xpromo (listing)
-  BLB: 'BLB', // snackbar
-  N: 'N',
+  TOPBUTTON: 'TOPBUTTON', // the use app button on the top nav
+  PILL: 'PILL',           // persistent blue pill at bottom of screen
+  SNACKBAR: 'SNACKBAR',   // medium sized non-modal dismissible container
+  NATIVE: 'NATIVE',       // modal popup that slides up from bottom of screen
+  CLASSIC: 'CLASSIC',     // old-school xpromo
 
   // outcomes
   VIEW: 'view',
   DISMISS: 'dismiss',
   ACCEPT: 'accept',
+};
+
+export const XPROMO_NAMES = {
+  [SCALED_INFERENCE.TOP_BUTTON]: 'topbutton',
+  [SCALED_INFERENCE.SNACKBAR]: 'snackbar',
+  [SCALED_INFERENCE.PILL]: 'pill',
+  [SCALED_INFERENCE.NATIVE]: 'app_selector_modal',
 };
 
 export const SCALED_INFERENCE_BRANCH_PARAMS = {
@@ -369,8 +369,8 @@ export const SCALED_INFERENCE_BRANCH_PARAMS = {
 };
 
 export const REVAMP_BRANCH_PARAMS = {
-  campaign: 'mweb_xpromo_revamp',
-  utm_name: 'mweb_xpromo_revamp',
+  campaign: 'mweb_xpromo_revamp_v2',
+  utm_name: 'mweb_xpromo_revamp_v2',
   channel: 'xpromo',
   utm_source: 'xpromo',
   feature: 'mweb',

@@ -10,7 +10,7 @@ import NSFWInterstitial from 'app/components/NSFWInterstitial';
 import SortAndTimeSelector from 'app/components/SortAndTimeSelector';
 import SubNav from 'app/components/SubNav';
 import Tutorial from 'app/components/Tutorial';
-import XPromoListingClickModal from 'app/components/XPromoListingClickModal';
+import XPromoPopup from 'app/components/XPromoPopup';
 import XPromoPill from 'app/components/XPromoPill';
 import { SORTS } from 'app/sortValues';
 
@@ -148,7 +148,7 @@ export const PostsFromSubredditPage = connect(mapStateToProps, mapDispatchToProp
           subredditShowSpoilers={ !!subreddit && subreddit.spoilersEnabled }
           />
       }
-      <XPromoListingClickModal />
+      <XPromoPopup />
       { subreddit && subreddit.over18 && <XPromoPill url={ subreddit && subreddit.url }/> }
     </div>
   );

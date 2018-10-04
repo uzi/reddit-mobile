@@ -11,6 +11,7 @@ import getXpromoTheme from 'lib/xpromoTheme';
 import AppButton from 'app/components/DualPartInterstitial/AppButton';
 import BulletList from 'app/components/DualPartInterstitial/Footer/BulletList';
 import DismissLink from 'app/components/DualPartInterstitial/Footer/DismissLink';
+import { getRevampVariant } from '../../../selectors/xpromo';
 
 class DualPartInterstitialFooter extends React.Component {
   buttonProps() {
@@ -23,9 +24,11 @@ class DualPartInterstitialFooter extends React.Component {
   }
 
   subtitleText() {
-    const { subredditNamePrefixed } = this.props;
+    const { subredditNamePrefixed, variant } = this.props;
     const pageName = subredditNamePrefixed ? subredditNamePrefixed : 'Reddit';
-    return `View ${ pageName } in the app because you deserve the best.`;
+    return variant === 'treatment_3' ?
+      `View ${ pageName } in the official Reddit app for the best experience.` :
+      `View ${ pageName } in the app because you deserve the best.`;
   }
 
   render() {
@@ -51,6 +54,7 @@ class DualPartInterstitialFooter extends React.Component {
 const selector = createStructuredSelector({
   xpromoTheme: state => xpromoTheme(state),
   subredditNamePrefixed: getSubredditNamePrefixed,
+  variant: state => getRevampVariant(state),
 });
 
 export default connect(selector)(DualPartInterstitialFooter);

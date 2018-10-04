@@ -16,7 +16,6 @@ import {
   loginRequiredEnabled,
   getExperimentRange,
   isXPromoPersistent,
-  getScaledInferenceVariant,
   getRevampVariant,
 } from 'app/selectors/xpromo';
 
@@ -32,8 +31,8 @@ import {
 import extractTaglist from 'lib/extractTagList';
 import {
   SCALED_INFERENCE,
-  SCALED_INFERENCE_BRANCH_PARAMS,
   REVAMP_BRANCH_PARAMS,
+  XPROMO_NAMES,
 } from '../app/constants';
 import { pageTypeSelector } from 'app/selectors/platformSelector';
 import { isOptOut } from '../app/selectors/xpromo';
@@ -94,8 +93,8 @@ export function getXPromoListingClickLink(state, postId, listingClickType) {
 
   return getXPromoLink(state, path, XPROMO_MODAL_LISTING_CLICK_NAME, {
     listing_click_type: listingClickType,
-    utm_content: SCALED_INFERENCE.MODAL_LISTING_CLICK,
-    tags: [SCALED_INFERENCE.MODAL_LISTING_CLICK],
+    utm_content: XPROMO_NAMES[SCALED_INFERENCE.NATIVE],
+    tags: [XPROMO_NAMES[SCALED_INFERENCE.NATIVE]],
   });
 }
 
@@ -144,7 +143,7 @@ function getXPromoLink(state, path, linkType, additionalData={}) {
   return getBranchLink(state, path, payload);
 }
 
-function getXpromoClosingTime(state, localStorageKey=BANNER_LAST_CLOSED) {
+export function getXpromoClosingTime(state, localStorageKey=BANNER_LAST_CLOSED) {
   if (localStorageAvailable()) {
     const lastClosedStr = localStorage.getItem(localStorageKey);
     return (lastClosedStr ? new Date(lastClosedStr).getTime() : 0);
@@ -154,10 +153,6 @@ function getXpromoClosingTime(state, localStorageKey=BANNER_LAST_CLOSED) {
 
 function getXpromoClosingRange(state, presetRange) {
   return FREQUENCIES[(presetRange || getExperimentRange(state) || EVERY_TWO_WEEKS)];
-}
-
-function getXpromoClosingLimit(state) {
-  return getXpromoClosingTime(state)+getXpromoClosingRange(state);
 }
 
 export function isInterstitialDimissed(state) {
@@ -201,10 +196,8 @@ export function getBranchLink(state, path, _payload={}) {
     userId = userAccount.id;
   }
 
-  const scaledInferenceVariant = getScaledInferenceVariant(state);
-  const isRevamp = !scaledInferenceVariant;
-  const variant = isRevamp ? getRevampVariant(state) : scaledInferenceVariant;
-  const baseParams = isRevamp ? REVAMP_BRANCH_PARAMS : SCALED_INFERENCE_BRANCH_PARAMS;
+  const variant = getRevampVariant(state);
+  const baseParams = REVAMP_BRANCH_PARAMS;
 
 
   const basePayload = {
@@ -248,44 +241,15 @@ export function getBranchLink(state, path, _payload={}) {
   return link;
 }
 
-/**
- * @TODO: These functions should refactored:
- * - shouldNotShowBanner
- * - shouldNotListingClick
- */
+/*
+
+The logic for choosing xpromo components is now increasingly
+specific to the particular variant being tested, so this function
+now only checks if the user selected permanent opt out
+*/
+
 export function shouldNotShowBanner(state) {
-  if (isOptOut(state)) {
-    return true;
-  }
-
-  const scaledInferenceVariant = getScaledInferenceVariant(state);
-  const xpromoRevampVariant = getRevampVariant(state);
-
-  // when the xpromoRevampVariant is active we want to show
-  // the xpromo (the blue pill at the time of writing) once per
-  // session, so we ignore 2 week interval for those cases
-
-  if (!scaledInferenceVariant) {
-    switch (xpromoRevampVariant) {
-      case 'treatment_1':
-      case 'treatment_3':
-        return false;
-    }
-  }
-
-  // Do not show the banner:
-  // If localStorage is not available
-  if (!localStorageAvailable()) {
-    return 'local_storage_unavailable';
-  }
-  // Do not show the banner:
-  // If closing date is in limit range still
-
-  if (getXpromoClosingLimit(state) > Date.now()) {
-    return 'dismissed_previously';
-  }
-  // Show the banner
-  return false;
+  return (isOptOut(state));
 }
 
 export function listingClickInitialState() {
