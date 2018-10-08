@@ -33,14 +33,9 @@ import {
 } from 'app/selectors/xpromo';
 import { setListingClickTarget } from '../../actions/xpromo';
 
-import { trackLinkTabExperiment } from 'lib/eventUtils';
-import { getExperimentVariant } from 'lib/experiments';
-import { EXPERIMENT_NAMES } from 'app/selectors/xpromo';
-
 const {
   VARIANT_TITLE_EXPANDO,
   VARIANT_MIXED_VIEW,
-  VARIANT_IOS_LINK_TAB,
 } = flags;
 
 const noExpandoPostTypes = new Set(['link', 'self', '']);
@@ -75,8 +70,6 @@ Post.propTypes = {
   onReportPost: T.func.isRequired,
   onToggleModal: T.func.isRequired,
   onPostClick: T.func,
-  trackLinkTabExperiment: T.func,
-  linkTabExperiment: T.string,
 };
 
 Post.defaultProps = {
@@ -94,8 +87,6 @@ Post.defaultProps = {
   onUpdatePostPlaytime: () => {},
   onToggleModal: () => {},
   onPostClick: () => {},
-  trackLinkTabExperiment: () => {},
-  linkTabExperiment: false,
 };
 
 Post.contextTypes = {
@@ -112,7 +103,7 @@ export function Post(props, context) {
   const renderMediaFullbleed = postShouldRenderMediaFullbleed(props.post);
   const forceHTTPS = shouldForceHTTPS({ https: true });
   const isAndroid = userAgent && /android/i.test(userAgent);
-  const showLinksInNewTab = externalDomain && (isAndroid || props.linkTabExperiment === 'treatment_1');
+  const showLinksInNewTab = externalDomain && isAndroid;
   const showNSFW = props.subredditIsNSFW || props.unblurred;
 
   // Spoilers differ from NSFW in that if a subreddit disables spoilers
@@ -169,10 +160,6 @@ export function Post(props, context) {
   const isSubredditModerator = includes(moderatingSubreddits.names, post.subreddit.toLowerCase());
   // Bind a new copy of interceptListingClick that uses `redux.getState` to check eligilibility
   const interceptListingClick = (e, listingClickType) => {
-    if (!isAndroid) {
-      props.trackLinkTabExperiment();
-    }
-
     const checkEligibility = postId => {
       if (single) {
         return false; // don't listing click on comments pages
@@ -326,7 +313,6 @@ const selector = createSelector(
   (state, props) => state.playingPosts[removePrefix(props.postId)],
   state => state.moderatingSubreddits,
   (state, props) => state.reports[props.postId],
-  (state) => getExperimentVariant(state, EXPERIMENT_NAMES[VARIANT_IOS_LINK_TAB]),
   (
     user,
     postId,
@@ -341,7 +327,6 @@ const selector = createSelector(
     isPlaying,
     moderatingSubreddits,
     reports,
-    linkTabExperiment,
   ) => {
     const editing = !!editingState;
     const editPending = editing && editingState.pending;
@@ -360,13 +345,11 @@ const selector = createSelector(
       isPlaying,
       moderatingSubreddits,
       reports,
-      linkTabExperiment,
     };
   }
 );
 
 const mapDispatchToProps = (dispatch, { postId }) => ({
-  trackLinkTabExperiment: () => dispatch(async (_, getState) => { trackLinkTabExperiment(getState()); }),
   toggleExpanded: (clickTarget) => dispatch(postActions.toggleExpandPost(postId, clickTarget)),
   toggleShowNSFW: () => dispatch(postActions.toggleNSFWBlur(postId)),
   onToggleEdit: () => dispatch(postActions.toggleEdit(postId)),
