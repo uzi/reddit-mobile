@@ -353,7 +353,7 @@ export const SCALED_INFERENCE = {
 };
 
 export const XPROMO_NAMES = {
-  [SCALED_INFERENCE.TOP_BUTTON]: 'topbutton',
+  [SCALED_INFERENCE.TOPBUTTON]: 'topbutton',
   [SCALED_INFERENCE.SNACKBAR]: 'snackbar',
   [SCALED_INFERENCE.PILL]: 'pill',
   [SCALED_INFERENCE.NATIVE]: 'app_selector_modal',
