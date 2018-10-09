@@ -533,7 +533,7 @@ export function getXPromoVariants(state) {
     default:
       return {
         [CLICK]: null,
-        [LISTING]: listing_t1,
+        [LISTING]: PILL,
         [POST]: CLASSIC,
         [TOPBUTTON]: null,
       };
