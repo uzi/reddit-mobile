@@ -28,6 +28,9 @@ export const WIKI_TYPE = 'wiki';
 export const SUBREDDIT_RULE = 'subreddit_rule';
 export const SUBREDDIT_RULE_TYPE = 'subreddit_rule';
 
+export const SITEWIDE_RULE = 'sitewide_rule';
+export const SITEWIDE_RULE_TYPE = 'sitewide_rule';
+
 const type_pairs = [
   [COMMENT, COMMENT_TYPE],
   [ACCOUNT, ACCOUNT_TYPE],
@@ -37,6 +40,7 @@ const type_pairs = [
   [TROPHIE, TROPHIE_TYPE],
   [PROMOCAMPAIGN, PROMOCAMPAIGN_TYPE],
   [WIKI, WIKI_TYPE],
+  [SITEWIDE_RULE, SITEWIDE_RULE_TYPE],
   [SUBREDDIT_RULE, SUBREDDIT_RULE_TYPE],
 ];
 

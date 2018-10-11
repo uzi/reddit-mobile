@@ -1,11 +1,13 @@
 import { apiOptionsFromState } from 'lib/apiOptionsFromState';
 import * as subredditRulesActions from 'app/actions/subredditRules';
+import * as sitewideRulesActions from 'app/actions/sitewideRules';
 import modelFromThingId from 'app/reducers/helpers/modelFromThingId';
 
 import apiRequest from 'apiClient/apiBase/apiRequest';
 import ResponseError from 'apiClient/errors/ResponseError';
-import * as ModelTypes from 'apiClient/models/thingTypes';
+import SitewideRule from 'apiClient/models/SitewideRule';
 import SubredditRule from 'apiClient/models/SubredditRule';
+import * as ModelTypes from 'apiClient/models/thingTypes';
 
 import includes from 'lodash/includes';
 
@@ -53,6 +55,11 @@ export const report = thingId => async (dispatch, getState) => {
     const fetchRules = subredditRulesActions.fetchSubredditRules(props.subredditName);
     await fetchRules(dispatch, getState);
   }
+
+  if (!state.sitewideRules || !state.sitewideRules.length) {
+    const fetchRules = sitewideRulesActions.fetchSitewideRules();
+    await fetchRules(dispatch, getState);
+  }
 };
 
 
@@ -88,7 +95,7 @@ export const submit = report => async (dispatch, getState) => {
     // The actual report text is sent as a different key depending on the type
     // of report.  If we add "other" as an option, it would be sent as
     // `other_reason`.
-    if (report.ruleName === SubredditRule.SITE_RULE_KEYWORD) {
+    if (report.ruleName === SitewideRule.SITEWIDE_RULE_KEYWORD) {
       body.site_reason = report.reason;
     } else {
       body.rule_reason = report.reason;

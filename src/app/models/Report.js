@@ -1,3 +1,5 @@
+import SitewideRule from 'apiClient/models/SitewideRule';
+
 /**
  * Represents a user report.
  * A report is generally tied to a subreddit rule, though it may also
@@ -21,10 +23,21 @@ export default class Report {
    * Create a Report instance for the given thingId and SubredditRule
    * @function
    * @param {string} thingId
+   * @param {SitewideRule} rule The SubredditRule being violated
+   * @returns {Report}
+   */
+  static fromSitewideRule(thingId, rule) {
+    return new Report(thingId, SitewideRule.SITEWIDE_RULE_KEYWORD, rule.reasonText);
+  }
+
+  /**
+   * Create a Report instance for the given thingId and SubredditRule
+   * @function
+   * @param {string} thingId
    * @param {SubredditRule} rule The SubredditRule being violated
    * @returns {Report}
    */
-  static fromRule(thingId, rule) {
+  static fromSubredditRule(thingId, rule) {
     return new Report(thingId, rule.shortName, rule.violationReason);
   }
 }

@@ -1,5 +1,3 @@
-import SubredditRule from 'apiClient/models/SubredditRule';
-
 /**
  * Helper to get subreddit rules from state.
  * @param {Object} state 
@@ -29,13 +27,4 @@ export function getSubredditRulesFromState(state, subredditName, thingType) {
   }
 
   return rules.filter(rule => rule.doesRuleApplyToThingType(thingType));
-}
-
-/**
- * Helper to get site-wide rules from state.
- * @param {Object} state 
- * @returns {?SubredditRule[]} Returns null if the rules do not exist in state.
- */
-export function getSiteRulesFromState(state) {
-  return state.subredditRules[SubredditRule.SITE_RULE_SUBREDDIT_NAME] || null;
 }

@@ -8,6 +8,7 @@ import {
   ACCOUNT,
   POST,
   MESSAGE,
+  SITEWIDE_RULE,
   SUBREDDIT,
   SUBREDDIT_RULE,
   WIKI,
@@ -23,6 +24,7 @@ export class APIResponseBase {
     this.comments = {};
     this.accounts = {};
     this.messages = {};
+    this.sitewide_rules = {};
     this.subreddits = {};
     this.subreddit_rules = {};
     this.wikis = {};
@@ -36,6 +38,7 @@ export class APIResponseBase {
       [POST]: this.posts,
       [ACCOUNT]: this.accounts,
       [MESSAGE]: this.messages,
+      [SITEWIDE_RULE]: this.sitewide_rules,
       [SUBREDDIT]: this.subreddits,
       [SUBREDDIT_RULE]: this.subreddit_rules,
       [WIKI]: this.wikis,

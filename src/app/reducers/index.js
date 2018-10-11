@@ -44,6 +44,8 @@ import scaledInference from './scaledInference';
 import scrollPositions from './scrollPositions';
 import sharing from './sharing';
 import subredditRequests from './subredditRequests';
+import sitewideRules from './sitewideRules';
+import sitewideRulesRequests from './sitewideRulesRequests';
 import subredditRules from './subredditRules';
 import subredditRulesRequests from './subredditRulesRequests';
 import subreddits from './subreddits';
@@ -108,6 +110,8 @@ export default {
   sessionTracker,
   scrollPositions,
   sharing,
+  sitewideRules,
+  sitewideRulesRequests,
   subredditRules,
   subredditRulesRequests,
   subreddits,

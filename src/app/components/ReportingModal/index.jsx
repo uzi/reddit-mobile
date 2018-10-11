@@ -4,39 +4,32 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
 
+import SitewideRule from 'apiClient/models/SitewideRule';
+import SubredditRule from 'apiClient/models/SubredditRule';
 import * as ModelTypes from 'apiClient/models/thingTypes';
 
 import * as modalActions from 'app/actions/modal';
 import * as reportingActions from 'app/actions/reporting';
 import Loading from 'app/components/Loading';
 import Report from 'app/models/Report';
-import {
-  getSiteRulesFromState,
-  getSubredditRulesFromState,
-} from 'lib/subredditRules';
+import { getSitewideRulesFromState } from 'lib/sitewideRules';
+import { getSubredditRulesFromState } from 'lib/subredditRules';
 
 import cx from 'lib/classNames';
 
 const T = React.PropTypes;
 
 /**
- * Get a list of rules that apply to the thing currently being reported.
+ * Get a list of subreddit rules that apply to the thing currently being reported.
  * @function
  * @param {Object} state
  * @returns {SubredditRule[]}
  */
-function rulesFromState(state) {
-  const {subredditName, thingId} = state.modal.props;
+function subredditRulesFromState(state) {
+  const { subredditName, thingId } = state.modal.props;
   const thingType = ModelTypes.thingType(thingId);
 
-  const siteRules = getSiteRulesFromState(state);
-  const subredditRules = getSubredditRulesFromState(state, subredditName, thingType);
-  
-  if (!subredditRules) {
-    return siteRules;
-  }
-
-  return subredditRules.concat(siteRules);
+  return getSubredditRulesFromState(state, subredditName, thingType);
 }
 
 /**
@@ -47,78 +40,260 @@ function rulesFromState(state) {
  * @extends {React.Component}
  */
 class ReportingModal extends React.Component {
+  // sequenceOfParentRules: the sequence of rule indexes
+  // that led us to the current rules page
+  // indexOfChosenChildRule: the index of the rule that is
+  // chosen on the current rules page
   state = {
-    selectedRuleIndex: 0,
+    sequenceOfParentRules: [],
+    indexOfChosenChildRule: null,
+    fileAComplaintPage: false,
   }
 
   static propTypes = {
+    onCloseReportFlow: T.func.isRequired,
     onSubmit: T.func.isRequired,
+    sitewideRules: T.arrayOf(SitewideRule),
     subredditName: T.string,
-    rules: T.arrayOf(T.object),
+    subredditRules: T.arrayOf(SubredditRule),
     thingId: T.string,
   };
 
+  handlerBack = this.handleBack.bind(this);
+  handlerNextOrSubmit = this.handleNextOrSubmit.bind(this);
+
   render() {
+    const {
+      onCloseReportFlow,
+      sitewideRules,
+    } = this.props;
+
+    const {
+      fileAComplaintPage,
+      indexOfChosenChildRule,
+      sequenceOfParentRules,
+    } = this.state;
+
+    const showReportFlow = !!sitewideRules.length;
+    const rulesChosen = indexOfChosenChildRule !== null;
+    const isFirstPage = !sequenceOfParentRules.length;
+
     return (
-      <div className='ReportingModalWrapper' onClick={ this.props.onClickOutside }>
-        <div className='ReportingModal'>
+      <div className='ReportingModalWrapper' onClick={ onCloseReportFlow }>
+        <div className='ReportingModal' onClick={ this.stopPropagationOfClick }>
 
           <div className='ReportingModal__title-bar'>
             <div className='ReportingModal__close' />
             <div className='ReportingModal__title'>
-              Report
+              { this.getCurrentHeader() }
             </div>
           </div>
 
-          { this.props.rules
-            ? <div className='ReportingModal__options'>
-                { this.props.rules.map((r, i) => this.renderReportRow(r, i)) }
+          { fileAComplaintPage
+            ? (
+              <div>
+                <div className='ReportingModal__file-prompt'>
+                  { this.getCurrentRules()[indexOfChosenChildRule].complaintPrompt }
+                </div>
+                <div className='ReportingModal__file-complaint-button'>
+                  <a href={ this.getCurrentRules()[indexOfChosenChildRule].complaintUrl }
+                     target='_blank'>
+                    FILE A COMPLAINT
+                  </a>
+                </div>
               </div>
-            : <Loading />
+            )
+            : showReportFlow
+              ? (
+                <div className='ReportingModal__options'>
+                  { this.getCurrentRules().map((r, i) => this.renderReportRow(r, i)) }
+                </div>
+              ) : <Loading />
           }
 
-          <div className='ReportingModal__submit'>
-            <div
-              className='ReportingModal__submit-button'
-              onClick={ () => this.handleSubmit() }
-            >
-              REPORT TO MODERATORS
-            </div>
-          </div>
-
+          { fileAComplaintPage
+            ? (
+              <div className='ReportingModal__submit'>
+                <div
+                  className={ cx('ReportingModal__submit-button', {
+                    disabled: true,
+                  }) }
+                >
+                  REPORT
+                </div>
+                <div
+                  className='ReportingModal__back-button'
+                  onClick={ onCloseReportFlow }
+                >
+                  CLOSE
+                </div>
+              </div>
+            )
+            : showReportFlow
+              ? (
+                <div className='ReportingModal__submit'>
+                  <div
+                    className={ cx('ReportingModal__submit-button', {
+                      disabled: !rulesChosen,
+                    }) }
+                    onClick={ rulesChosen ? this.handlerNextOrSubmit : this.stopPropagationOfClick }
+                  >
+                    { rulesChosen
+                      && !(this.getCurrentRules()[indexOfChosenChildRule].nextStepReasons
+                          && this.getCurrentRules()[indexOfChosenChildRule].nextStepReasons.length)
+                        ? 'REPORT'
+                        : 'NEXT'
+                    }
+                  </div>
+                  <div
+                    className='ReportingModal__back-button'
+                    onClick={ isFirstPage ? onCloseReportFlow : this.handlerBack }
+                  >
+                    { isFirstPage ? 'CLOSE' : 'BACK' }
+                  </div>
+                </div>
+              ) : null
+          }
         </div>
       </div>
     );
   }
 
-  handleSubmit() {
+  getAllRules() {
     const {
+      sitewideRules,
+      subredditName,
+      subredditRules,
+    } = this.props;
+
+    const allRules = sitewideRules.slice();
+    const reasonTextToShow = `It breaks r/${subredditName}'s rules`;
+
+    if (subredditRules && subredditRules.length) {
+      const subredditRulesReason = {
+        nextStepHeader: 'Which rule does it break?',
+        nextStepReasons: subredditRules,
+        reasonTextToShow,
+        getReportReasonToShow: () => { return reasonTextToShow; },
+      };
+      allRules.splice(2, 0, subredditRulesReason);
+    }
+
+    return allRules;
+  }
+
+  getCurrentRules() {
+    const {
+      sequenceOfParentRules,
+    } = this.state;
+
+    let currentRules = this.getAllRules();
+    sequenceOfParentRules.forEach(function(indexOfRule) {
+      currentRules = currentRules[indexOfRule].nextStepReasons;
+    });
+
+    return currentRules;
+  }
+
+  getCurrentHeader() {
+    const {
+      fileAComplaintPage,
+      sequenceOfParentRules,
+    } = this.state;
+
+    if (fileAComplaintPage) {
+      return 'File a complaint?';
+    }
+
+    if (!sequenceOfParentRules.length) {
+      return 'We\'re sorry something\'s wrong. How can we help?';
+    }
+
+    let rules = this.getAllRules();
+    let parentRule;
+    sequenceOfParentRules.forEach(function(indexOfRule) {
+      parentRule = rules[indexOfRule];
+      rules = rules[indexOfRule].nextStepReasons;
+    });
+
+    return parentRule.nextStepHeader;
+  }
+
+  onUpdateIndexOfChosenRule(indexOfRule) {
+    this.setState({
+      indexOfChosenChildRule: indexOfRule,
+    });
+  }
+
+  onAddToSequenceOfParentRules(indexOfRule) {
+    const newSequence = this.state.sequenceOfParentRules.slice();
+    newSequence.push(indexOfRule);
+    this.setState({
+      sequenceOfParentRules: newSequence,
+      indexOfChosenChildRule: null,
+    });
+  }
+
+  handleNextOrSubmit(e) {
+    e.stopPropagation();
+
+    const {
+      onCloseReportFlow,
       onSubmit,
-      rules,
       thingId,
     } = this.props;
 
-    const violatedRule = rules[this.state.selectedRuleIndex];
-    const report = Report.fromRule(thingId, violatedRule);
-    onSubmit(report);
+    const {
+      indexOfChosenChildRule,
+    } = this.state;
+
+    const violatedRule = this.getCurrentRules()[indexOfChosenChildRule];
+
+    if (violatedRule.fileComplaint) {
+      this.setState({
+        fileAComplaintPage: true,
+      });
+      return;
+    }
+
+    if (violatedRule.nextStepReasons && violatedRule.nextStepReasons.length) {
+      this.onAddToSequenceOfParentRules(indexOfChosenChildRule);
+    } else {
+      let report;
+      if (violatedRule instanceof SitewideRule) {
+        report = Report.fromSitewideRule(thingId, violatedRule);
+      } else {
+        report = Report.fromSubredditRule(thingId, violatedRule);
+      }
+      onSubmit(report);
+      onCloseReportFlow();
+    }
+  }
+
+  handleBack(e) {
+    e.stopPropagation();
+
+    const newSequence = this.state.sequenceOfParentRules.slice();
+    newSequence.pop();
+    this.setState({
+      sequenceOfParentRules: newSequence,
+      indexOfChosenChildRule: null,
+    });
   }
 
   renderReportRow(rule, selectedRuleIndex) {
     const onClick = e => {
       e.stopPropagation();
-      this.setState({ selectedRuleIndex });
+      this.onUpdateIndexOfChosenRule(selectedRuleIndex);
     };
-    const isChecked = this.state.selectedRuleIndex === selectedRuleIndex;
+    const isChecked = this.state.indexOfChosenChildRule === selectedRuleIndex;
 
     const className = cx('icon', {
       'icon-check-circled': isChecked,
       'icon-circle': !isChecked,
     });
 
-    let displayText = rule.getReportReason();
-    if (rule.isSiteRule()) {
-      displayText = `Reddit rule: ${displayText}`;
-    }
+    const displayText = rule.getReportReasonToShow();
 
     return (
       <div className='ReportingModal__option' onClick={ onClick } >
@@ -129,21 +304,27 @@ class ReportingModal extends React.Component {
       </div>
     );
   }
+
+  stopPropagationOfClick(e) {
+    e.stopPropagation();
+  }
 }
 
 const selector = createSelector(
   state => state.modal.props.thingId,
+  state => getSitewideRulesFromState(state),
   state => state.modal.props.subredditName,
-  state => rulesFromState(state),
-  (thingId, subredditName, rules) => ({
+  state => subredditRulesFromState(state),
+  (thingId, sitewideRules, subredditName, subredditRules) => ({
     thingId,
+    sitewideRules,
     subredditName,
-    rules,
+    subredditRules,
   }),
 );
 
 const dispatcher = dispatch => ({
-  onClickOutside: () => dispatch(modalActions.closeModal()),
+  onCloseReportFlow: () => dispatch(modalActions.closeModal()),
   onSubmit: report => dispatch(reportingActions.submit(report)),
 });
 

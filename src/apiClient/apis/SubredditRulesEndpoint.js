@@ -26,7 +26,7 @@ export default {
     };
 
     const apiResponse = await apiRequest(apiOptions, 'GET', path, { query });
-    const { rules, site_rules } = apiResponse.response.body;
+    const { rules } = apiResponse.response.body;
 
     if (rules) {
       rules.forEach(rule => {
@@ -35,12 +35,6 @@ export default {
         // not actually returned from the API, though, so add it now.
         rule.subredditName = subredditName;
         apiResponse.addResult(SubredditRule.fromJSON(rule));
-      });
-    }
-
-    if (site_rules) {
-      site_rules.forEach(rule => {
-        apiResponse.addResult(SubredditRule.fromSiteRule(rule));
       });
     }
 

@@ -45,12 +45,9 @@ export const fetchSubredditRules = subredditName => async (dispatch, getState) =
 
   try {
     const res = await SubredditRulesEndpoint.get(apiOptions, subredditName);
-    const allRules = res.results.map(r => res.getModelFromRecord(r));
+    const subredditRules = res.results.map(r => res.getModelFromRecord(r));
 
-    const subredditRules = allRules.filter(r => !r.isSiteRule());
-    const siteRules = allRules.filter(r => r.isSiteRule());
-
-    dispatch(received(subredditName, subredditRules, siteRules));
+    dispatch(received(subredditName, subredditRules));
   } catch (e) {
     if (e instanceof ResponseError) {
       dispatch(failed(subredditName, e));
