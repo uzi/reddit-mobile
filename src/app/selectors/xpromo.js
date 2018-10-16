@@ -16,7 +16,7 @@ import {
 
 import features, { isNSFWPage } from 'app/featureFlags';
 import getRouteMetaFromState from 'lib/getRouteMetaFromState';
-import { getExperimentData, getExperimentVariant } from 'lib/experiments';
+import { getExperimentData } from 'lib/experiments';
 import { getDevice, IPHONE, ANDROID } from 'lib/getDeviceFromState';
 import { isInterstitialDimissed } from 'lib/xpromoState';
 import { trackXPromoIneligibleEvent } from 'lib/eventUtils';
@@ -461,8 +461,9 @@ const { SNACKBAR, PILL, CLASSIC } = SCALED_INFERENCE;
 
 const SPARKLE = 'pulse';
 
-export function getRevampVariant(state) {
-  return getExperimentVariant(state, EXPERIMENT_NAMES[VARIANT_XPROMO_REVAMP_2]);
+// hardcoding variant
+export function getRevampVariant() {
+  return 'treatment_6';
 }
 
 export function getTopButtonStyle(state) {
@@ -470,7 +471,6 @@ export function getTopButtonStyle(state) {
 }
 
 export function getXPromoVariants(state) {
-  const revampVariant = getRevampVariant(state);
   const user = userAccountSelector(state);
   const isLoggedIn = user && !user.loggedOut;
   const closingTime = getXpromoClosingTime();
@@ -478,64 +478,12 @@ export function getXPromoVariants(state) {
 
   const everyWeek = EXPERIMENT_FREQUENCY_VARIANTS[EVERY_WEEK];
   const isTimeToShowSnackbar = (currentTime - closingTime > everyWeek);
-  const listing_t1 = (isTimeToShowSnackbar && !isLoggedIn) ? SNACKBAR : PILL;
-  const listing_t2 = (isTimeToShowSnackbar) ? SNACKBAR : PILL;
+  const listingComponentType = (isTimeToShowSnackbar && !isLoggedIn) ? SNACKBAR : PILL;
 
-  switch (revampVariant) {
-    case 'treatment_1':
-      return {
-        [CLICK]: null,
-        [LISTING]: listing_t1,
-        [POST]: CLASSIC,
-        [TOPBUTTON]: null,
-      };
-
-    case 'treatment_2':
-      return {
-        [CLICK]: null,
-        [LISTING]: listing_t2,
-        [POST]: CLASSIC,
-        [TOPBUTTON]: null,
-      };
-
-    case 'treatment_3':
-      return {
-        [CLICK]: null,
-        [LISTING]: listing_t1,
-        [POST]: CLASSIC,
-        [TOPBUTTON]: null,
-      };
-
-    case 'treatment_4':
-      return {
-        [CLICK]: true,
-        [LISTING]: listing_t1,
-        [POST]: CLASSIC,
-        [TOPBUTTON]: null,
-      };
-
-    case 'treatment_5':
-      return {
-        [CLICK]: null,
-        [LISTING]: PILL,
-        [POST]: CLASSIC,
-        [TOPBUTTON]: SPARKLE,
-      };
-
-    case 'treatment_6':
-      return {
-        [CLICK]: true,
-        [LISTING]: listing_t1,
-        [POST]: CLASSIC,
-        [TOPBUTTON]: SPARKLE,
-      };
-
-    default:
-      return {
-        [CLICK]: null,
-        [LISTING]: PILL,
-        [POST]: CLASSIC,
-        [TOPBUTTON]: null,
-      };
-  }
+  return {
+    [CLICK]: true,
+    [LISTING]: listingComponentType,
+    [POST]: CLASSIC,
+    [TOPBUTTON]: SPARKLE,
+  };
 }

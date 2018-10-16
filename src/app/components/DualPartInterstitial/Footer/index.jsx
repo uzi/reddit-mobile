@@ -24,11 +24,9 @@ class DualPartInterstitialFooter extends React.Component {
   }
 
   subtitleText() {
-    const { subredditNamePrefixed, variant } = this.props;
+    const { subredditNamePrefixed } = this.props;
     const pageName = subredditNamePrefixed ? subredditNamePrefixed : 'Reddit';
-    return variant === 'treatment_3' ?
-      `View ${ pageName } in the official Reddit app for the best experience.` :
-      `View ${ pageName } in the app because you deserve the best.`;
+    return `View ${ pageName } in the official Reddit app for the best experience.`;
   }
 
   render() {
