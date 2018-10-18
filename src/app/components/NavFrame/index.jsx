@@ -33,7 +33,7 @@ function renderXPromo (componentName, children, isDisplay=false, mixin=false) {
     case CLASSIC:
       return <DualPartInterstitial mixin={ mixin }>{ children }</DualPartInterstitial>;
     case PILL:
-      return <XPromoPill active={ true } scaledInference={ true }/>;
+      return <XPromoPill active={ true } />;
     case SNACKBAR:
       return <SnackBar/>;
   }

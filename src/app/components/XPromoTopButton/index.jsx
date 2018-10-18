@@ -4,7 +4,6 @@ import cx from 'lib/classNames';
 import { connect } from 'react-redux';
 import { getTopButtonStyle } from 'app/selectors/xpromo';
 import { getBranchLink } from 'lib/xpromoState';
-import { reportOutcome } from 'app/actions/scaledInference';
 import { SCALED_INFERENCE, XPROMO_NAMES } from 'app/constants';
 import { isOptOut } from 'app/selectors/xpromo';
 
@@ -21,10 +20,6 @@ const mapStateToProps = state => {
   };
 };
 
-const mapDispatchToProps = {
-  reportOutcome,
-};
-
 const DisconnectedTopButton = props => {
   const { link, style, isOptOut } = props;
 
@@ -35,4 +30,4 @@ const DisconnectedTopButton = props => {
   );
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(DisconnectedTopButton);
+export default connect(mapStateToProps)(DisconnectedTopButton);
