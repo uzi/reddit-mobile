@@ -40,7 +40,6 @@ import searchRequests from './searchRequests';
 import session from './session';
 import sessionRefresing from './sessionRefreshing';
 import sessionTracker from './sessionTracker';
-import scaledInference from './scaledInference';
 import scrollPositions from './scrollPositions';
 import sharing from './sharing';
 import subredditRequests from './subredditRequests';
@@ -103,7 +102,6 @@ export default {
   reports,
   rulesModal,
   savedRequests,
-  scaledInference,
   searchRequests,
   session,
   sessionRefresing,
