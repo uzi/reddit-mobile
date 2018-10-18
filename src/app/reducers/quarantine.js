@@ -10,9 +10,11 @@
  * user has already opted into, you should do so through the normal subreddit
  * model.
  */
-import { NAVIGATE_TO_URL } from 'platform/actions';
 import { RECEIVED_SUBREDDIT } from 'app/actions/subreddits';
-import { RECEIVED_QUARANTINE_INTERSTITIAL } from 'app/actions/quarantine';
+import {
+  RECEIVED_QUARANTINE_INTERSTITIAL,
+  OPTED_OUT_OF_QUARANTINE,
+} from 'app/actions/quarantine';
 
 export const DEFAULT = {};
 
@@ -26,7 +28,7 @@ export default (state=DEFAULT, action={}) => {
       };
     }
 
-    case NAVIGATE_TO_URL:
+    case OPTED_OUT_OF_QUARANTINE:
     case RECEIVED_SUBREDDIT: {
       // We only ever really need to keep track of one subreddit's state here
       // so instead of deleting when we want to clear state, we might as well

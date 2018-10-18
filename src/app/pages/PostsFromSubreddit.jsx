@@ -7,6 +7,7 @@ import LoadingXpromo from 'app/components/LoadingXpromo';
 import { SuspensionBanner } from 'app/components/SuspensionBanner';
 import PostsList from 'app/components/PostsList';
 import NSFWInterstitial from 'app/components/NSFWInterstitial';
+import QuarantineBanner from 'app/components/QuarantineBanner';
 import SortAndTimeSelector from 'app/components/SortAndTimeSelector';
 import SubNav from 'app/components/SubNav';
 import Tutorial from 'app/components/Tutorial';
@@ -141,6 +142,13 @@ export const PostsFromSubredditPage = connect(mapStateToProps, mapDispatchToProp
   return (
     <div className={ className }>
       { !forFakeSubreddit ? <CommunityHeader subredditName={ subredditName } /> : null }
+      { subreddit && subreddit.quarantine
+        ? <QuarantineBanner
+            quarantineMessageHTML={ subreddit.quarantineMessageHTML }
+            subredditName={ subredditName }
+          />
+        : null
+      }
       { showSubnav ? renderSubNav(subnavLink, showBestSort) : null }
       { accountSuspended || accountFPRed ? <SuspensionBanner isFPR={ accountFPRed } /> : null }
       { shouldShowTutorial
