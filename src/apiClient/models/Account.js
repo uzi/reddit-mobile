@@ -20,6 +20,7 @@ export default class Account extends RedditModel {
     inBeta: T.bool,
     inboxCount: T.number,
     isEmployee: T.bool,
+    isFPR: T.bool,
     isGold: T.bool,
     isMod: T.bool,
     isSuspended: T.bool,
@@ -40,6 +41,7 @@ export default class Account extends RedditModel {
   static API_ALIASES = {
     comment_karma: 'commentKarma',
     created_utc: 'createdUTC',
+    force_password_reset: 'isFPR',
     gold_creddits: 'goldCreddits',
     gold_expiration: 'goldExpiration',
     has_mail: 'hasMail',

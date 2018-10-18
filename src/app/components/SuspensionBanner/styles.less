@@ -1,27 +1,27 @@
 @import (reference) '~app/less/variables';
 
 .SuspensionBanner {
-  display: block;
+  display: flex;
+  text-decoration: none !important;
 
-  &__icon.icon.icon-law{
-    position: absolute;
-    width: 60px;
+  &__icon.icon.icon-law {
+    flex: 0 1 60px;
     text-align: center;
-    display: inline-block;
-    vertical-align: middle;
-    height: 60px;
-    line-height: 60px;
     color: white;
-    background-color: @red;    
+    background-color: @red;
+
+    &:before {
+      position: relative;
+      top: 35%;
+    }
   }
 
   &__text {
+    flex: 1;
     line-height: 20px;
-    margin-left: 60px;
     padding: 10px;
     color: white;
     background-color: @nsfw-salmon;
-    height: 60px;
     font-size: 16px;
   }
 }

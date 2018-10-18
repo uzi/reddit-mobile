@@ -4,7 +4,7 @@ import { createSelector } from 'reselect';
 
 import CommunityHeader from 'app/components/CommunityHeader';
 import LoadingXpromo from 'app/components/LoadingXpromo';
-import SuspensionBanner from 'app/components/SuspensionBanner';
+import { SuspensionBanner } from 'app/components/SuspensionBanner';
 import PostsList from 'app/components/PostsList';
 import NSFWInterstitial from 'app/components/NSFWInterstitial';
 import SortAndTimeSelector from 'app/components/SortAndTimeSelector';
@@ -102,7 +102,11 @@ export const PostsFromSubredditPage = connect(mapStateToProps, mapDispatchToProp
     href: `/r/${subredditName}/about`,
     text: 'About this community',
   };
-  const accountSuspended = accounts[username] && accounts[username].isSuspended;
+
+  const account = accounts[username];
+  const accountSuspended = account && account.isSuspended;
+  const accountFPRed = account && account.isFPR;
+
   const isLoggedIn = user && !user.loggedOut;
   const showBestSort = (isLoggedIn
     && isHomePage(currentPage.urlParams.subredditName, currentPage.urlParams.pageName)
@@ -138,7 +142,7 @@ export const PostsFromSubredditPage = connect(mapStateToProps, mapDispatchToProp
     <div className={ className }>
       { !forFakeSubreddit ? <CommunityHeader subredditName={ subredditName } /> : null }
       { showSubnav ? renderSubNav(subnavLink, showBestSort) : null }
-      { accountSuspended ? <SuspensionBanner /> : null }
+      { accountSuspended || accountFPRed ? <SuspensionBanner isFPR={ accountFPRed } /> : null }
       { shouldShowTutorial
         ? <Tutorial />
         : <PostsList
