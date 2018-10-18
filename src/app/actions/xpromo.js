@@ -1,24 +1,16 @@
 import { XPROMO_MODAL_LISTING_CLICK_NAME } from 'app/constants';
 
 import {
-  getXPromoListingClickLink,
-  markBannerClosed,
   markListingClickTimestampLocalStorage,
   setModalDismissCountLocalStorage,
   shouldNotShowBanner,
   listingClickInitialState as getListingClickInitialState,
-  isXPromoPersistentEnabled,
 } from 'lib/xpromoState';
 
 import {
-  XPROMO_APP_STORE_VISIT,
   XPROMO_DISMISS,
   XPROMO_VIEW,
 } from 'lib/eventUtils';
-
-import * as scaledInferenceActions from './scaledInference';
-
-import { SCALED_INFERENCE } from 'app/constants';
 
 export const SHOW = 'XPROMO__SHOW';
 export const show = () => ({ type: SHOW });
