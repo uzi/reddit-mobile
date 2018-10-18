@@ -1,0 +1,24 @@
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "baseUrl": ".",
+        "moduleResolution": "node",
+        "paths": {
+          "apiClient": ["./src/apiClient"],
+          "apiClient/*": ["./src/apiClient/*"],
+          "app": ["./src/app"],
+          "app/*": ["./src/app/*"],
+          "lib/*": ["./src/lib/*"],
+          "platform": ["./src/platform"],
+          "platform/*": ["./src/platform/*"],
+          "server": ["./src/server"],
+          "server/*": ["./src/server/*"]
+        },
+        "jsx": "preserve"
+    },
+    "exclude": [
+      "node_modules",
+      "build",
+      "bin"
+    ]
+}
