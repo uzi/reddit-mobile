@@ -1,7 +1,10 @@
 import { apiOptionsFromState } from 'lib/apiOptionsFromState';
 import isFakeSubreddit from 'lib/isFakeSubreddit';
+import { isErrorFromQuarantine } from 'lib/quarantine';
 import SubredditEndpoint from 'apiClient/apis/SubredditEndpoint';
 import ResponseError from 'apiClient/errors/ResponseError';
+
+import { receivedQuarantineInterstitial } from 'app/actions/quarantine';
 
 export const FETCHING_SUBREDDIT = 'FETCHING_SUBREDDIT';
 export const fetching = name => ({
@@ -40,7 +43,11 @@ export const fetchSubreddit = (name) => async (dispatch, getState) => {
     dispatch(received(name, model));
   } catch (e) {
     if (e instanceof ResponseError) {
-      dispatch(failed(name, e));
+      if (isErrorFromQuarantine(e)) {
+        dispatch(receivedQuarantineInterstitial(name, e.response.body.quarantine_message_html));
+      } else {
+        dispatch(failed(name, e));
+      }
     } else {
       throw e;
     }

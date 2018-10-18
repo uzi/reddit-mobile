@@ -6,6 +6,7 @@ import PostsFromSubredditHandler from './handlers/PostsFromSubreddit';
 import LiveRedirectHandler from './handlers/LiveRedirect';
 import Login from './handlers/Login';
 import Register from './handlers/Register';
+import OptIntoQuarantineHandler from './handlers/OptIntoQuarantineHandler';
 import OverlayMenuCompactToggleHandler from './handlers/OverlayMenuCompactToggle';
 import OverlayMenuThemeToggleHandler from './handlers/OverlayMenuThemeToggle';
 import SavedAndHiddenHandler from './handlers/SavedAndHidden';
@@ -74,6 +75,7 @@ export default [
   ['/actions/overlay-compact-toggle', OverlayMenuCompactToggleHandler],
   ['/actions/overlay-theme-toggle', OverlayMenuThemeToggleHandler],
   ['/actions/setOver18', SetOver18Handler],
+  ['/actions/optIntoQuarantine', OptIntoQuarantineHandler],
   ['/actions/toggle-subreddit-subscription', ToggleSubredditSubscriptionHandler],
 
   // reroutes

@@ -29,6 +29,7 @@ import posts from './posts';
 import postsLists from './postsLists';
 import preferences from './preferences';
 import preferencesRequest from './preferencesRequest';
+import quarantine from './quarantine';
 import recentSubreddits from './recentSubreddits';
 import recommendedSubreddits from './recommendedSubreddits';
 import replying from './replying';
@@ -95,6 +96,7 @@ export default {
   postsLists,
   preferences,
   preferencesRequest,
+  quarantine,
   replying,
   replyRequests,
   recentSubreddits,

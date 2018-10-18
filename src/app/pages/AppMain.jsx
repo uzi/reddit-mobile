@@ -24,6 +24,7 @@ import ModalSwitch from 'app/components/ModalSwitch';
 import Place from 'app/components/Place';
 import PostSubmitCommunityModal from 'app/components/PostSubmitCommunityModal';
 import PostSubmitModal from 'app/components/PostSubmitModal';
+import QuarantineInterstitial from 'app/components/QuarantineInterstitial';
 import Register from 'app/components/Register';
 import Toaster from 'app/components/Toaster';
 import CTA from 'app/components/Share/CTA';
@@ -37,13 +38,19 @@ const selector = createSelector(
   state => !!state.widgets.tooltip.id,
   state => state.posting.showCaptcha,
   state => !!state.modal.type,
+  state => state.quarantine,
   (
     currentPage,
     isToasterOpen,
     isTooltipOpen,
     isCaptchaOpen,
     isModalOpen,
+    quarantine,
   ) => {
+    const { subredditName } = currentPage.urlParams;
+    const normalizedName = subredditName ? subredditName.toLowerCase() : '';
+    const isQuarantine = normalizedName in quarantine;
+    const quarantineMessage = isQuarantine ? quarantine[normalizedName] : '';
     return {
       isModalOpen,
       isToasterOpen,
@@ -51,6 +58,9 @@ const selector = createSelector(
       url: currentPage.url,
       referrer: currentPage.referrer,
       statusCode: currentPage.status,
+      subredditName,
+      isQuarantine,
+      quarantineMessage,
     };
   }
 );
@@ -83,7 +93,23 @@ const AppMain = props => {
     isToasterOpen,
     isModalOpen,
     showDropdownCover,
+    subredditName,
+    isQuarantine,
+    quarantineMessage,
   } = props;
+
+  if (isQuarantine) {
+    return (
+      <div className='AppMainPage'>
+        <NavFrame>
+          <QuarantineInterstitial
+            subredditName={ subredditName }
+            quarantineMessage={ quarantineMessage }
+          />
+        </NavFrame>
+      </div>
+    );
+  }
 
   if (statusCode !== 200) {
     return (

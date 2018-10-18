@@ -1,7 +1,9 @@
 import { apiOptionsFromState } from 'lib/apiOptionsFromState';
-import { paramsToPostsListsId } from 'app/models/PostsList';
-
+import { isErrorFromQuarantine } from 'lib/quarantine';
 import PostsEndpoint from 'apiClient/apis/PostsEndpoint';
+
+import { receivedQuarantineInterstitial } from 'app/actions/quarantine';
+import { paramsToPostsListsId } from 'app/models/PostsList';
 
 export const FETCHING_POSTS_LIST = 'FETCHING_POSTS_LIST';
 export const fetching = (postsListId, postsParams) => ({
@@ -38,6 +40,11 @@ export const fetchPostsFromSubreddit = postsParams => async (dispatch, getState)
     const apiResponse = await PostsEndpoint.get(apiOptions, postsParams);
     dispatch(received(postsListId, apiResponse));
   } catch (e) {
-    dispatch(failed(postsListId, e));
+    if (isErrorFromQuarantine(e)) {
+      const { subredditName } = postsParams;
+      dispatch(receivedQuarantineInterstitial(subredditName, e.response.body.quarantine_message_html));
+    } else {
+      dispatch(failed(postsListId, e));
+    }
   }
 };
