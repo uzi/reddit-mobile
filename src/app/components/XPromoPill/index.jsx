@@ -6,16 +6,13 @@ import { getBranchLink } from 'lib/xpromoState';
 import { connect } from 'react-redux';
 import cx from 'lib/classNames';
 import {
-  logAppStoreNavigation,
-  navigateToAppStore,
-  promoClicked,
   promoDismissed,
   hide,
 } from 'app/actions/xpromo';
 
 import { trackXPromoView } from 'lib/eventUtils';
 import { SCALED_INFERENCE, XPROMO_NAMES } from 'app/constants';
-import { setMetadata, reportOutcome } from '../../actions/scaledInference';
+
 
 class XPromoPill extends React.Component {
   constructor() {
@@ -31,31 +28,18 @@ class XPromoPill extends React.Component {
 
   render() {
     const { dismissed } = this.state;
-    const { href, promoClicked, promoDismissed, logAppStoreNavigation, setMetadata, reportOutcome } = this.props;
+    const { href } = this.props;
 
     const dismiss = (e) => {
       this.setState({ dismissed: true });
-      promoDismissed(SCALED_INFERENCE.PILL);
       e.stopPropagation();
       e.preventDefault();
       return false;
     };
 
-    const accept = async (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      setMetadata({ bannerDismissed: true });
-      promoClicked('pill');
-      const outcomePromise = reportOutcome('accept');
-      const logAppStorePromise = logAppStoreNavigation('shazam', { interstitial_type: 'pill' });
-      return Promise.all([outcomePromise, logAppStorePromise]).then(() => {
-        navigateToAppStore(href);
-      });
-    };
-
     return (
       <div className={ cx('XPromoPill', { dismissed }) } href={ href }>
-        <span onClick={ accept }>OPEN REDDIT APP</span>
+        <a href={ href }>OPEN REDDIT APP</a>
         <img
           className="XPromoPill__close"
           src={ `${config.assetPath}/img/close-circle-x.png` }
@@ -66,34 +50,21 @@ class XPromoPill extends React.Component {
   }
 }
 
-const SCALED_INFERENCE_PARAMS = {
+const PARAMS = {
   tags: [XPROMO_NAMES[SCALED_INFERENCE.PILL]],
   utm_content: XPROMO_NAMES[SCALED_INFERENCE.PILL],
 };
 
-const PORN_PARAMS = {
-  campaign: 'nsfw_xpromo',
-  utm_source: 'nsfw_xpromo',
-  tags: [XPROMO_NAMES[SCALED_INFERENCE.PILL]],
-  utm_content: XPROMO_NAMES[SCALED_INFERENCE.PILL],
-};
-
-const mapStateToProps = (state, ownProps) => {
-  const params = ownProps.scaledInference ? SCALED_INFERENCE_PARAMS : PORN_PARAMS;
-
-  const href = getBranchLink(state, state.platform.currentPage.url, params);
+const mapStateToProps = (state) => {
+  const href = getBranchLink(state, state.platform.currentPage.url, PARAMS);
   return { href };
 };
 
 const mapDispatchToProps = {
-  reportOutcome,
-  setMetadata,
-  promoClicked,
   promoDismissed: () => async (dispatch) => {
     dispatch(hide());
     dispatch(promoDismissed());
   },
-  logAppStoreNavigation,
   trackXPromoView: () => async (_, getState) => {
     return trackXPromoView(getState(), { interstitial_type: SCALED_INFERENCE.PILL });
   },

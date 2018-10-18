@@ -6,9 +6,6 @@ import SnooIcon from 'app/components/SnooIcon';
 import { getBranchLink } from 'lib/xpromoState';
 import {
   hide,
-  logAppStoreNavigation,
-  navigateToAppStore,
-  promoClicked,
   promoDismissed,
 } from 'app/actions/xpromo';
 import { trackXPromoView } from 'lib/eventUtils';
@@ -35,8 +32,6 @@ class SnackBar extends React.Component {
   render() {
     const {
       href,
-      reportOutcome,
-      logAppStoreNavigation,
       listingClickModalIsActive,
     } = this.props;
 
@@ -45,19 +40,6 @@ class SnackBar extends React.Component {
       this.setState({
         dismissed: true,
       });
-    };
-
-    const accept = async (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      setMetadata({ bannerDismissed: true });
-      this.props.promoClicked('snackbar');
-      const extraData = { interstitial_type: 'snackbar' };
-      const outcomePromise = reportOutcome('accept');
-      const logAppStorePromise = logAppStoreNavigation(null, extraData);
-      await outcomePromise;
-      await logAppStorePromise;
-      navigateToAppStore(href);
     };
 
     const dismissed = this.state.dismissed || listingClickModalIsActive;
@@ -82,8 +64,8 @@ class SnackBar extends React.Component {
           </div>
           <a
             className="SnackBar__yes SnackBar__button"
-            href={ this.props.href }
-            onClick={ accept }>
+            href={ href }
+          >
             { YES_COPY }
           </a>
         </div>
@@ -108,12 +90,10 @@ const mapStateToProps = (state) => {
 };
 
 const mapDispatchToProps = {
-  promoClicked,
   promoDismissed: () => async (dispatch) => {
     dispatch(hide());
     dispatch(promoDismissed());
   },
-  logAppStoreNavigation,
   setMetadata,
   reportOutcome,
   trackXPromoView: () => async (_, getState) => {

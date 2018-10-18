@@ -4,27 +4,28 @@ import cx from 'lib/classNames';
 import { connect } from 'react-redux';
 import config from 'config';
 import SnooIcon from 'app/components/SnooIcon';
-
+import { getXPromoLinkforCurrentPage } from 'lib/xpromoState';
 import {
-  listingClickModalAppStoreClicked,
   listingClickModalDismissClicked,
 } from 'app/actions/xpromo';
+import { XPROMO_NAMES, SCALED_INFERENCE } from 'app/constants';
+
 
 const { assetPath } = config;
 
 const dispatcher = dispatch => ({
-  onGotoAppStore: () => dispatch(listingClickModalAppStoreClicked()),
   onDismiss: () => dispatch(listingClickModalDismissClicked()),
 });
 
 function mapStateToProps (state) {
   const { active } = state.xpromo.listingClick;
-  return { active };
+  const link = getXPromoLinkforCurrentPage(state, XPROMO_NAMES[SCALED_INFERENCE.NATIVE]);
+  return { active, link };
 }
 
 class XPromoPopup extends React.Component {
   render() {
-    const { active, onDismiss, onGotoAppStore } = this.props;
+    const { link, active, onDismiss } = this.props;
     const className = cx('XPromoPopup', { active });
 
     const ua = (window.navigator && window.navigator.userAgent.toLowerCase()) || '';
@@ -60,7 +61,7 @@ class XPromoPopup extends React.Component {
             <div className="XPromoPopup__action">
               <SnooIcon />
               <span className="XPromoPopup__actionTitle">Reddit App</span>
-              <span onClick={ onGotoAppStore } className="XPromoPopup__actionButton">OPEN</span>
+              <a href={ link } className="XPromoPopup__actionButton">OPEN</a>
             </div>
             <div className="XPromoPopup__action">
               <img src={ `${continueIconURL}` } className={ continueIconClassName } />
