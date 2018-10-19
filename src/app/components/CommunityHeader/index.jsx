@@ -100,8 +100,15 @@ const CommunityHeader = props => {
     return <Loading />;
   }
 
+  const canShowSubscribers = !subreddit.quarantine || subreddit.quarantine_allow_subscriber_count;
+
+  let subscribers = null;
+  if (canShowSubscribers) {
+    subscribers = <span>{ `${formatNumber(subreddit.subscribers)} subscribers` }</span>;
+  }
+
   let onlineCount;
-  if (subreddit.accountsActive) {
+  if (canShowSubscribers && subreddit.accountsActive) {
     onlineCount = ` ${UTF8Circle} ${formatNumber(subreddit.accountsActive)} online`;
   }
 
@@ -117,7 +124,7 @@ const CommunityHeader = props => {
         </h4>
       </div>
       <div className='CommunityHeader-text-row'>
-        <span>{ `${formatNumber(subreddit.subscribers)} subscribers` }</span>
+        { subscribers }
         { onlineCount }
         <SubredditSubscribeForm
           subredditName={ subreddit.uuid }
