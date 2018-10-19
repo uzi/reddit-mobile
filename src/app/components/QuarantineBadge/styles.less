@@ -1,0 +1,19 @@
+@import (reference) '~app/less/variables';
+
+.QuarantineBadge {
+  background-color: @alert-warning-color;
+  border-radius: 2px;
+  color: @alert-warning-text;
+  display: inline-block;
+  font-size: 11px;
+  margin: 0 @half-grid-size;
+  padding: 0 @half-grid-size;
+
+  &:first-child {
+    margin-left: 0;
+  }
+
+  &:last-child {
+    margin-right: 0;
+  }
+}

@@ -9,6 +9,7 @@ import { getStatusBy, getApprovalStatus, sumReportsCount } from 'lib/modToolHelp
 import PostModel from 'apiClient/models/PostModel';
 
 import { LISTING_CLICK_TYPES } from 'app/constants';
+import QUARANTINE_BADGE from 'app/components/QuarantineBadge';
 
 import {
   isPostNSFW,
@@ -87,6 +88,7 @@ PostHeader.propTypes = {
   showLinksInNewTab: T.bool.isRequired,
   onElementClick: T.func.isRequired,
   titleOpensExpando: T.bool.isRequired,
+  userActivityPage: T.bool,
 };
 
 function postTextColorClass(distinguished) {
@@ -187,7 +189,7 @@ function renderAuthorAndTimeStamp(post, interceptListingClick, single, hideWhen,
   );
 }
 
-function renderPostFlair(post, single) {
+function renderPostFlair(post, single, userActivityPage) {
   const isNSFW = isPostNSFW(post);
 
   const {
@@ -196,16 +198,19 @@ function renderPostFlair(post, single) {
     gilded,
     promoted,
     spoiler,
+    quarantine,
   } = post;
 
+  const showQuarantined = quarantine && userActivityPage;
   const showingGilded = gilded && single;
 
-  if (!(stickied || showingGilded || distinguished === 'admin' || isNSFW || promoted || spoiler)) {
+  if (!(stickied || showingGilded || distinguished === 'admin' || isNSFW || promoted || spoiler || showQuarantined)) {
     return null;
   }
 
   return (
     <span>
+      { showQuarantined ? QUARANTINE_BADGE : null }
       { stickied ? STICKY_FLAIR : null }
       { showingGilded ? GILDED_FLAIR : null }
       { showingGilded && gilded !== 1 ? gilded : null }
@@ -289,13 +294,14 @@ function renderPostDescriptor(
   hideWhen,
   isPromotedUserPost,
   reports,
+  userActivityPage,
 ) {
   const {
     subredditDetail,
     subreddit,
   } = post;
 
-  const postFlairOrNil = renderPostFlair(post, single);
+  const postFlairOrNil = renderPostFlair(post, single, userActivityPage);
   const subredditLabelOrNil = subredditLabelIfNeeded(subredditDetail, subreddit,
     hideSubredditLabel, interceptListingClick);
 
@@ -487,6 +493,7 @@ export default function PostHeader(props) {
     onTapExpand,
     isSubredditModerator,
     reports,
+    userActivityPage,
   } = props;
 
   const showSourceLink = showingLink && !renderMediaFullbleed && !post.promoted;
@@ -521,6 +528,7 @@ export default function PostHeader(props) {
           hideWhen,
           isPromotedUserPost,
           reports,
+          userActivityPage,
         )
       }
       { renderPostTitleLink(post, interceptListingClick, showLinksInNewTab,

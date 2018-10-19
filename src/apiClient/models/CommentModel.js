@@ -36,6 +36,7 @@ export default class CommentModel extends RedditModel {
     approved: T.bool,
     spam: T.bool,
     depth: T.number,
+    quarantine: T.bool,
 
     // aliases
     approvedBy: T.string,

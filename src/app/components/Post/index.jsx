@@ -267,6 +267,7 @@ export function Post(props, context) {
           isSubredditModerator={ isSubredditModerator }
           reports={ reports }
           interceptListingClick={ interceptListingClick }
+          userActivityPage={ userActivityPage }
         />
       </div>
       { contentOrNil }
