@@ -30,13 +30,18 @@ const renderErrorMessage = error => {
 };
 
 const renderBannerRow = (subreddit, theme) => {
-  const iconUrl = subreddit.iconImage;
+  let { iconImage, bannerImage } = subreddit;
+
+  if (subreddit.quarantine && !subreddit.quarantine_allow_sr_images) {
+    iconImage = '';
+    bannerImage = '';
+  }
 
   const iconStyle = {};
   const iconClass = ['CommunityHeader-banner-icon-holder'];
 
-  if (iconUrl) {
-    iconStyle.backgroundImage = `url(${iconUrl})`;
+  if (iconImage) {
+    iconStyle.backgroundImage = `url(${iconImage})`;
     iconClass.push('CommunityHeader-banner-icon-holder-image');
   }
 
@@ -55,9 +60,9 @@ const renderBannerRow = (subreddit, theme) => {
     }
   }
 
-  if (subreddit.bannerImage) {
+  if (bannerImage) {
     bannerClass.push('m-with-banner');
-    bannerStyle.backgroundImage = `url(${subreddit.bannerImage})`;
+    bannerStyle.backgroundImage = `url(${bannerImage})`;
   }
 
   return (
