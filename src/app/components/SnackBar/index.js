@@ -10,6 +10,7 @@ import {
 } from 'app/actions/xpromo';
 import { trackXPromoView } from 'lib/eventUtils';
 import { XPROMO_NAMES, SCALED_INFERENCE } from 'app/constants';
+import { setMetadata, reportOutcome } from 'app/actions/scaledInference';
 
 const HEADER_COPY = 'Open in the official Reddit app';
 const BODY_COPY = 'Fastest way to browse and packed with exclusive features like Chat and News.';
@@ -93,7 +94,8 @@ const mapDispatchToProps = {
     dispatch(hide());
     dispatch(promoDismissed());
   },
-
+  setMetadata,
+  reportOutcome,
   trackXPromoView: () => async (_, getState) => {
     return trackXPromoView(getState(), { interstitial_type: SCALED_INFERENCE.SNACKBAR });
   },
