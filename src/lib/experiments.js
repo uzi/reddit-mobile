@@ -1,4 +1,4 @@
-import { SCALED_INFERENCE } from 'app/constants';
+import { XPROMO } from 'app/constants';
 
 export function extractUser(state) {
   if (!state || !state.user || !state.accounts) {
@@ -41,7 +41,7 @@ export function getActiveExperimentVariant(state, experimentName) {
 }
 
 export function getExperimentVariant(state, experimentName) {
-  if (experimentName === SCALED_INFERENCE.EXPERIMENT) {
+  if (experimentName === XPROMO.EXPERIMENT) {
     const queryParams = state.platform.currentPage && state.platform.currentPage.queryParams;
 
     if (queryParams && queryParams.si_experiment) {

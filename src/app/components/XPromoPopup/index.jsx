@@ -8,7 +8,7 @@ import { getXPromoLinkforCurrentPage } from 'lib/xpromoState';
 import {
   listingClickModalDismissClicked,
 } from 'app/actions/xpromo';
-import { XPROMO_NAMES, SCALED_INFERENCE } from 'app/constants';
+import { XPROMO_NAMES, XPROMO } from 'app/constants';
 
 
 const { assetPath } = config;
@@ -19,7 +19,7 @@ const dispatcher = dispatch => ({
 
 function mapStateToProps (state) {
   const { active } = state.xpromo.listingClick;
-  const link = getXPromoLinkforCurrentPage(state, XPROMO_NAMES[SCALED_INFERENCE.NATIVE]);
+  const link = getXPromoLinkforCurrentPage(state, XPROMO_NAMES[XPROMO.NATIVE]);
   return { active, link };
 }
 

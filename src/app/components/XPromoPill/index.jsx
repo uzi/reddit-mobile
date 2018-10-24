@@ -11,7 +11,7 @@ import {
 } from 'app/actions/xpromo';
 
 import { trackXPromoView } from 'lib/eventUtils';
-import { SCALED_INFERENCE, XPROMO_NAMES } from 'app/constants';
+import { XPROMO, XPROMO_NAMES } from 'app/constants';
 
 
 class XPromoPill extends React.Component {
@@ -51,8 +51,8 @@ class XPromoPill extends React.Component {
 }
 
 const PARAMS = {
-  tags: [XPROMO_NAMES[SCALED_INFERENCE.PILL]],
-  utm_content: XPROMO_NAMES[SCALED_INFERENCE.PILL],
+  tags: [XPROMO_NAMES[XPROMO.PILL]],
+  utm_content: XPROMO_NAMES[XPROMO.PILL],
 };
 
 const mapStateToProps = (state) => {
@@ -66,7 +66,7 @@ const mapDispatchToProps = {
     dispatch(promoDismissed());
   },
   trackXPromoView: () => async (_, getState) => {
-    return trackXPromoView(getState(), { interstitial_type: SCALED_INFERENCE.PILL });
+    return trackXPromoView(getState(), { interstitial_type: XPROMO.PILL });
   },
 };
 

@@ -1,14 +1,14 @@
 import {
   PAGE_NAMES,
-  SCALED_INFERENCE,
+  XPROMO,
 } from 'app/constants';
 
 export const pageTypeSelector = state => {
   const currentPageURL = (state.platform.currentPage && state.platform.currentPage.url) || '';
   if (/\/r\/\w+\/comments/.test(currentPageURL)) {
-    return SCALED_INFERENCE.POST;
+    return XPROMO.POST;
   }
-  return SCALED_INFERENCE.LISTING;
+  return XPROMO.LISTING;
 };
 
 export const getCurrentSubreddit = state => {

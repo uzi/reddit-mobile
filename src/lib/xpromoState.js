@@ -30,7 +30,7 @@ import {
 
 import extractTaglist from 'lib/extractTagList';
 import {
-  SCALED_INFERENCE,
+  XPROMO,
   REVAMP_BRANCH_PARAMS,
   XPROMO_NAMES,
 } from '../app/constants';
@@ -93,8 +93,8 @@ export function getXPromoListingClickLink(state, postId, listingClickType) {
 
   return getXPromoLink(state, path, XPROMO_MODAL_LISTING_CLICK_NAME, {
     listing_click_type: listingClickType,
-    utm_content: XPROMO_NAMES[SCALED_INFERENCE.NATIVE],
-    tags: [XPROMO_NAMES[SCALED_INFERENCE.NATIVE]],
+    utm_content: XPROMO_NAMES[XPROMO.NATIVE],
+    tags: [XPROMO_NAMES[XPROMO.NATIVE]],
   });
 }
 

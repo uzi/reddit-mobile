@@ -13,11 +13,11 @@ import {
 import SnackBar from 'app/components/SnackBar';
 import XPromoPill from 'app/components/XPromoPill';
 import { pageTypeSelector } from 'app/selectors/platformSelector';
-import { SCALED_INFERENCE } from '../../constants';
+import { XPROMO } from '../../constants';
 import { isCurrentContentNSFW } from '../../selectors/platformSelector';
 import { getXPromoVariants } from '../../selectors/xpromo';
 
-const { CLASSIC, SNACKBAR, PILL } = SCALED_INFERENCE;
+const { CLASSIC, SNACKBAR, PILL } = XPROMO;
 
 function renderXPromo (componentName, children, isDisplay=false, mixin=false) {
   if (!isDisplay) { return null; }
@@ -33,7 +33,7 @@ function renderXPromo (componentName, children, isDisplay=false, mixin=false) {
     case CLASSIC:
       return <DualPartInterstitial mixin={ mixin }>{ children }</DualPartInterstitial>;
     case PILL:
-      return <XPromoPill active={ true } scaledInference={ true }/>;
+      return <XPromoPill active={ true } />;
     case SNACKBAR:
       return <SnackBar/>;
   }

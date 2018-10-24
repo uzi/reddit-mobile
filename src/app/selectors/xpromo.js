@@ -22,7 +22,7 @@ import { isInterstitialDimissed } from 'lib/xpromoState';
 import { trackXPromoIneligibleEvent } from 'lib/eventUtils';
 import { isCommentsPage } from 'platform/pageUtils';
 import { POST_TYPE } from 'apiClient/models/thingTypes';
-import { SCALED_INFERENCE } from 'app/constants';
+import { XPROMO } from 'app/constants';
 import { getXpromoClosingTime } from '../../lib/xpromoState';
 import { userAccountSelector } from 'app/selectors/userAccount';
 
@@ -266,7 +266,7 @@ export function commentsInterstitialEnabled(state) {
 export function listingClickEnabled(state, postId) {
   const variants = getXPromoVariants(state);
 
-  if (!variants[SCALED_INFERENCE.CLICK]) {
+  if (!variants[XPROMO.CLICK]) {
     return false;
   }
 
@@ -456,8 +456,8 @@ export function XPromoIsActive(state) {
   return isContentLoaded(state) && xpromoIsConfiguredOnPage(state) && state.xpromo.interstitials.showBanner;
 }
 
-const { CLICK, LISTING, POST, TOPBUTTON } = SCALED_INFERENCE;
-const { SNACKBAR, PILL, CLASSIC } = SCALED_INFERENCE;
+const { CLICK, LISTING, POST, TOPBUTTON } = XPROMO;
+const { SNACKBAR, PILL, CLASSIC } = XPROMO;
 
 const SPARKLE = 'pulse';
 

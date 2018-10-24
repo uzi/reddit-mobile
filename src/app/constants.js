@@ -326,9 +326,9 @@ export const VIDEO_WATCHED_SECONDS = [
   VIDEO_WATCHED_SECONDS_10,
 ];
 
-export const SCALED_INFERENCE = {
+export const XPROMO = {
   // experiment name
-  EXPERIMENT: 'scaled_inference_2',
+  EXPERIMENT: 'mweb_xpromo_revamp_v2',
 
   // scaled inference projects
   PROJECT_2: 'treatment_2',
@@ -353,15 +353,15 @@ export const SCALED_INFERENCE = {
 };
 
 export const XPROMO_NAMES = {
-  [SCALED_INFERENCE.TOPBUTTON]: 'topbutton',
-  [SCALED_INFERENCE.SNACKBAR]: 'snackbar',
-  [SCALED_INFERENCE.PILL]: 'pill',
-  [SCALED_INFERENCE.NATIVE]: 'app_selector_modal',
+  [XPROMO.TOPBUTTON]: 'topbutton',
+  [XPROMO.SNACKBAR]: 'snackbar',
+  [XPROMO.PILL]: 'pill',
+  [XPROMO.NATIVE]: 'app_selector_modal',
 };
 
-export const SCALED_INFERENCE_BRANCH_PARAMS = {
-  campaign: SCALED_INFERENCE.EXPERIMENT,
-  utm_name: SCALED_INFERENCE.EXPERIMENT,
+export const XPROMO_BRANCH_PARAMS = {
+  campaign: XPROMO.EXPERIMENT,
+  utm_name: XPROMO.EXPERIMENT,
   channel: 'xpromo',
   utm_source: 'xpromo',
   feature: 'mweb',

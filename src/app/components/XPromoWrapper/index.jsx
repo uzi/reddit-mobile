@@ -32,7 +32,7 @@ import {
   xpromoAdFeedVariant,
 } from 'app/selectors/xpromo';
 
-import { SCALED_INFERENCE } from 'app/constants';
+import { XPROMO } from 'app/constants';
 
 class XPromoWrapper extends React.Component {
   constructor(props) {
@@ -197,7 +197,7 @@ const selector = createStructuredSelector({
 
 const mapDispatchToProps = {
   trackXPromoView: () => async (_, getState) => {
-    return trackXPromoView(getState(), { interstitial_type: SCALED_INFERENCE.TRANSPARENT });
+    return trackXPromoView(getState(), { interstitial_type: XPROMO.TRANSPARENT });
   },
   trackXPromoEvent: (...args) => async(_, getState) => {
     return trackXPromoEvent(getState(), ...args);

@@ -9,8 +9,7 @@ import {
   promoDismissed,
 } from 'app/actions/xpromo';
 import { trackXPromoView } from 'lib/eventUtils';
-import { XPROMO_NAMES, SCALED_INFERENCE } from 'app/constants';
-import { setMetadata, reportOutcome } from 'app/actions/scaledInference';
+import { XPROMO_NAMES, XPROMO } from 'app/constants';
 
 const HEADER_COPY = 'Open in the official Reddit app';
 const BODY_COPY = 'Fastest way to browse and packed with exclusive features like Chat and News.';
@@ -76,9 +75,9 @@ class SnackBar extends React.Component {
 
 const mapStateToProps = (state) => {
   const href = getBranchLink(state, state.platform.currentPage.url, {
-    tags: [XPROMO_NAMES[SCALED_INFERENCE.SNACKBAR]],
-    utm_content: XPROMO_NAMES[SCALED_INFERENCE.SNACKBAR],
-  }, XPROMO_NAMES[SCALED_INFERENCE.SNACKBAR]);
+    tags: [XPROMO_NAMES[XPROMO.SNACKBAR]],
+    utm_content: XPROMO_NAMES[XPROMO.SNACKBAR],
+  }, XPROMO_NAMES[XPROMO.SNACKBAR]);
 
   const listingClickModalIsActive = state.xpromo.listingClick.active;
 
@@ -94,10 +93,9 @@ const mapDispatchToProps = {
     dispatch(hide());
     dispatch(promoDismissed());
   },
-  setMetadata,
-  reportOutcome,
+
   trackXPromoView: () => async (_, getState) => {
-    return trackXPromoView(getState(), { interstitial_type: SCALED_INFERENCE.SNACKBAR });
+    return trackXPromoView(getState(), { interstitial_type: XPROMO.SNACKBAR });
   },
 };
 

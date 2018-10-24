@@ -4,25 +4,20 @@ import cx from 'lib/classNames';
 import { connect } from 'react-redux';
 import { getTopButtonStyle } from 'app/selectors/xpromo';
 import { getBranchLink } from 'lib/xpromoState';
-import { reportOutcome } from 'app/actions/scaledInference';
-import { SCALED_INFERENCE, XPROMO_NAMES } from 'app/constants';
+import { XPROMO, XPROMO_NAMES } from 'app/constants';
 import { isOptOut } from 'app/selectors/xpromo';
 
 const mapStateToProps = state => {
   return {
     link: getBranchLink(state, state.platform.currentPage.url, {
-      tags: [XPROMO_NAMES[SCALED_INFERENCE.TOPBUTTON]],
-      utm_content: XPROMO_NAMES[SCALED_INFERENCE.TOPBUTTON],
+      tags: [XPROMO_NAMES[XPROMO.TOPBUTTON]],
+      utm_content: XPROMO_NAMES[XPROMO.TOPBUTTON],
     }),
 
     style: getTopButtonStyle(state),
 
     isOptOut: isOptOut(state),
   };
-};
-
-const mapDispatchToProps = {
-  reportOutcome,
 };
 
 const DisconnectedTopButton = props => {
@@ -35,4 +30,4 @@ const DisconnectedTopButton = props => {
   );
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(DisconnectedTopButton);
+export default connect(mapStateToProps)(DisconnectedTopButton);
