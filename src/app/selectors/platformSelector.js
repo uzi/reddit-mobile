@@ -1,3 +1,5 @@
+import { createSelector } from 'reselect';
+
 import {
   PAGE_NAMES,
   XPROMO,
@@ -10,6 +12,17 @@ export const pageTypeSelector = state => {
   }
   return XPROMO.LISTING;
 };
+
+// regexes borrowed from the router
+// ['/r/:subredditName/(w|wiki)/:path(.*)?', WikiPageHandler]
+// ['/(help|w|wiki)/:path(.*)?', WikiPageHandler]
+const WIKI_REGEX_1 = /^\/r\/\w+\/((w)|(wiki))/;
+const WIKI_REGEX_2 = /^((help)|(w)|(wiki))/;
+
+export const isWikiPage = createSelector(
+  state => state.platform.currentPage && state.platform.currentPage.url,
+  url => WIKI_REGEX_1.test(url) || WIKI_REGEX_2.test(url)
+);
 
 export const getCurrentSubreddit = state => {
   const regex = /\/r\/(\w+)/;
