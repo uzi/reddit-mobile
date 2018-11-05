@@ -92,7 +92,6 @@ export function getXPromoListingClickLink(state, postId, listingClickType) {
   const path = getXPromoListingClickPath(state, post, listingClickType);
 
   return getXPromoLink(state, path, XPROMO_MODAL_LISTING_CLICK_NAME, {
-    listing_click_type: listingClickType,
     utm_content: XPROMO_NAMES[XPROMO.NATIVE],
     tags: [XPROMO_NAMES[XPROMO.NATIVE]],
   });

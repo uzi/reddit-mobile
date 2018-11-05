@@ -4,12 +4,11 @@ import cx from 'lib/classNames';
 import { connect } from 'react-redux';
 import config from 'config';
 import SnooIcon from 'app/components/SnooIcon';
-import { getXPromoLinkforCurrentPage } from 'lib/xpromoState';
 import {
   listingClickModalDismissClicked,
 } from 'app/actions/xpromo';
-import { XPROMO_NAMES, XPROMO } from 'app/constants';
 
+import { getXPromoListingClickLink, getXPromoLinkforCurrentPage } from 'lib/xpromoState';
 
 const { assetPath } = config;
 
@@ -18,8 +17,17 @@ const dispatcher = dispatch => ({
 });
 
 function mapStateToProps (state) {
-  const { active } = state.xpromo.listingClick;
-  const link = getXPromoLinkforCurrentPage(state, XPROMO_NAMES[XPROMO.NATIVE]);
+  const { active, clickInfo } = state.xpromo.listingClick;
+
+  let link;
+
+  if (clickInfo) {
+    const { postId, listingClickType } = clickInfo;
+    link = getXPromoListingClickLink(state, postId, listingClickType);
+  } else {
+    link = getXPromoLinkforCurrentPage(state);
+  }
+
   return { active, link };
 }
 
