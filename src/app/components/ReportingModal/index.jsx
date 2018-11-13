@@ -77,6 +77,7 @@ class ReportingModal extends React.Component {
     const showReportFlow = !!sitewideRules.length;
     const rulesChosen = indexOfChosenChildRule !== null;
     const isFirstPage = !sequenceOfParentRules.length;
+    const currentRule = this.getCurrentRules()[indexOfChosenChildRule];
 
     return (
       <div className='ReportingModalWrapper' onClick={ onCloseReportFlow }>
@@ -93,12 +94,12 @@ class ReportingModal extends React.Component {
             ? (
               <div>
                 <div className='ReportingModal__file-prompt'>
-                  { this.getCurrentRules()[indexOfChosenChildRule].complaintPrompt }
+                  { currentRule.complaintPrompt }
                 </div>
                 <div className='ReportingModal__file-complaint-button'>
-                  <a href={ this.getCurrentRules()[indexOfChosenChildRule].complaintUrl }
+                  <a href={ currentRule.complaintUrl }
                      target='_blank'>
-                    FILE A COMPLAINT
+                    { currentRule.complaintButtonText }
                   </a>
                 </div>
               </div>
@@ -198,11 +199,14 @@ class ReportingModal extends React.Component {
   getCurrentHeader() {
     const {
       fileAComplaintPage,
+      indexOfChosenChildRule,
       sequenceOfParentRules,
     } = this.state;
 
+    const currentRule = this.getCurrentRules()[indexOfChosenChildRule];
+
     if (fileAComplaintPage) {
-      return 'File a complaint?';
+      return currentRule.complaintPageTitle;
     }
 
     if (!sequenceOfParentRules.length) {

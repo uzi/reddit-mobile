@@ -21,6 +21,8 @@ export default class SitewideRule extends RedditModel {
         fileComplaint: val.fileComplaint,
         complaintPrompt: val.complaintPrompt,
         complaintUrl: val.complaintUrl,
+        complaintButtonText: val.complaintButtonText,
+        complaintPageTitle: val.complaintPageTitle,
       });
     }),
     reasonText: T.string,
@@ -28,6 +30,8 @@ export default class SitewideRule extends RedditModel {
     fileComplaint: T.bool,
     complaintPrompt: T.string,
     complaintUrl: T.string,
+    complaintButtonText: T.string,
+    complaintPageTitle: T.string,
   };
 
   makeUUID(data) {
