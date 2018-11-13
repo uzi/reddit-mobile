@@ -122,16 +122,9 @@ export const setupGoogleTag = () => {
     }//www.googletagservices.com/tag/js/gpt.js`;
   const node = document.getElementsByTagName('script')[0];
   node.parentNode.insertBefore(gads, node);
-  const pageConfig = {
-    allowOverlayExpansion: false,
-    allowPushExpansion: false,
-    sandbox: true,
-  };
 
   googletag.cmd.push(function() {
     googletag.pubads().disableInitialLoad();
-    googletag.pubads().setForceSafeFrame(true);
-    googletag.pubads().setSafeFrameConfig(pageConfig);
     googletag.enableServices();
   });
 
