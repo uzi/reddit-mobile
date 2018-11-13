@@ -12,6 +12,7 @@ import * as modalActions from 'app/actions/modal';
 import * as reportingActions from 'app/actions/reporting';
 import Loading from 'app/components/Loading';
 import Report from 'app/models/Report';
+import { formatPythonString } from 'lib/formatPythonString';
 import { getSitewideRulesFromState } from 'lib/sitewideRules';
 import { getSubredditRulesFromState } from 'lib/subredditRules';
 
@@ -66,6 +67,7 @@ class ReportingModal extends React.Component {
     const {
       onCloseReportFlow,
       sitewideRules,
+      thingId,
     } = this.props;
 
     const {
@@ -97,7 +99,9 @@ class ReportingModal extends React.Component {
                   { currentRule.complaintPrompt }
                 </div>
                 <div className='ReportingModal__file-complaint-button'>
-                  <a href={ currentRule.complaintUrl }
+                {/* Server returns complaintUrls in the format of `/api/report_redirect?reason_code=SomeFileComplaintReason&thing=%(thing)s`
+                in order to track clicking of "File a complaint" button. Because of that we need to format it and put thingId inside */}
+                  <a href={ formatPythonString(decodeURI(currentRule.complaintUrl), { thing: thingId }) }
                      target='_blank'>
                     { currentRule.complaintButtonText }
                   </a>
