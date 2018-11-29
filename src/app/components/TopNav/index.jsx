@@ -4,6 +4,8 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
 
+import config from 'config';
+
 import { Anchor } from 'platform/components';
 import { METHODS } from 'platform/router';
 import * as platformActions from 'platform/actions';
@@ -95,7 +97,7 @@ export const TopNav = props => {
         >
           { feature.enabled(flags.MCDONALDS_CAMPAIGN) ?
             <img
-              src={ `${assetPath ? assetPath : ''}/img/mcdonalds-burger@2x.png` }
+              src={ `${config.assetPath}/img/mcdonalds-burger@2x.png` }
               className='TopNav-Mcdonalds'
             /> :
             <span className={ sideNavIcon }>
