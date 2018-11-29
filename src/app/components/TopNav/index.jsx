@@ -13,12 +13,16 @@ import cx from 'lib/classNames';
 import * as overlayActions from 'app/actions/overlay';
 import * as subscribedSubredditsActions from 'app/actions/subscribedSubreddits';
 
+import { flags } from 'app/constants';
+
 import Logo from 'app/components/Logo';
 import SnooIcon from 'app/components/SnooIcon';
 import XPromoTopButton from 'app/components/XPromoTopButton';
 
+import { featuresSelector } from 'app/selectors/features';
+
 export const TopNav = props => {
-  const { assetPath, overlay } = props;
+  const { assetPath, overlay, feature } = props;
 
   // NOTE: this isn't working (no user in props)
   let notificationsCount;
@@ -89,8 +93,15 @@ export const TopNav = props => {
           className='MobileButton TopNav-floaty'
           onClick={ toggleSettingsMenu }
         >
-          <span className={ sideNavIcon }></span>
-          { notificationsCount }
+          { feature.enabled(flags.MCDONALDS_CAMPAIGN) ?
+            <img
+              src={ `${assetPath ? assetPath : ''}/img/mcdonalds-burger@2x.png` }
+              className='TopNav-Mcdonalds'
+            /> :
+            <span className={ sideNavIcon }>
+            { notificationsCount }
+            </span>
+          }
         </div>
       </div>
     </nav>
@@ -100,8 +111,9 @@ export const TopNav = props => {
 const mapStateToProps = createSelector(
   state => state.overlay,
   state => state.session.isValid,
-  (overlay, isLoggedIn) => {
-    return { overlay, isLoggedIn };
+  featuresSelector,
+  (overlay, isLoggedIn, feature) => {
+    return { overlay, isLoggedIn, feature };
   },
 );
 

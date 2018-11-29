@@ -85,6 +85,7 @@ const {
   VARIANT_XPROMO_AD_FEED_IOS,
   VARIANT_XPROMO_AD_FEED_ANDROID,
 
+  MCDONALDS_CAMPAIGN,
 } = flagConstants;
 
 const config = {
@@ -494,6 +495,18 @@ const config = {
       ] },
     ],
   },
+  [MCDONALDS_CAMPAIGN]: {
+    url: 'mcdonalds_campaign',
+    and: [
+      { country: 'US' },
+      { timeframe: [
+        // 12/03/2018 @ 5:00am (UTC) / 12/03/2018 @ 12:00am (EST)
+        1543813200000,
+        // 12/04/2018 @ 5:00am (UTC) / 12/04/2018 @ 12:00am (EST)
+        1543899600000,
+      ] },
+    ],
+  },
 };
 
 const flags = new Flags(config);
@@ -792,3 +805,16 @@ export const isNSFWPage = state => {
 };
 
 export default flags;
+
+flags.addRule('country', function(country) {
+  return this.state.meta.country === country;
+});
+
+
+const NOW = Date.now();
+flags.addRule('timeframe', function(timeframeTuple) {
+  const start = timeframeTuple[0];
+  const end = timeframeTuple[1];
+  return NOW > start && NOW < end;
+});
+

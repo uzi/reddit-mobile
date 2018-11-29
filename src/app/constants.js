@@ -207,6 +207,8 @@ export const flags = {
   // xpromo revamp
   VARIANT_XPROMO_REVAMP: 'mwebXpromoRevamp',
   VARIANT_XPROMO_REVAMP_2: 'mwebXpromoRevamp2',
+
+  MCDONALDS_CAMPAIGN: 'mcdonaldsCampaign',
 };
 
 // Now we have 2 different types of XPromo

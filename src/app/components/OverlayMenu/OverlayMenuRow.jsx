@@ -37,6 +37,10 @@ function iconOrSpacerFromProps(props) {
       backgroundStyle.backgroundColor = props.iconBackgroundColor;
     }
 
+    if (props.iconWidth) {
+      backgroundStyle.width = props.iconWidth;
+    }
+
     iconContent = (
       <span
         className='OverlayMenu-icon OverlayMenu-icon-img'
@@ -96,6 +100,7 @@ LinkRow.propTypes = {
   noRoute: T.bool,
   clickHandler: T.func,
   onClick: T.func,
+  iconWidth: T.number,
 };
 
 function LinkRow(props) {

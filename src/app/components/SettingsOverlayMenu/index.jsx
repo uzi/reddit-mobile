@@ -7,10 +7,12 @@ import titleCase from 'lib/titleCase';
 import { urlWith } from 'lib/urlWith';
 import OverlayMenu from 'app/components/OverlayMenu';
 import { LinkRow, ButtonRow, ExpandoRow } from 'app/components/OverlayMenu/OverlayMenuRow';
+import ClaimCheeseburger from 'app/components/ClaimCheeseburger';
 import menuItems from './SettingsOverlayMenuItems';
-import { COLOR_SCHEME } from 'app/constants';
+import { COLOR_SCHEME, flags } from 'app/constants';
 import { userAccountSelector } from 'app/selectors/userAccount';
 import { showXPromoOptOutMenuLink } from 'app/selectors/xpromo';
+import { featuresSelector } from 'app/selectors/features';
 import { setXPromoOptout } from 'app/actions/optOuts';
 import config from 'config';
 const { NIGHTMODE } = COLOR_SCHEME;
@@ -107,12 +109,21 @@ export const renderLoggedInUserRows = (user) => {
 };
 
 export const SettingsOverlayMenu = (props) => {
-  const { compact, theme, pageData, user, optOut } = props;
+  const { compact, theme, pageData, user, optOut, feature } = props;
   const { url, queryParams } = pageData;
   const desktopRedirectParams = { ...queryParams, ...DESKTOP_TRACKING_PARAMS };
-
   return (
     <OverlayMenu>
+      { feature.enabled(flags.MCDONALDS_CAMPAIGN) &&
+        <LinkRow
+          key='mcdonalds-campaign'
+          href='https://smart.link/5b86b5c671171'
+          text={ <ClaimCheeseburger /> }
+          iconURL={ `${config.assetPath}/img/mcdonalds-snoo@2x.png` }
+          noRoute
+          iconWidth='22px'
+        />
+      }
       {
         user ? renderLoggedInUserRows(user) : renderLoginRow()
       }
@@ -171,14 +182,15 @@ export const SettingsOverlayMenu = (props) => {
   );
 };
 
-
 const selector = createSelector(
   state => state.compact,
   state => state.theme,
   state => state.platform.currentPage,
   showXPromoOptOutMenuLink,
   userAccountSelector,
-  (compact, theme, pageData, optOut, user) => ({ compact, theme, pageData, optOut, user }),
+  featuresSelector,
+  (compact, theme, pageData, optOut, user, feature) =>
+    ({ compact, theme, pageData, optOut, user, feature }),
 );
 
 const dispatcher = dispatch => ({
